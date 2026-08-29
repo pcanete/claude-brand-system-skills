@@ -107,6 +107,36 @@ contrato.
 
 ---
 
+---
+
+## wordpress-publisher
+
+### La portada publicada se verifica sin sesión
+
+Con sesión iniciada, WordPress carga estilos que un visitante nunca recibe: la
+barra de administración y lo que cada plugin sume para usuarios logueados. La
+portada puede verse distinta —tipografías, colores de botones— sin que nada
+esté mal para el público.
+
+Quien publica suele estar logueado, así que es la vista equivocada para
+verificar. **La comprobación se hace en una ventana privada.**
+
+Pasó en un caso real: dos plugins distintos mostraron el mismo síntoma, se
+buscó la causa en el empaquetado, y la versión anónima estaba correcta desde el
+principio.
+
+### Verificación de paridad entre lo local y lo publicado
+
+Falta la compuerta entre exportar el plugin y darlo por bueno: comparar el
+sitio construido con la portada ya publicada y listar qué elementos difieren en
+familia tipográfica, tamaño, peso o tracking.
+
+El método está probado —recorrer los elementos de texto de las dos URLs y
+comparar sus estilos computados— y detecta en segundos lo que hoy se descubre
+mirando. Con una condición que este caso dejó clara: **la comparación se hace
+contra la versión anónima del sitio publicado**, porque es la única que
+representa lo que ve un visitante.
+
 ## Transversales
 
 ### El peso de los skills
