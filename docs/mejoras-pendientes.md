@@ -159,22 +159,27 @@ checkpoint deja de significar algo.
 
 **Origen:** misma auditoría. La asimetría es visible en el propio esquema.
 
-### Las observaciones y los datos siguen siendo dos vocabularios
+### Qué se demuestra y qué se puede citar
 
-La compuerta nueva del escáner obliga a que la ruta de una observación resuelva
-en el documento, así que el índice ya no puede derivar a una lista de etiquetas.
-Lo que no resuelve es el otro lado: `reference-lab-builder` puede demostrar
-cualquier dato registrado y `reference-to-astro` solo puede citar observaciones.
-Los dos criterios son correctos por separado —demostrar no es justificar— pero
-quien escribe los dos contratos del mismo proyecto sigue teniendo que saber en
-qué vocabulario está.
+`reference-lab-builder` puede demostrar cualquier dato registrado;
+`reference-to-astro` solo puede citar observaciones. Los dos criterios son
+correctos por separado —demostrar no es justificar— y la distancia entre ellos
+resultó ser más chica de lo que parecía.
 
-Hoy el blueprint sugiere las observaciones cercanas cuando la ruta no existe, y
-los dos resuelven las rutas con la misma semántica. Falta decidir si eso alcanza
-o si el laboratorio debería marcar qué demos se apoyan en observaciones y
-cuáles solo en datos registrados, para que la diferencia se vea sin leer código.
+Medido sobre un proyecto real, antes y después de corregir las rutas de
+observación de su escaneo: las rutas compartidas entre el laboratorio y el
+blueprint pasaron de 0 a 5, y las del laboratorio que además son observaciones,
+de 0 a 8 sobre 18. La mayor parte de lo que parecían dos vocabularios era el
+índice mal direccionado, que la compuerta 7 ahora impide.
 
-**Origen:** primer SITE_BLUEPRINT contra contratos reales, 2026-08-29.
+Lo que queda es legítimo: 10 rutas que el laboratorio demuestra y el escáner
+nunca promovió a observación. Falta decidir si el laboratorio debería marcar
+cuáles de sus demos se apoyan en una observación con evidencia y cuáles solo en
+un dato registrado, para que la diferencia se vea sin leer código. Es una
+distinción real y hoy la página no la muestra.
+
+**Origen:** primer SITE_BLUEPRINT contra contratos reales, 2026-08-29, y la
+migración del escaneo que siguió.
 
 ### Las auditorías de comportamiento no se pueden citar como evidencia
 
