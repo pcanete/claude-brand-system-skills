@@ -3,7 +3,7 @@ name: reference-to-astro
 description: Builds a website in Astro from an analyzed reference and an approved SITE_BLUEPRINT that maps client content to evidenced visual, responsive and behavioral patterns. Use when reference contracts and real content must become a verified implementation. Not for inventing a visual direction, scanning the reference, or packaging the result for WordPress.
 license: MIT
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
 ---
 
 # Reference-to-Astro
@@ -71,8 +71,9 @@ at the points named below.
 | `node scripts/audit-assets.mjs` | once supplied media is wired in |
 | `node scripts/visual-qa.mjs` | during QA, once the site serves |
 | `node scripts/build-content-architecture.mjs` | before implementation, to review routes, content mapping and conversion paths |
+| `node scripts/review-changeset.mjs` | after an external HTML editor returns an edited copy |
 
-All four accept `--project <dir>` and write their reports under `qa/` in that
+The first four accept `--project <dir>` and write their reports under `qa/` in that
 project. Install their dependencies once with `npm install` inside the skill
 directory.
 
@@ -266,6 +267,25 @@ Give every user-reviewable content or structural region a stable semantic
 `data-rta-id`. Read `references/stable-review-anchors.md`. These identifiers
 must survive Astro compilation so a later HTML review can describe changes
 without treating compiled HTML as source.
+
+When an external editor returns an edited copy, turn it into a changeset before
+touching anything:
+
+```bash
+node scripts/review-changeset.mjs --original dist/index.html   --edited revision/edited.html --out REVIEW_CHANGESET.json
+```
+
+It reads both files with JavaScript disabled and compares by `data-rta-id`. That
+matters because an editor exports the live DOM, so the site's own runtime state
+— transition classes, initialisation flags, inline styles written while
+scrolling — comes back looking like authored markup. State spread across several
+elements is filtered and reported; state living on a single element is flagged
+by naming convention and left for a person to judge. A project can declare its
+own runtime vocabulary with `--ignore-classes` and `--ignore-attributes`.
+
+The changeset is not applied automatically. Translating a CSS rule into the
+component that owns it, in the units that component already uses, is a
+judgement. What the script removes is the guessing about *what* changed.
 
 ## Design tokens
 

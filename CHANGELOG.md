@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+`reference-to-astro` 1.4.0 — traducir de vuelta lo que devuelve un editor externo
+
+Probado contra VvvebJs y la portada compilada de un sitio real. El editor
+preserva los `data-rta-id`: las 42 anclas sobreviven a la exportación y 39
+salen byte a byte idénticas. Lo que no sobrevive intacto es todo lo demás.
+
+**Exportar serializa el DOM vivo**, así que el estado momentáneo del sitio queda
+horneado como si fuera markup escrito. En una exportación sin editar nada
+aparecieron 13 elementos con una clase de transición de página, 36 estilos
+inline que había escrito el script de scroll, y varios atributos de
+inicialización. Publicar eso como fuente deja el sitio con una transición a
+medio salir, permanente.
+
+`review-changeset.mjs` compara por ancla, con JavaScript apagado para que
+parsear no ejecute el sitio. El estado repartido entre varios elementos se
+filtra y se informa; el que vive en un solo elemento —un header compactado, un
+ítem activo— se marca por convención de nombres y se deja para que lo juzgue una
+persona, en vez de descartarlo en silencio. Un proyecto puede declarar su
+vocabulario de runtime con `--ignore-classes` e `--ignore-attributes`.
+
+Sobre una edición real de tres ajustes, devolvió la regla CSS exacta que se
+tocó, sin un solo falso positivo.
+
+No aplica nada por su cuenta. Traducir una regla CSS al componente que la posee,
+en las unidades que ese componente ya usa, es un juicio. Lo que el script saca
+del medio es adivinar *qué* cambió.
+
+Y deja medido el límite: 42 anclas sobre 582 elementos. Lo que ocurra fuera de
+un ancla no se puede atribuir, y eso es una carencia del build, no del editor.
+
 `visual-tuning-kit` 0.6.0, `reference-to-astro` 1.3.0 — auditoría cruzada: el editor de la otra línea, y el checkpoint que faltaba
 
 La línea de Codex adoptó `derive-schema.mjs`, `map-content.mjs`, el enum de

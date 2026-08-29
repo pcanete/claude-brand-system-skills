@@ -8,7 +8,7 @@ Cada skill se versiona por separado.
 | brand-manual-builder | 0.1.0 | Brand manual spec 0.1.x |
 | reference-scanner | 0.8.0 | Web reference schemas 0.3.x |
 | reference-lab-builder | 0.2.1 | Reference lab spec 0.1.x |
-| reference-to-astro | 1.3.0 | Web reference schemas 0.3.x, SITE_BLUEPRINT 0.1.x |
+| reference-to-astro | 1.4.0 | Web reference schemas 0.3.x, SITE_BLUEPRINT 0.1.x |
 | visual-tuning-kit | 0.6.0 | Tuning contract 0.1 |
 | wordpress-publisher | 0.3.0 | Plugin template 0.1.x |
 
