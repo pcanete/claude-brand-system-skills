@@ -3,7 +3,7 @@ name: reference-lab-builder
 description: Turns evidence-backed STYLE_DNA and REFERENCE_EVIDENCE into a neutral interactive reference lab where typography, components, responsive states, motion, and behaviors can be inspected and approved before target content is applied. Use after reference-scanner and before SITE_BLUEPRINT. Not for scanning the source site, reproducing its content or brand, building the final customer website, or packaging WordPress.
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # Reference Lab Builder

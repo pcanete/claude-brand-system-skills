@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+`reference-scanner` 0.8.0, `reference-to-astro` 1.1.0 — una observación tiene que apuntar a lo que el documento dice
+
+**Compuerta 7: las rutas de observación resuelven en el documento.**
+`observations[].path` es la dirección que los demás skills citan para justificar
+una decisión. Si no resuelve, el escáner afirmó algo que no escribió, y el
+índice queda como una lista de etiquetas donde quien cita no tiene dónde mirar.
+
+Contra un escaneo forense real, **9 de 21 observaciones no resolvían**: la
+observación se llamaba `motion.process_cards` y el dato vivía en
+`motion.scroll.process`. Ninguna compuerta lo veía. El fixture del propio
+repositorio tenía cuatro casos del mismo tipo, por un guion bajo donde iba un
+guion medio.
+
+Incluye lo ausente: observar que no hay video es un hallazgo, y el lugar de un
+hallazgo es el documento. Se registra el dato y la observación lo señala.
+
+**Un resolvedor de rutas que entiende arreglos por id.** `components` es un
+arreglo de objetos con `id`, así que `components.global-header.states` no
+resolvía con un descenso por claves. Ahora un segmento puede ser una clave o el
+id de un elemento. `reference-lab-builder` 0.2.1 usa la misma semántica: un spec
+que cita un componente ya no pasa en un skill y falla en el otro.
+
+**El blueprint sugiere las observaciones cercanas.** Citar una ruta que existe
+como dato pero no como observación devolvía `unknown STYLE_DNA path` y nada más;
+quien escribe el contrato no tiene cómo saber el nombre que le puso el escáner.
+Ahora el error lista las candidatas, con la que comparte la hoja primero.
+
 `reference-lab-builder` 0.2.0 — cuatro demos mostraban algo distinto de lo que declaraban
 
 El primer uso contra un escaneo real —siete demos sobre 27 rutas de STYLE_DNA y

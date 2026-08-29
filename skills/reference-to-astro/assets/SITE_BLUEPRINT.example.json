@@ -88,7 +88,7 @@
               "rationale": "The target hero needs the same editorial dominance without reusing the reference content."
             },
             {
-              "style_path": "media.sequences.object_process",
+              "style_path": "media.sequences.object-process-sequence",
               "application": ["media", "motion"],
               "mode": "adaptive",
               "evidence_refs": ["synthetic-media-sequence"],

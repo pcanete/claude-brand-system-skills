@@ -159,30 +159,22 @@ checkpoint deja de significar algo.
 
 **Origen:** misma auditoría. La asimetría es visible en el propio esquema.
 
-### Un STYLE_DNA, dos espacios de nombres incompatibles
+### Las observaciones y los datos siguen siendo dos vocabularios
 
-`reference-lab-builder` valida sus `source_paths` resolviéndolos en el árbol del
-documento. `reference-to-astro` valida sus `style_path` contra el índice de
-`observations`. Son dos espacios distintos, y ninguno contiene al otro.
+La compuerta nueva del escáner obliga a que la ruta de una observación resuelva
+en el documento, así que el índice ya no puede derivar a una lista de etiquetas.
+Lo que no resuelve es el otro lado: `reference-lab-builder` puede demostrar
+cualquier dato registrado y `reference-to-astro` solo puede citar observaciones.
+Los dos criterios son correctos por separado —demostrar no es justificar— pero
+quien escribe los dos contratos del mismo proyecto sigue teniendo que saber en
+qué vocabulario está.
 
-Medido sobre un escaneo real de 178 rutas y 21 observaciones: **11 de las 21
-rutas de observación no resuelven en el árbol** —`motion.process_cards` no
-existe como dato; el dato vive en `motion.scroll.process`— y **ninguna de las 6
-rutas citadas en el laboratorio está en observations**.
+Hoy el blueprint sugiere las observaciones cercanas cuando la ruta no existe, y
+los dos resuelven las rutas con la misma semántica. Falta decidir si eso alcanza
+o si el laboratorio debería marcar qué demos se apoyan en observaciones y
+cuáles solo en datos registrados, para que la diferencia se vea sin leer código.
 
-Quien escribe los dos contratos del mismo proyecto tiene que saber que el mismo
-concepto tiene dos nombres según qué archivo esté escribiendo, y ningún
-validador puede decirle el nombre que espera el otro.
-
-La regla del blueprint es la correcta —solo se cita lo que el escáner registró
-como observado y respaldado— así que la salida no es relajarla sino que las dos
-converjan ahí. Lo que falta es una compuerta barata del lado del escáner: la
-ruta de una observación tiene que resolver en el documento que anota. Hoy nada
-lo comprueba, y por eso las observaciones derivaron a ser etiquetas.
-
-**Origen:** primer SITE_BLUEPRINT escrito contra contratos reales, 2026-08-29.
-Se descubrió porque el blueprint rechazó rutas que el laboratorio había aceptado
-media hora antes.
+**Origen:** primer SITE_BLUEPRINT contra contratos reales, 2026-08-29.
 
 ### Las auditorías de comportamiento no se pueden citar como evidencia
 

@@ -205,6 +205,29 @@ function checkBlueprintContentCoverage(blueprint, content) {
   return issues;
 }
 
+// El blueprint solo cita rutas del índice de observaciones: no alcanza con que
+// la ruta exista como dato. Quien escribe el contrato no tiene cómo saber el
+// nombre que el escáner le puso, así que se lo decimos.
+function nearestPaths(wanted, available) {
+  const parts = String(wanted).split(".");
+  const leaf = parts[parts.length - 1];
+
+  // Primero las que comparten la hoja —`motion.scroll.process` contra
+  // `motion.process_cards`, que es el caso real— y después el resto de la zona.
+  const scored = [...available]
+    .map((candidate) => {
+      const sharesLeaf = candidate.split(".").some((segment) => segment.includes(leaf) || leaf.includes(segment));
+      const sharesRoot = candidate.split(".")[0] === parts[0];
+      return { candidate, score: (sharesLeaf ? 2 : 0) + (sharesRoot ? 1 : 0) };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (!scored.length) return "";
+  return `
+      observaciones cercanas: ${scored.slice(0, 5).map((item) => item.candidate).join(", ")}`;
+}
+
 function checkBlueprintReferenceIntegrity(blueprint, style, evidence) {
   const issues = [];
   const stylePaths = new Set((style.observations || []).map((item) => item.path));
@@ -216,7 +239,8 @@ function checkBlueprintReferenceIntegrity(blueprint, style, evidence) {
       for (const pattern of section.reference_patterns || []) {
         if (!stylePaths.has(pattern.style_path)) {
           issues.push(
-            `${pageId}/${section.id}: unknown STYLE_DNA path '${pattern.style_path}'`
+            `${pageId}/${section.id}: unknown STYLE_DNA path '${pattern.style_path}'` +
+              nearestPaths(pattern.style_path, stylePaths)
           );
         }
         for (const ref of pattern.evidence_refs || []) {

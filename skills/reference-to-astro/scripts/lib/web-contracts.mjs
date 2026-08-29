@@ -343,6 +343,54 @@ export function checkClaimedAreasBacked(style) {
   return issues;
 }
 
+// Resuelve una ruta con puntos dentro del documento. Un segmento puede ser una
+// clave de objeto o el `id` de un elemento de un arreglo, que es como el
+// contrato guarda los componentes: `components.global-header.states`.
+export function resolvePath(document, dottedPath) {
+  let node = document;
+
+  for (const segment of String(dottedPath).split(".")) {
+    if (node && typeof node === "object" && !Array.isArray(node) && segment in node) {
+      node = node[segment];
+      continue;
+    }
+
+    if (Array.isArray(node)) {
+      const match = node.find((item) => item && typeof item === "object" && item.id === segment);
+      if (match !== undefined) {
+        node = match;
+        continue;
+      }
+    }
+
+    return { found: false, stoppedAt: segment };
+  }
+
+  return { found: true, value: node };
+}
+
+// GATE 7 — Las observaciones apuntan a lo que el documento dice.
+// `observations[].path` es la dirección que otros skills citan para justificar
+// una decisión. Si no resuelve, el escáner afirmó algo que no escribió: el
+// índice queda como una lista de etiquetas y quien cita no tiene dónde mirar.
+//
+// Incluye lo ausente. Observar que no hay video es un hallazgo, y el lugar de
+// un hallazgo es el documento: se registra el dato y la observación lo señala.
+export function checkObservationPathsResolve(style) {
+  const issues = [];
+
+  for (const observation of style.observations || []) {
+    const { found, stoppedAt } = resolvePath(style, observation.path);
+    if (!found) {
+      issues.push(
+        `${observation.path}: no resuelve en el documento (se corta en '${stoppedAt}')`
+      );
+    }
+  }
+
+  return issues;
+}
+
 export function verifyWebContracts(style, evidence, { strict = true } = {}) {
   const groups = [
     {
@@ -373,6 +421,11 @@ export function verifyWebContracts(style, evidence, { strict = true } = {}) {
     {
       label: "Claimed areas are backed by evidence",
       issues: checkClaimedAreasBacked(style),
+      strictOnly: true
+    },
+    {
+      label: "Observation paths resolve in the document",
+      issues: checkObservationPathsResolve(style),
       strictOnly: true
     }
   ];

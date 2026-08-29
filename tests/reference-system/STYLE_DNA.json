@@ -146,7 +146,7 @@
       "notes": ""
     },
     {
-      "path": "interaction.filtering.gallery",
+      "path": "interaction.filtering.gallery-filter",
       "value": [
         "Context",
         "Detail",
@@ -162,7 +162,7 @@
       "notes": ""
     },
     {
-      "path": "interaction.direct_manipulation.product",
+      "path": "interaction.direct_manipulation.product-drag",
       "value": "drag-based spatial inspection",
       "mode": "inferred",
       "confidence": 0.72,
@@ -174,7 +174,7 @@
       "notes": "Rendering technology remains unknown."
     },
     {
-      "path": "media.sequences.object_process",
+      "path": "media.sequences.object-process-sequence",
       "value": "explicitly ordered three-step transformation sequence",
       "mode": "exact",
       "confidence": 0.99,
@@ -186,7 +186,7 @@
       "notes": ""
     },
     {
-      "path": "media.interactive_scenes.product_viewer",
+      "path": "media.interactive_scenes.product-viewer",
       "value": "drag-inspected product scene",
       "mode": "inferred",
       "confidence": 0.72,

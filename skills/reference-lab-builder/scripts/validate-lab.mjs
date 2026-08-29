@@ -20,8 +20,28 @@ async function readJson(file) {
   catch (error) { throw new Error(`Unable to read JSON: ${absolute}\n${error.message}`); }
 }
 
+// Misma semántica de resolución que el resto de la cadena: un segmento puede
+// ser una clave de objeto o el `id` de un elemento de un arreglo. Sin esto, un
+// spec que cita un componente pasa en un skill y falla en el otro.
 function getPath(object, dottedPath) {
-  return dottedPath.split(".").reduce((value, key) => value?.[key], object);
+  let node = object;
+
+  for (const segment of String(dottedPath).split(".")) {
+    if (node && typeof node === "object" && !Array.isArray(node) && segment in node) {
+      node = node[segment];
+      continue;
+    }
+    if (Array.isArray(node)) {
+      const match = node.find((item) => item && typeof item === "object" && item.id === segment);
+      if (match !== undefined) {
+        node = match;
+        continue;
+      }
+    }
+    return undefined;
+  }
+
+  return node;
 }
 
 function collectIds(node, ids = new Set()) {

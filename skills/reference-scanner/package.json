@@ -1,6 +1,6 @@
 {
   "name": "reference-scanner-skill",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "description": "Evidence-driven Agent Skill for analysing reference websites",
