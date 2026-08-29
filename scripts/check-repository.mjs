@@ -75,7 +75,9 @@ for (const file of files.filter((item) => item.endsWith(".mjs"))) {
 
 const skillNames = [
   "brand-dna-scanner",
+  "brand-manual-builder",
   "reference-scanner",
+  "reference-lab-builder",
   "reference-to-astro",
   "visual-tuning-kit",
   "wordpress-publisher"
@@ -289,6 +291,46 @@ const builderValidator = path.join(
   "validate-inputs.mjs"
 );
 
+const manualValidator = path.join(
+  root,
+  "skills",
+  "brand-manual-builder",
+  "scripts",
+  "validate-manual.mjs"
+);
+
+const manualBuilder = path.join(
+  root,
+  "skills",
+  "brand-manual-builder",
+  "scripts",
+  "build-manual.mjs"
+);
+
+const labValidator = path.join(
+  root,
+  "skills",
+  "reference-lab-builder",
+  "scripts",
+  "validate-lab.mjs"
+);
+
+const labBuilder = path.join(
+  root,
+  "skills",
+  "reference-lab-builder",
+  "scripts",
+  "build-lab.mjs"
+);
+
+const approvedBlueprint = path.join(
+  root,
+  "skills",
+  "reference-to-astro",
+  "assets",
+  "SITE_BLUEPRINT.example.json"
+);
+
 const brandExamples = [
   "--dna",
   path.join(root, "skills", "brand-dna-scanner", "examples", "BRAND_DNA.example.json"),
@@ -308,6 +350,86 @@ runNode("Brand DNA example rejected by its own validator", [
   ...brandExamples
 ]);
 
+const manualExample = [
+  "--dna",
+  path.join(root, "skills", "brand-dna-scanner", "examples", "BRAND_DNA.example.json"),
+  "--evidence",
+  path.join(root, "skills", "brand-dna-scanner", "examples", "BRAND_EVIDENCE.example.json"),
+  "--spec",
+  path.join(root, "skills", "brand-manual-builder", "assets", "BRAND_MANUAL_SPEC.example.json")
+];
+
+// Cada contrato con aprobación se prueba en los dos sentidos: el borrador tiene
+// que rechazarse cuando se lo presenta como aprobado, y tiene que pasar cuando
+// se lo prepara. Probar un solo sentido deja pasar un validador que siempre
+// dice que no.
+runNode("Draft brand manual rejected in review mode", [
+  manualValidator,
+  ...manualExample
+], { expect: "fail" });
+
+runNode("Draft brand manual rejected in preparation mode", [
+  manualValidator,
+  ...manualExample,
+  "--allow-draft"
+]);
+
+const manualBuildRoot = fs.mkdtempSync(path.join(os.tmpdir(), "brand-manual-build-"));
+runNode("Brand manual example failed to render", [
+  manualBuilder,
+  ...manualExample,
+  "--out",
+  manualBuildRoot
+]);
+
+if (!fs.existsSync(path.join(manualBuildRoot, "index.html"))) {
+  fail("Brand manual builder produced no index.html");
+}
+
+if (!fs.existsSync(path.join(manualBuildRoot, "BRAND_MANUAL.json"))) {
+  fail("Brand manual builder produced no BRAND_MANUAL.json");
+}
+
+fs.rmSync(manualBuildRoot, { recursive: true, force: true });
+
+const labExample = [
+  "--style",
+  path.join(root, "tests", "reference-system", "STYLE_DNA.json"),
+  "--evidence",
+  path.join(root, "tests", "reference-system", "REFERENCE_EVIDENCE.json"),
+  "--spec",
+  path.join(root, "skills", "reference-lab-builder", "assets", "REFERENCE_LAB_SPEC.example.json")
+];
+
+runNode("Draft reference lab was accepted in approval mode", [
+  labValidator,
+  ...labExample
+], { expect: "fail" });
+
+runNode("Draft reference lab failed preparation validation", [
+  labValidator,
+  ...labExample,
+  "--allow-draft"
+]);
+
+const labBuildRoot = fs.mkdtempSync(path.join(os.tmpdir(), "reference-lab-build-"));
+runNode("Reference lab example failed to render", [
+  labBuilder,
+  ...labExample,
+  "--out",
+  labBuildRoot
+]);
+
+if (!fs.existsSync(path.join(labBuildRoot, "index.html"))) {
+  fail("Reference lab builder produced no index.html");
+}
+
+if (!fs.existsSync(path.join(labBuildRoot, "REFERENCE_LAB.json"))) {
+  fail("Reference lab builder produced no REFERENCE_LAB.json");
+}
+
+fs.rmSync(labBuildRoot, { recursive: true, force: true });
+
 runNode("Scan artifacts fixture rejected by reference-scanner", [
   scannerValidator,
   ...webFixtures("reference-system")
@@ -319,8 +441,54 @@ runNode("Reference-system fixture rejected by reference-to-astro", [
   builderValidator,
   ...webFixtures("reference-system"),
   "--content",
-  path.join(root, "tests", "reference-system", "CONTENT_MANIFEST.json")
+  path.join(root, "tests", "reference-system", "CONTENT_MANIFEST.json"),
+  "--blueprint",
+  approvedBlueprint
 ]);
+
+// El borrador se fabrica degradando el ejemplo aprobado: así los dos fixtures
+// no pueden diferir en nada más que el estado de aprobación.
+const blueprintGateRoot = fs.mkdtempSync(
+  path.join(os.tmpdir(), "site-blueprint-gate-")
+);
+const draftBlueprint = path.join(blueprintGateRoot, "SITE_BLUEPRINT.json");
+const draftBlueprintDocument = JSON.parse(read(approvedBlueprint));
+draftBlueprintDocument.approval = {
+  status: "draft",
+  approved_by: null,
+  approved_at: null,
+  notes: "Awaiting human review."
+};
+draftBlueprintDocument.checkpoints.find(
+  (checkpoint) => checkpoint.id === "reference-lab"
+).status = "pending";
+fs.writeFileSync(
+  draftBlueprint,
+  `${JSON.stringify(draftBlueprintDocument, null, 2)}
+`
+);
+
+const blueprintGateArgs = [
+  builderValidator,
+  ...webFixtures("reference-system"),
+  "--content",
+  path.join(root, "tests", "reference-system", "CONTENT_MANIFEST.json"),
+  "--blueprint",
+  draftBlueprint
+];
+
+runNode(
+  "Draft SITE_BLUEPRINT was accepted for construction",
+  blueprintGateArgs,
+  { expect: "fail" }
+);
+
+runNode("Draft SITE_BLUEPRINT cannot be validated as work in progress", [
+  ...blueprintGateArgs,
+  "--lenient"
+]);
+
+fs.rmSync(blueprintGateRoot, { recursive: true, force: true });
 
 // The gates are the product. These fixtures must fail, and must fail only
 // because of the gates: in lenient mode they are well-formed.

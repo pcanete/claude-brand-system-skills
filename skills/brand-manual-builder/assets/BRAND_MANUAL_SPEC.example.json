@@ -1,0 +1,101 @@
+{
+  "version": "0.1",
+  "project": {
+    "brand_name": "Example Brand",
+    "objective": "Make the supported identity system visible and reviewable before production.",
+    "generated_from": {
+      "brand_dna": "BRAND_DNA.json",
+      "brand_evidence": "BRAND_EVIDENCE.json"
+    }
+  },
+  "theme": {
+    "canvas": "#F2F0EA",
+    "ink": "#151515",
+    "muted": "#6D6A63",
+    "accent": "#E34B2F",
+    "border": "#CBC7BE",
+    "display_family": "Arial, sans-serif",
+    "body_family": "Arial, sans-serif",
+    "mono_family": "Courier New, monospace",
+    "logo_path": null,
+    "font_faces": []
+  },
+  "sections": [
+    {
+      "id": "identity",
+      "eyebrow": "Brand core",
+      "title": "Technical precision presented as cultural confidence.",
+      "kind": "hero",
+      "source_paths": ["core.essence", "personality.primary_traits"],
+      "evidence_refs": ["ev-web-copy", "ev-campaign-copy"]
+    },
+    {
+      "id": "recognition",
+      "eyebrow": "Recognition model",
+      "title": "What must remain recognizable",
+      "kind": "assets",
+      "source_paths": ["recognition_model", "distinctive_assets"],
+      "evidence_refs": ["ev-web-home", "ev-campaign-01"]
+    },
+    {
+      "id": "verbal",
+      "eyebrow": "Verbal DNA",
+      "title": "A concise and authoritative voice",
+      "kind": "system",
+      "source_paths": ["verbal", "semantic_territory"],
+      "evidence_refs": ["ev-web-copy", "ev-campaign-copy"]
+    },
+    {
+      "id": "visual",
+      "eyebrow": "Visual DNA",
+      "title": "Controlled hierarchy over decoration",
+      "kind": "system",
+      "source_paths": ["visual"],
+      "evidence_refs": ["ev-web-home", "ev-campaign-01"]
+    },
+    {
+      "id": "imagery-motion",
+      "eyebrow": "Image and motion",
+      "title": "Sculptural imagery, restrained movement",
+      "kind": "system",
+      "source_paths": ["photography", "motion"],
+      "evidence_refs": ["ev-web-photography", "ev-social-photography"]
+    },
+    {
+      "id": "rules",
+      "eyebrow": "Operational rules",
+      "title": "Preserve, adapt, avoid",
+      "kind": "rules",
+      "source_paths": ["rules"],
+      "evidence_refs": ["ev-web-home", "ev-campaign-01"]
+    },
+    {
+      "id": "coverage",
+      "eyebrow": "Evidence",
+      "title": "What was observed",
+      "kind": "evidence",
+      "source_paths": ["coverage", "observations"],
+      "evidence_refs": ["ev-web-home", "ev-campaign-01", "ev-web-copy", "ev-campaign-copy"]
+    },
+    {
+      "id": "limitations",
+      "eyebrow": "Limits",
+      "title": "What this manual cannot claim yet",
+      "kind": "limitations",
+      "source_paths": ["limitations"],
+      "evidence_refs": []
+    }
+  ],
+  "review": {
+    "status": "draft",
+    "checklist": [
+      { "id": "recognition", "label": "The identity feels recognizable", "status": "pending", "notes": "" },
+      { "id": "voice", "label": "The verbal system is accurate", "status": "pending", "notes": "" },
+      { "id": "visual", "label": "The visual rules are accurate", "status": "pending", "notes": "" },
+      { "id": "limits", "label": "The limitations are explicit", "status": "pending", "notes": "" }
+    ],
+    "approved_by": null,
+    "approved_at": null
+  }
+}
+

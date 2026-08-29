@@ -1,4 +1,4 @@
 interface:
   display_name: "Reference to Astro"
-  short_description: "Convierte referencias y contenido en sitios Astro"
-  default_prompt: "Usa $reference-to-astro para construir en Astro el sitio definido por mi referencia, STYLE_DNA y contenido del cliente."
+  short_description: "Aprueba el blueprint y construye el sitio Astro"
+  default_prompt: "Usa $reference-to-astro para mapear mi contenido en SITE_BLUEPRINT, pedirme aprobación y construir después el sitio Astro."

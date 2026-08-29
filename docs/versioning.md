@@ -5,8 +5,10 @@ Cada skill se versiona por separado.
 | Skill | Versión | Contrato |
 | --- | ---: | --- |
 | brand-dna-scanner | 0.4.0 | Brand DNA 0.1.x |
+| brand-manual-builder | 0.1.0 | Brand manual spec 0.1.x |
 | reference-scanner | 0.7.0 | Web reference schemas 0.3.x |
-| reference-to-astro | 0.7.0 | Web reference schemas 0.3.x |
+| reference-lab-builder | 0.1.0 | Reference lab spec 0.1.x |
+| reference-to-astro | 1.0.0 | Web reference schemas 0.3.x, SITE_BLUEPRINT 0.1.x |
 | visual-tuning-kit | 0.3.0 | Tuning contract 0.1 |
 | wordpress-publisher | 0.2.0 | Plugin template 0.1.x |
 

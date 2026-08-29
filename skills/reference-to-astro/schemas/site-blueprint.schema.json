@@ -1,0 +1,370 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reference-web-system.local/site-blueprint.schema.json",
+  "title": "Reference Web System — SITE_BLUEPRINT",
+  "type": "object",
+  "required": [
+    "version",
+    "project",
+    "inputs",
+    "checkpoints",
+    "global_system",
+    "pages",
+    "decisions",
+    "approval"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^1\\.0(?:\\.[0-9]+)?$"
+    },
+    "project": {
+      "type": "object",
+      "required": ["name", "objective", "framework", "rendering", "fidelity_target"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "objective": { "type": "string", "minLength": 1 },
+        "framework": { "enum": ["astro", "html", "other"] },
+        "rendering": { "enum": ["static", "hybrid", "server"] },
+        "fidelity_target": { "enum": ["directional", "high", "forensic"] },
+        "locales": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 2 },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "inputs": {
+      "type": "object",
+      "required": ["style_dna", "reference_evidence", "content_manifest", "build_brief"],
+      "properties": {
+        "style_dna": { "type": "string", "minLength": 1 },
+        "reference_evidence": { "type": "string", "minLength": 1 },
+        "content_manifest": { "type": "string", "minLength": 1 },
+        "build_brief": { "type": "string", "minLength": 1 },
+        "brand_dna": { "type": ["string", "null"] },
+        "brand_rules": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "checkpoints": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/checkpoint" },
+      "minItems": 3
+    },
+    "global_system": {
+      "type": "object",
+      "required": [
+        "brand_application",
+        "reference_application",
+        "responsive_strategy",
+        "motion_strategy"
+      ],
+      "properties": {
+        "brand_application": { "$ref": "#/$defs/ruleSet" },
+        "reference_application": {
+          "type": "object",
+          "required": ["must_preserve", "may_adapt", "must_not_copy"],
+          "properties": {
+            "must_preserve": { "$ref": "#/$defs/stringList" },
+            "may_adapt": { "$ref": "#/$defs/stringList" },
+            "must_not_copy": { "$ref": "#/$defs/stringList" }
+          },
+          "additionalProperties": false
+        },
+        "navigation": { "type": "object" },
+        "responsive_strategy": { "type": "string", "minLength": 1 },
+        "motion_strategy": { "type": "string", "minLength": 1 },
+        "accessibility_strategy": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "pages": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/page" }
+    },
+    "decisions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/decision" }
+    },
+    "approval": { "$ref": "#/$defs/approval" }
+  },
+  "$defs": {
+    "stringList": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "ruleSet": {
+      "type": "object",
+      "required": ["must_preserve", "may_adapt", "must_not_introduce"],
+      "properties": {
+        "must_preserve": { "$ref": "#/$defs/stringList" },
+        "may_adapt": { "$ref": "#/$defs/stringList" },
+        "must_not_introduce": { "$ref": "#/$defs/stringList" }
+      },
+      "additionalProperties": false
+    },
+    "checkpoint": {
+      "type": "object",
+      "required": ["id", "status", "artifact"],
+      "properties": {
+        "id": {
+          "enum": ["brand-manual", "reference-lab", "content-architecture"]
+        },
+        "status": { "enum": ["approved", "waived", "pending"] },
+        "artifact": { "type": ["string", "null"] },
+        "reason": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "page": {
+      "type": "object",
+      "required": ["route", "purpose", "content_page", "sections"],
+      "properties": {
+        "route": { "type": "string", "pattern": "^/" },
+        "purpose": { "type": "string", "minLength": 1 },
+        "content_page": { "type": "string", "minLength": 1 },
+        "reading_path": { "$ref": "#/$defs/stringList" },
+        "sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/section" },
+          "minItems": 1
+        },
+        "excluded_content_sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "reason"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "reason": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "section": {
+      "type": "object",
+      "required": [
+        "id",
+        "content_section",
+        "role",
+        "component",
+        "content_policy",
+        "reference_patterns",
+        "composition",
+        "responsive",
+        "behaviors",
+        "acceptance"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "content_section": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 },
+        "component": {
+          "type": "object",
+          "required": ["family", "variant", "reusable"],
+          "properties": {
+            "family": { "type": "string", "minLength": 1 },
+            "variant": { "type": "string", "minLength": 1 },
+            "reusable": { "type": "boolean" },
+            "reuse_key": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        },
+        "content_policy": {
+          "type": "object",
+          "required": ["must_preserve", "may_condense", "notes"],
+          "properties": {
+            "must_preserve": { "$ref": "#/$defs/stringList" },
+            "may_condense": { "type": "boolean" },
+            "notes": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "reference_patterns": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/referencePattern" },
+          "minItems": 1
+        },
+        "composition": { "$ref": "#/$defs/composition" },
+        "responsive": { "$ref": "#/$defs/responsive" },
+        "behaviors": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/behavior" }
+        },
+        "acceptance": { "$ref": "#/$defs/acceptance" },
+        "uncertainties": { "$ref": "#/$defs/stringList" }
+      },
+      "additionalProperties": false
+    },
+    "referencePattern": {
+      "type": "object",
+      "required": ["style_path", "application", "mode", "evidence_refs", "rationale"],
+      "properties": {
+        "style_path": { "type": "string", "minLength": 1 },
+        "application": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "composition",
+              "typography",
+              "component",
+              "media",
+              "interaction",
+              "motion",
+              "responsive"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "mode": { "enum": ["exact", "derived", "adaptive", "inferred"] },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "rationale": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "composition": {
+      "type": "object",
+      "required": [
+        "dominant_mass",
+        "secondary_mass",
+        "alignment_anchors",
+        "reading_path",
+        "intended_empty_space",
+        "figure_ground",
+        "media_focal_strategy"
+      ],
+      "properties": {
+        "dominant_mass": { "type": "string", "minLength": 1 },
+        "secondary_mass": { "type": "string", "minLength": 1 },
+        "alignment_anchors": { "$ref": "#/$defs/stringList" },
+        "reading_path": { "$ref": "#/$defs/stringList" },
+        "intended_empty_space": { "type": "string", "minLength": 1 },
+        "figure_ground": { "type": "string", "minLength": 1 },
+        "media_focal_strategy": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "responsiveMode": {
+      "type": "object",
+      "required": ["layout_intent", "content_order", "media_behavior"],
+      "properties": {
+        "layout_intent": { "type": "string", "minLength": 1 },
+        "content_order": { "$ref": "#/$defs/stringList" },
+        "media_behavior": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "responsive": {
+      "type": "object",
+      "required": ["desktop", "tablet", "mobile", "transformations"],
+      "properties": {
+        "desktop": { "$ref": "#/$defs/responsiveMode" },
+        "tablet": { "$ref": "#/$defs/responsiveMode" },
+        "mobile": { "$ref": "#/$defs/responsiveMode" },
+        "transformations": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "invariant",
+              "scale",
+              "reflow",
+              "reorder",
+              "replace",
+              "omit",
+              "recrop",
+              "interaction-substitution",
+              "motion-reduction",
+              "layout-mode-change"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "behavior": {
+      "type": "object",
+      "required": ["id", "kind", "implementation_intent", "desktop", "mobile", "reduced_motion", "evidence_refs"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": {
+          "enum": [
+            "pointer-microinteraction",
+            "keyboard-interaction",
+            "touch-interaction",
+            "stateful-component",
+            "scroll-reactive",
+            "scroll-linked",
+            "continuous-motion",
+            "page-transition",
+            "media-interaction",
+            "typography-microinteraction",
+            "responsive-substitution",
+            "other"
+          ]
+        },
+        "implementation_intent": { "type": "string", "minLength": 1 },
+        "desktop": { "type": "string", "minLength": 1 },
+        "mobile": { "type": "string", "minLength": 1 },
+        "reduced_motion": { "type": "string", "minLength": 1 },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "acceptance": {
+      "type": "object",
+      "required": ["visual", "content", "responsive", "behavior"],
+      "properties": {
+        "visual": { "$ref": "#/$defs/stringList" },
+        "content": { "$ref": "#/$defs/stringList" },
+        "responsive": { "$ref": "#/$defs/stringList" },
+        "behavior": { "$ref": "#/$defs/stringList" }
+      },
+      "additionalProperties": false
+    },
+    "decision": {
+      "type": "object",
+      "required": ["id", "topic", "decision", "rationale", "status"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "topic": { "type": "string", "minLength": 1 },
+        "decision": { "type": "string", "minLength": 1 },
+        "rationale": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["resolved", "open"] }
+      },
+      "additionalProperties": false
+    },
+    "approval": {
+      "type": "object",
+      "required": ["status", "notes"],
+      "properties": {
+        "status": { "enum": ["draft", "changes-requested", "approved"] },
+        "approved_by": { "type": ["string", "null"] },
+        "approved_at": { "type": ["string", "null"], "format": "date-time" },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

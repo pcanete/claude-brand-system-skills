@@ -1,0 +1,16 @@
+{
+  "name": "reference-lab-builder-skill",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Build an evidence-backed interactive reference lab",
+  "scripts": {
+    "validate": "node scripts/validate-lab.mjs",
+    "build": "node scripts/build-lab.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8",
+    "ajv-formats": "^3"
+  }
+}
+

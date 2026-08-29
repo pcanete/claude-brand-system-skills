@@ -1,0 +1,84 @@
+{
+  "version": "0.1",
+  "project": {
+    "reference_label": "Synthetic editorial reference",
+    "objective": "Review the recorded interaction system without copying source content or branding.",
+    "generated_from": {
+      "style_dna": "STYLE_DNA.json",
+      "reference_evidence": "REFERENCE_EVIDENCE.json"
+    }
+  },
+  "theme": {
+    "canvas": "#F0EFEA",
+    "ink": "#151515",
+    "muted": "#77736B",
+    "accent": "#FF3D1F",
+    "border": "#C9C6BE",
+    "display_family": "Arial, sans-serif",
+    "body_family": "Arial, sans-serif",
+    "mono_family": "Courier New, monospace"
+  },
+  "demos": [
+    {
+      "id": "load-progress",
+      "title": "Percentage loading state",
+      "kind": "loader",
+      "source_paths": ["experience.load"],
+      "evidence_refs": ["synthetic-load-indicator"],
+      "config": { "duration_ms": 1600 },
+      "note": "Duration is adaptive because completion timing was not observed."
+    },
+    {
+      "id": "gallery-filter",
+      "title": "Category filtering",
+      "kind": "filter",
+      "source_paths": ["interaction.filtering"],
+      "evidence_refs": ["synthetic-gallery-filter"],
+      "config": { "items": ["Context", "Detail", "System"] },
+      "note": "Labels are recorded; transition timing remains adaptive."
+    },
+    {
+      "id": "process-sequence",
+      "title": "Ordered process sequence",
+      "kind": "media-sequence",
+      "source_paths": ["media.sequences"],
+      "evidence_refs": ["synthetic-media-sequence"],
+      "config": { "items": ["Source", "Process", "Artifact"], "speed_px_s": 45 },
+      "note": "Sequence order is observed; continuous motion is an adaptive demonstration."
+    },
+    {
+      "id": "product-drag",
+      "title": "Direct manipulation surface",
+      "kind": "drag-surface",
+      "source_paths": ["interaction.direct_manipulation", "media.interactive_scenes"],
+      "evidence_refs": ["synthetic-product-drag"],
+      "config": { "labels": ["Drag", "Inspect", "Release"] },
+      "note": "Demonstrates drag behavior without claiming the source rendering technology."
+    },
+    {
+      "id": "fullscreen-media",
+      "title": "Fullscreen media state",
+      "kind": "fullscreen",
+      "source_paths": ["interaction.fullscreen_media"],
+      "evidence_refs": ["synthetic-fullscreen-media"],
+      "config": { "labels": ["Open media", "Close"] },
+      "note": "Uses generated geometry instead of third-party media."
+    }
+  ],
+  "responsive_cases": [
+    { "id": "desktop", "label": "Desktop", "width": 1440, "height": 900, "notes": "Primary comparison surface." },
+    { "id": "mobile", "label": "Mobile", "width": 390, "height": 844, "notes": "Stacked controls and touch behavior." }
+  ],
+  "review": {
+    "status": "draft",
+    "checklist": [
+      { "id": "visual", "label": "Visual hierarchy matches the recorded system", "status": "pending", "notes": "" },
+      { "id": "interaction", "label": "Interaction states feel equivalent", "status": "pending", "notes": "" },
+      { "id": "responsive", "label": "Desktop and mobile behavior are understood", "status": "pending", "notes": "" },
+      { "id": "unknowns", "label": "Adaptive values and unknowns remain explicit", "status": "pending", "notes": "" }
+    ],
+    "approved_by": null,
+    "approved_at": null
+  }
+}
+

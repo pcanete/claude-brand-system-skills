@@ -137,6 +137,28 @@ mirando. Con una condición que este caso dejó clara: **la comparación se hace
 contra la versión anónima del sitio publicado**, porque es la única que
 representa lo que ve un visitante.
 
+### El laboratorio de referencia no cubre WebGL ni transiciones de página
+
+`reference-lab-builder` aísla doce tipos de demo, y ninguno es WebGL ni
+transición entre páginas. Son justamente las dos cosas que `reference-to-astro`
+declara como riesgo de fidelidad y donde una reconstrucción falla sin que nadie
+se dé cuenta hasta ver el sitio armado. El checkpoint responde "¿entendimos el
+sistema?" con un sí que deja afuera lo más caro de equivocar.
+
+**Origen:** auditoría cruzada del 2026-08-29; el catálogo de demos y las
+secciones `webgl-policy.md` y `motion-system.md` de `reference-to-astro` no se
+cruzan.
+
+### El checkpoint content-architecture no tiene herramienta
+
+`SITE_BLUEPRINT` exige tres checkpoints. Dos tienen skill que los produce
+—`brand-manual-builder` y `reference-lab-builder`—; el tercero se aprueba a
+mano contra el `CONTENT_MANIFEST`, sin artefacto que revisar. En la práctica va
+a terminar en `waived` con un motivo escrito de apuro, que es el modo en que un
+checkpoint deja de significar algo.
+
+**Origen:** misma auditoría. La asimetría es visible en el propio esquema.
+
 ## Transversales
 
 ### El peso de los skills

@@ -8,11 +8,16 @@ lo dice y se detiene.
 
 ```
                     (opcional)
-                brand-dna-scanner ──> BRAND_DNA
+                brand-dna-scanner ──> BRAND_DNA ──> brand-manual-builder
+                                          │            (¿la entendimos?)
                                           │
-una referencia ──> reference-scanner ──> STYLE_DNA ──┐
-                                                     │
+una referencia ──> reference-scanner ──> STYLE_DNA ──> reference-lab-builder
+                                                     │   (¿lo entendimos?)
 contenido del cliente ──> CONTENT_MANIFEST ──────────┤
+                                                     v
+                                            SITE_BLUEPRINT
+                                          (el plan, aprobado)
+                                                     │
                                                      v
                                           reference-to-astro
                                                      │
@@ -33,10 +38,15 @@ El caso más frecuente no empieza en la marca. Empieza en una referencia:
 1. **Escanear la referencia** con `reference-scanner`. Produce `STYLE_DNA` y
    `REFERENCE_EVIDENCE`: cómo funciona ese sitio, con la evidencia de dónde
    salió cada afirmación.
-2. **Reconstruir con el contenido del cliente** usando `reference-to-astro`.
+2. **Planificar antes de construir.** `reference-to-astro` produce primero un
+   `SITE_BLUEPRINT`: qué sección del contenido va contra qué patrón de la
+   referencia, con qué evidencia. Cada patrón tiene que resolver en el
+   `STYLE_DNA` y en la evidencia registrada — no se puede planificar contra algo
+   que el escaneo no vio. Es un borrador hasta que una persona lo aprueba.
+3. **Reconstruir con el contenido del cliente**, ya sobre el plan aprobado.
    La referencia aporta lógica visual; el cliente aporta identidad y
    contenido. Sale un proyecto Astro verificado.
-3. **Afinar** con `visual-tuning-kit`. Lo que queda después de reconstruir: bajar el
+4. **Afinar** con `visual-tuning-kit`. Lo que queda después de reconstruir: bajar el
    titular, acercar el visual, cambiar dónde corta una línea. Dentro de límites
    declarados, no con CSS libre.
 4. **Publicar** con `wordpress-publisher` cuando el cliente ya tiene un
@@ -71,8 +81,10 @@ revisión del repositorio falla.
 | Skill | Pregunta que responde | Salida |
 | --- | --- | --- |
 | `brand-dna-scanner` | ¿Qué hace reconocible a esta marca? | `BRAND_DNA`, reglas verificables |
+| `brand-manual-builder` | ¿Entendimos bien la marca antes de usarla? | Manual navegable, aprobado |
 | `reference-scanner` | ¿Cómo funciona esta web de referencia? | `STYLE_DNA`, evidencia |
-| `reference-to-astro` | ¿Cómo se reconstruye con el contenido del cliente? | Proyecto Astro verificado |
+| `reference-lab-builder` | ¿Entendimos el sistema visual antes de aplicarlo? | Laboratorio neutro, aprobado |
+| `reference-to-astro` | ¿Cómo se reconstruye con el contenido del cliente? | `SITE_BLUEPRINT` aprobado, luego proyecto Astro verificado |
 | `visual-tuning-kit` | ¿Cómo se afina sin volver a tocar el código? | Valores aprobados que se compilan |
 | `wordpress-publisher` | ¿Cómo entra esta portada en un WordPress vivo? | Plugin instalable y verificado |
 

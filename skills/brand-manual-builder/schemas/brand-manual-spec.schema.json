@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/brand-manual-spec.schema.json",
+  "title": "Brand Manual Spec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "project", "theme", "sections", "review"],
+  "properties": {
+    "version": { "const": "0.1" },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["brand_name", "objective", "generated_from"],
+      "properties": {
+        "brand_name": { "type": "string", "minLength": 1 },
+        "objective": { "type": "string", "minLength": 1 },
+        "generated_from": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["brand_dna", "brand_evidence"],
+          "properties": {
+            "brand_dna": { "type": "string", "minLength": 1 },
+            "brand_evidence": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canvas", "ink", "muted", "accent", "border", "display_family", "body_family", "mono_family"],
+      "properties": {
+        "canvas": { "$ref": "#/$defs/color" },
+        "ink": { "$ref": "#/$defs/color" },
+        "muted": { "$ref": "#/$defs/color" },
+        "accent": { "$ref": "#/$defs/color" },
+        "border": { "$ref": "#/$defs/color" },
+        "display_family": { "type": "string", "minLength": 1 },
+        "body_family": { "type": "string", "minLength": 1 },
+        "mono_family": { "type": "string", "minLength": 1 },
+        "logo_path": { "type": ["string", "null"] },
+        "font_faces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["family", "src", "weight", "style"],
+            "properties": {
+              "family": { "type": "string", "minLength": 1 },
+              "src": { "type": "string", "minLength": 1 },
+              "weight": { "type": ["integer", "string"] },
+              "style": { "enum": ["normal", "italic"] }
+            }
+          },
+          "default": []
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "eyebrow", "title", "kind", "source_paths", "evidence_refs"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+          "eyebrow": { "type": "string" },
+          "title": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["hero", "statement", "assets", "system", "rules", "evidence", "limitations", "review"] },
+          "source_paths": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "evidence_refs": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "checklist", "approved_by", "approved_at"],
+      "properties": {
+        "status": { "enum": ["draft", "changes-requested", "approved"] },
+        "checklist": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label", "status"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "label": { "type": "string", "minLength": 1 },
+              "status": { "enum": ["pending", "accepted", "changes-requested"] },
+              "notes": { "type": "string" }
+            }
+          }
+        },
+        "approved_by": { "type": ["string", "null"] },
+        "approved_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    }
+  },
+  "$defs": {
+    "color": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+  }
+}

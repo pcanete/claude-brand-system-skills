@@ -1,9 +1,9 @@
 ---
 name: reference-to-astro
-description: Builds a website in Astro from an analyzed reference. Consumes STYLE_DNA, CONTENT_MANIFEST and BUILD_BRIEF, and reconstructs the reference's layout, typography, media, responsive, interaction and motion language using the client's own content. Use when reference contracts exist and the site has to be built, extended or verified. Not for inventing a visual direction from scratch, and not for analyzing a reference — that is reference-scanner.
+description: Builds a website in Astro from an analyzed reference and an approved SITE_BLUEPRINT that maps client content to evidenced visual, responsive and behavioral patterns. Use when reference contracts and real content must become a verified implementation. Not for inventing a visual direction, scanning the reference, or packaging the result for WordPress.
 license: MIT
 metadata:
-  version: "0.7.0"
+  version: "1.0.0"
 ---
 
 # Reference-to-Astro
@@ -22,11 +22,12 @@ them correctly to new content.
 Locate and read:
 
 1. `STYLE_DNA.json`
-2. `CONTENT_MANIFEST.json`
-3. `BUILD_BRIEF.md`
+2. `REFERENCE_EVIDENCE.json`
+3. `CONTENT_MANIFEST.json`
+4. `BUILD_BRIEF.md`
+5. `SITE_BLUEPRINT.json`
 
-Also read `REFERENCE_EVIDENCE.json` or reference screenshots/videos when
-available.
+Also read reference screenshots/videos when available.
 
 Annotated screenshots carry explicit user intent. When an annotation selects a
 target composition or calls out a mismatch, it overrides weaker inferred
@@ -48,9 +49,15 @@ Each input has a contract:
 | `REFERENCE_EVIDENCE.json` | `schemas/reference-evidence.schema.json` | produced by `reference-scanner` |
 | `CONTENT_MANIFEST.json` | `schemas/content-manifest.schema.json` | `assets/CONTENT_MANIFEST.example.json` |
 | `BUILD_BRIEF.md` | — | `assets/BUILD_BRIEF.template.md` |
+| `SITE_BLUEPRINT.json` | `schemas/site-blueprint.schema.json` | `assets/SITE_BLUEPRINT.example.json` |
 
-When an input is missing, produce it from its template before building rather
-than improvising around the gap.
+When `SITE_BLUEPRINT.json` is missing, read
+`references/site-blueprint.md`, produce a draft, validate it with `--lenient`,
+present it to the user, and stop before implementation. Only the user can turn
+that checkpoint into an approved blueprint.
+
+Do not fabricate other missing contracts. Return to the producing skill or ask
+for the source material the missing contract requires.
 
 ## Bundled tooling
 
@@ -76,14 +83,17 @@ Before any construction work, verify the contracts:
 node scripts/validate-inputs.mjs \
   --style STYLE_DNA.json \
   --evidence REFERENCE_EVIDENCE.json \
-  --content CONTENT_MANIFEST.json
+  --content CONTENT_MANIFEST.json \
+  --blueprint SITE_BLUEPRINT.json
 ```
 
 The validator rejects contracts that are well-formed but unsupported: claims
 recorded as observed with no evidence behind them, coverage the scan did not
 earn, salient claims missing from `observations`, blocks that assert findings
 with no evidence-backed observation behind them, and behavior audits that a
-STANDARD or FORENSIC scan promised and did not deliver.
+STANDARD or FORENSIC scan promised and did not deliver. It also rejects a
+blueprint with unmapped content, unknown evidence, pending checkpoints, open
+decisions or no human approval.
 
 A contract can be entirely well-formed, modest in every self-reported score,
 and still assert an exact typeface and a twelve-column grid that nobody ever
@@ -93,9 +103,9 @@ If it fails, do not start building. Return to whoever produced the contract
 with the specific gaps. Building on an unsupported contract produces a site
 whose decisions nobody can defend later.
 
-`--lenient` checks shape only. Use it to confirm a contract is at least
-well-formed while its evidence is still being gathered — never as a way past
-the gate.
+`--lenient` allows draft approval and pending checkpoints while still checking
+schema, content coverage and reference integrity. Use it to prepare the
+checkpoint — never as a way past the build gate.
 
 ## Authority hierarchy
 
@@ -103,13 +113,14 @@ When requirements conflict, use this order:
 
 1. Functional correctness
 2. Explicit user requirements
-3. Reference fidelity
-4. Supplied content integrity
-5. Responsive preservation of reference intent
-6. Accessibility
-7. Performance
-8. Framework correctness
-9. Agent aesthetic preference
+3. Approved SITE_BLUEPRINT decisions
+4. Reference fidelity
+5. Supplied content integrity
+6. Responsive preservation of reference intent
+7. Accessibility
+8. Performance
+9. Framework correctness
+10. Agent aesthetic preference
 
 The agent's personal design taste may never replace an intentional
 reference-derived decision.
@@ -293,23 +304,28 @@ Map:
 
 ### Phase 2 — Implementation plan
 
-Create an internal map for:
+Read `references/site-blueprint.md`.
+
+If no approved SITE_BLUEPRINT exists, create the draft checkpoint now. It must
+map every supplied content section or explicitly exclude it with a reason, and
+record:
 
 - routes
-- layout primitives
-- reusable components
-- media
-- interactive islands
-- motion systems
-- page transitions
-- WebGL
-- responsive transformations
-- uncertain observations requiring QA
+- reference patterns and evidence applied to each target section
+- layout primitives and reusable component families
+- media, interaction, motion, transition and optional WebGL intent
+- desktop, tablet and mobile transformations
+- composition and acceptance criteria
+- unresolved decisions requiring user review
 
 Read `references/design-composition.md` and create a composition brief for
-each high-salience section before styling it. The brief identifies dominant and
-secondary masses, alignment anchors, reading path, intended empty space,
-figure-ground treatment, media focal point and responsive transformation.
+each section inside the blueprint before styling it. The brief identifies
+dominant and secondary masses, alignment anchors, reading path, intended empty
+space, figure-ground treatment, media focal point and responsive
+transformation.
+
+Present the draft and stop. Do not write the implementation until the user has
+approved the blueprint and the strict input gate passes.
 
 Do not begin with animation.
 
@@ -486,6 +502,9 @@ Review in this order:
 Complete only when:
 
 - `validate-inputs.mjs` passed before the build started
+- SITE_BLUEPRINT carries user approval, no open decisions and no pending
+  checkpoints
+- every supplied content section is mapped or excluded with a recorded reason
 - `build-check.mjs`, `audit-assets.mjs` and `visual-qa.mjs` ran and their
   reports are in `qa/`
 - production build succeeds
@@ -505,10 +524,11 @@ Complete only when:
 
 Return:
 
-1. implementation summary
-2. architecture decisions
-3. fidelity exceptions
-4. unresolved assumptions
-5. QA results
+1. approved blueprint path and checkpoint status
+2. implementation summary
+3. architecture decisions
+4. fidelity exceptions
+5. unresolved assumptions
+6. QA results
 
 Do not claim exact fidelity for interactions that were not directly observed.

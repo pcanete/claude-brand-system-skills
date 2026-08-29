@@ -2,6 +2,47 @@
 
 ## Unreleased
 
+`reference-to-astro` 1.0.0, `brand-manual-builder` 0.1.0, `reference-lab-builder` 0.1.0 — el plan aprobado, y los dos checkpoints que lo preceden
+
+Traído de la línea de Codex por auditoría cruzada. Las compuertas de esta línea
+cerraban la invención a la salida del escáner: un contrato que afirma algo tiene
+que poder señalar de dónde lo sacó. Faltaba cerrarla donde nace, que es cuando
+se decide qué patrón de la referencia se aplica a qué sección del cliente.
+
+**`SITE_BLUEPRINT`.** El plan que hay que aprobar antes de construir. Registra
+por sección qué patrón de la referencia se aplica y con qué evidencia, las
+decisiones tomadas con su razón, y tres checkpoints obligatorios
+—`brand-manual`, `reference-lab`, `content-architecture`— cada uno aprobado,
+saltado con motivo escrito, o pendiente. Saltear deja de ser un olvido y pasa a
+ser una decisión registrada.
+
+Cuatro compuertas nuevas en `validate-inputs.mjs`. La que importa: cada
+`style_path` del plan tiene que resolver en el `STYLE_DNA` y cada
+`evidence_ref` en la evidencia registrada. Escribir "esta sección usa el
+parallax de la referencia" sin que el escaneo haya visto ningún parallax ahora
+falla, con el nombre de la sección.
+
+`--lenient` prepara el borrador. El modo estricto rechaza checkpoints
+pendientes, decisiones abiertas y falta de aprobación humana.
+
+También desaparece una instrucción propia que era un agujero: ante un contrato
+faltante, esta línea decía «producilo desde su plantilla antes de construir».
+Eso es exactamente inventar el insumo. Ahora se vuelve al skill que lo produce.
+
+**`brand-manual-builder` y `reference-lab-builder`** son los dos primeros
+checkpoints hechos artefacto. El manual convierte el `BRAND_DNA` en un
+documento navegable; el laboratorio arma un sitio neutro —contenido inventado,
+geometría generada, ningún asset de la referencia— con doce tipos de demo que
+aíslan tipografía, componentes, estados responsive y movimiento. Cada demo
+expone de qué valor del `STYLE_DNA` salió. Los dos responden la misma pregunta
+antes de gastar trabajo: ¿entendimos esto, o creemos que lo entendimos?
+
+**El CI ahora prueba los contratos con aprobación en los dos sentidos**: el
+borrador tiene que rechazarse presentado como aprobado, y tiene que pasar en
+modo preparación. Probar un solo sentido deja pasar un validador que siempre
+dice que no. El borrador de blueprint se fabrica degradando el ejemplo
+aprobado, así los dos fixtures no pueden derivar entre sí.
+
 `visual-tuning-kit` 0.3.0 — el editor de la otra línea, con derivación automática
 
 El editor visual que faltaba ya existía: la línea de Codex lo tenía terminado

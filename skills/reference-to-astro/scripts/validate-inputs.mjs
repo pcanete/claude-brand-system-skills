@@ -6,7 +6,8 @@
 //
 // Usage:
 //   node scripts/validate-inputs.mjs --style STYLE_DNA.json \
-//     --evidence REFERENCE_EVIDENCE.json --content CONTENT_MANIFEST.json
+//     --evidence REFERENCE_EVIDENCE.json --content CONTENT_MANIFEST.json \
+//     --blueprint SITE_BLUEPRINT.json
 //
 //   --lenient   check shape and reference integrity only
 //   --schemas   override the schema directory
@@ -17,6 +18,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   createValidator,
+  collectEvidenceIds,
   formatSchemaErrors,
   readJson,
   reportGroups,
@@ -38,7 +40,8 @@ const strict = !process.argv.includes("--lenient");
 const files = {
   style: arg("style", "STYLE_DNA.json"),
   evidence: arg("evidence", "REFERENCE_EVIDENCE.json"),
-  content: arg("content", "CONTENT_MANIFEST.json")
+  content: arg("content", "CONTENT_MANIFEST.json"),
+  blueprint: arg("blueprint", "SITE_BLUEPRINT.json")
 };
 
 const schemaDir = arg("schemas", path.resolve(scriptDir, "../schemas"));
@@ -79,33 +82,202 @@ function checkSectionAssets(content) {
   return issues;
 }
 
+function checkBlueprintCheckpoints(blueprint, { strict }) {
+  const required = new Set([
+    "brand-manual",
+    "reference-lab",
+    "content-architecture"
+  ]);
+  const seen = new Set();
+  const issues = [];
+
+  for (const checkpoint of blueprint.checkpoints || []) {
+    if (seen.has(checkpoint.id)) {
+      issues.push(`duplicate checkpoint '${checkpoint.id}'`);
+    }
+    seen.add(checkpoint.id);
+
+    if (checkpoint.status === "waived" && !checkpoint.reason?.trim()) {
+      issues.push(`${checkpoint.id}: waived checkpoint requires a reason`);
+    }
+
+    if (strict && checkpoint.status === "pending") {
+      issues.push(`${checkpoint.id}: checkpoint is still pending`);
+    }
+  }
+
+  for (const id of required) {
+    if (!seen.has(id)) issues.push(`missing required checkpoint '${id}'`);
+  }
+
+  return issues;
+}
+
+function checkBlueprintApproval(blueprint, { strict }) {
+  const issues = [];
+  const decisions = blueprint.decisions || [];
+  const ids = decisions.map((decision) => decision.id);
+
+  if (!unique(ids)) issues.push("decision ids must be unique");
+
+  if (strict) {
+    for (const decision of decisions) {
+      if (decision.status === "open") {
+        issues.push(`${decision.id}: decision is still open`);
+      }
+    }
+
+    if (blueprint.approval?.status !== "approved") {
+      issues.push(
+        `approval.status is '${blueprint.approval?.status || "missing"}', expected 'approved'`
+      );
+    }
+  }
+
+  return issues;
+}
+
+function checkBlueprintContentCoverage(blueprint, content) {
+  const issues = [];
+  const routes = new Set();
+
+  for (const [pageId, page] of Object.entries(blueprint.pages || {})) {
+    if (routes.has(page.route)) issues.push(`${pageId}: duplicate route '${page.route}'`);
+    routes.add(page.route);
+
+    const contentPage = content.pages?.[page.content_page];
+    if (!contentPage) {
+      issues.push(`${pageId}: unknown content page '${page.content_page}'`);
+      continue;
+    }
+
+    if (contentPage.route !== page.route) {
+      issues.push(
+        `${pageId}: route '${page.route}' does not match CONTENT_MANIFEST route '${contentPage.route}'`
+      );
+    }
+
+    const available = new Set((contentPage.sections || []).map((section) => section.id));
+    const mapped = new Set();
+    const sectionIds = new Set();
+
+    for (const section of page.sections || []) {
+      if (sectionIds.has(section.id)) {
+        issues.push(`${pageId}: duplicate blueprint section id '${section.id}'`);
+      }
+      sectionIds.add(section.id);
+
+      if (!available.has(section.content_section)) {
+        issues.push(
+          `${pageId}/${section.id}: unknown content section '${section.content_section}'`
+        );
+      }
+      if (mapped.has(section.content_section)) {
+        issues.push(
+          `${pageId}: content section '${section.content_section}' is mapped more than once`
+        );
+      }
+      mapped.add(section.content_section);
+    }
+
+    const excluded = new Set();
+    for (const item of page.excluded_content_sections || []) {
+      if (!available.has(item.id)) {
+        issues.push(`${pageId}: excluded content section '${item.id}' does not exist`);
+      }
+      if (excluded.has(item.id)) {
+        issues.push(`${pageId}: content section '${item.id}' is excluded more than once`);
+      }
+      excluded.add(item.id);
+    }
+
+    for (const id of available) {
+      const destinations = Number(mapped.has(id)) + Number(excluded.has(id));
+      if (destinations === 0) {
+        issues.push(`${pageId}: content section '${id}' is neither mapped nor excluded`);
+      }
+      if (destinations > 1) {
+        issues.push(`${pageId}: content section '${id}' is both mapped and excluded`);
+      }
+    }
+  }
+
+  return issues;
+}
+
+function checkBlueprintReferenceIntegrity(blueprint, style, evidence) {
+  const issues = [];
+  const stylePaths = new Set((style.observations || []).map((item) => item.path));
+  const evidenceIds = collectEvidenceIds(evidence);
+  const behaviorIds = new Set();
+
+  for (const [pageId, page] of Object.entries(blueprint.pages || {})) {
+    for (const section of page.sections || []) {
+      for (const pattern of section.reference_patterns || []) {
+        if (!stylePaths.has(pattern.style_path)) {
+          issues.push(
+            `${pageId}/${section.id}: unknown STYLE_DNA path '${pattern.style_path}'`
+          );
+        }
+        for (const ref of pattern.evidence_refs || []) {
+          if (!evidenceIds.has(ref)) {
+            issues.push(`${pageId}/${section.id}: unknown evidence reference '${ref}'`);
+          }
+        }
+      }
+
+      for (const behavior of section.behaviors || []) {
+        if (behaviorIds.has(behavior.id)) {
+          issues.push(`duplicate blueprint behavior id '${behavior.id}'`);
+        }
+        behaviorIds.add(behavior.id);
+        for (const ref of behavior.evidence_refs || []) {
+          if (!evidenceIds.has(ref)) {
+            issues.push(
+              `${pageId}/${section.id}/${behavior.id}: unknown evidence reference '${ref}'`
+            );
+          }
+        }
+      }
+    }
+  }
+
+  return issues;
+}
+
 async function main() {
   const [
     style,
     evidence,
     content,
+    blueprint,
     styleSchema,
     evidenceSchema,
-    contentSchema
+    contentSchema,
+    blueprintSchema
   ] = await Promise.all([
     readJson(files.style, cwd),
     readJson(files.evidence, cwd),
     readJson(files.content, cwd),
+    readJson(files.blueprint, cwd),
     readJson(path.join(schemaDir, "style-dna.schema.json"), cwd),
     readJson(path.join(schemaDir, "reference-evidence.schema.json"), cwd),
-    readJson(path.join(schemaDir, "content-manifest.schema.json"), cwd)
+    readJson(path.join(schemaDir, "content-manifest.schema.json"), cwd),
+    readJson(path.join(schemaDir, "site-blueprint.schema.json"), cwd)
   ]);
 
   const validators = createValidator({
     STYLE_DNA: styleSchema,
     REFERENCE_EVIDENCE: evidenceSchema,
-    CONTENT_MANIFEST: contentSchema
+    CONTENT_MANIFEST: contentSchema,
+    SITE_BLUEPRINT: blueprintSchema
   });
 
   const documents = {
     STYLE_DNA: style,
     REFERENCE_EVIDENCE: evidence,
-    CONTENT_MANIFEST: content
+    CONTENT_MANIFEST: content,
+    SITE_BLUEPRINT: blueprint
   };
 
   let failed = false;
@@ -136,6 +308,22 @@ async function main() {
     {
       label: "Section media resolve to assets",
       issues: checkSectionAssets(content)
+    },
+    {
+      label: "Blueprint checkpoints are explicit",
+      issues: checkBlueprintCheckpoints(blueprint, { strict })
+    },
+    {
+      label: "Blueprint has human approval",
+      issues: checkBlueprintApproval(blueprint, { strict })
+    },
+    {
+      label: "Blueprint covers the supplied content",
+      issues: checkBlueprintContentCoverage(blueprint, content)
+    },
+    {
+      label: "Blueprint patterns resolve to recorded reference evidence",
+      issues: checkBlueprintReferenceIntegrity(blueprint, style, evidence)
     }
   ];
 

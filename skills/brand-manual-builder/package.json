@@ -1,0 +1,16 @@
+{
+  "name": "brand-manual-builder-skill",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Build a reviewable visual brand manual from evidence-backed Brand DNA",
+  "scripts": {
+    "validate": "node scripts/validate-manual.mjs",
+    "build": "node scripts/build-manual.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8",
+    "ajv-formats": "^3"
+  }
+}
+

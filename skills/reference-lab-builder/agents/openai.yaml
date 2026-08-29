@@ -1,0 +1,5 @@
+interface:
+  display_name: "Reference Lab Builder"
+  short_description: "Convierte un escaneo web en un laboratorio aprobable"
+  default_prompt: "Usa $reference-lab-builder para convertir este STYLE_DNA en un laboratorio visual interactivo, mostrármelo y detenerte antes de aprobarlo."
+

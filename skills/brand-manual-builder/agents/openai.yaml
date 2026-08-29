@@ -1,0 +1,5 @@
+interface:
+  display_name: "Brand Manual Builder"
+  short_description: "Convierte Brand DNA en un manual visual aprobable"
+  default_prompt: "Usa $brand-manual-builder para convertir este BRAND_DNA en un manual visual navegable, mostrármelo y detenerte antes de aprobarlo."
+
