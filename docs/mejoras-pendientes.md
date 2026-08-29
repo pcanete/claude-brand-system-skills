@@ -159,6 +159,44 @@ checkpoint deja de significar algo.
 
 **Origen:** misma auditoría. La asimetría es visible en el propio esquema.
 
+### Un STYLE_DNA, dos espacios de nombres incompatibles
+
+`reference-lab-builder` valida sus `source_paths` resolviéndolos en el árbol del
+documento. `reference-to-astro` valida sus `style_path` contra el índice de
+`observations`. Son dos espacios distintos, y ninguno contiene al otro.
+
+Medido sobre un escaneo real de 178 rutas y 21 observaciones: **11 de las 21
+rutas de observación no resuelven en el árbol** —`motion.process_cards` no
+existe como dato; el dato vive en `motion.scroll.process`— y **ninguna de las 6
+rutas citadas en el laboratorio está en observations**.
+
+Quien escribe los dos contratos del mismo proyecto tiene que saber que el mismo
+concepto tiene dos nombres según qué archivo esté escribiendo, y ningún
+validador puede decirle el nombre que espera el otro.
+
+La regla del blueprint es la correcta —solo se cita lo que el escáner registró
+como observado y respaldado— así que la salida no es relajarla sino que las dos
+converjan ahí. Lo que falta es una compuerta barata del lado del escáner: la
+ruta de una observación tiene que resolver en el documento que anota. Hoy nada
+lo comprueba, y por eso las observaciones derivaron a ser etiquetas.
+
+**Origen:** primer SITE_BLUEPRINT escrito contra contratos reales, 2026-08-29.
+Se descubrió porque el blueprint rechazó rutas que el laboratorio había aceptado
+media hora antes.
+
+### Las auditorías de comportamiento no se pueden citar como evidencia
+
+`collectEvidenceIds` recorre ocho colecciones y `behavior_audits` no está entre
+ellas. Son la evidencia más fuerte del documento —auditorías temporales y entre
+dispositivos, con su propia compuerta que verifica que lo sean— y un blueprint
+que declara un comportamiento atado al scroll no puede citarlas.
+
+El laboratorio sí las acepta, porque recorre el documento entero juntando
+cualquier objeto con `id`. La misma referencia vale en un skill y no en el otro.
+
+**Origen:** mismo blueprint. Hubo que sacar ocho referencias `audit-*` que eran
+justo las que respaldaban los tres revelados de scroll.
+
 ## Transversales
 
 ### El peso de los skills
