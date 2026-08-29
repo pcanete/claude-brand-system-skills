@@ -111,6 +111,10 @@ sincronizada: las mejoras cruzan por auditoría, revisando qué encontró el otr
 motor, no por merge automático. Cuando difieren, la diferencia es una decisión,
 no un descuido.
 
+## Qué falta
+
+[mejoras-pendientes.md](docs/mejoras-pendientes.md) registra lo que un trabajo real mostró que falta y todavía no está en los skills. Cada entrada dice de dónde salió: si no se puede rastrear a un caso, no va.
+
 ## Desarrollo
 
 ```bash

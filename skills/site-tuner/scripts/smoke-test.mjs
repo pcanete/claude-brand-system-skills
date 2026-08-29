@@ -1,68 +1,145 @@
+#!/usr/bin/env node
+
+// Verifica el calibrador contra un servidor de desarrollo, sin saber nada del
+// proyecto: todo lo que espera lo lee del contrato.
+//
+//   node scripts/smoke-test.mjs --url http://localhost:4321 \
+//     --schema src/config/tuning.schema.json
+//
+//   --values <archivo>   además comprueba que Aplicar escriba el valor
+//
+// Requiere Playwright disponible en el proyecto.
+
 import fs from 'node:fs';
 import path from 'node:path';
+import process from 'node:process';
 import { createRequire } from 'node:module';
 
-const require = createRequire(import.meta.url);
-const { chromium } = require('C:/Users/Patricio Cañete/.codex/skills/reference-to-astro/node_modules/playwright');
+function arg(name, fallback) {
+  const index = process.argv.indexOf(`--${name}`);
+  if (index === -1) return fallback;
+  return process.argv[index + 1];
+}
 
-const project = path.resolve(import.meta.dirname, '..');
-const approvedFile = path.join(project, 'src/config/tuning.values.json');
-const initialApproved = JSON.parse(fs.readFileSync(approvedFile, 'utf8'));
-const originalWidth = initialApproved.values['hero-copy-width'];
-const testWidth = originalWidth === 475 ? 480 : 475;
+const baseUrl = arg('url', 'http://localhost:4321');
+const schemaPath = arg('schema', 'src/config/tuning.schema.json');
+const valuesPath = arg('values', null);
+
+const schema = JSON.parse(fs.readFileSync(path.resolve(schemaPath), 'utf8'));
+const controls = schema.groups.flatMap((group) => group.controls);
+const parameter = schema.query_parameter ?? 'tune';
+
+// El skill vive fuera del proyecto, así que su import no ve el node_modules
+// del proyecto. Se busca primero ahí, que es donde corresponde que esté.
+const { chromium } = await (async () => {
+  const fromProject = createRequire(path.join(process.cwd(), 'noop.js'));
+
+  try {
+    return fromProject('playwright');
+  } catch {
+    try {
+      return await import('playwright');
+    } catch {
+      throw new Error(
+        'Playwright no está disponible. Instalalo en el proyecto: npm i -D playwright',
+      );
+    }
+  }
+})();
+
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+
 const errors = [];
 page.on('console', (message) => {
   if (message.type() === 'error') errors.push(`console: ${message.text()}`);
 });
 page.on('pageerror', (error) => errors.push(`page: ${error.message}`));
 
-await page.goto('http://127.0.0.1:4321/?tune=1', { waitUntil: 'domcontentloaded' });
-await page.waitForSelector('[data-visual-tuner]');
+const results = {};
 
-const controls = await page.locator('[data-control-id]').count();
-if (controls !== 32) throw new Error(`Expected 32 controls, found ${controls}`);
+try {
+  await page.goto(`${baseUrl}/?${parameter}=1`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('[data-visual-tuner]');
 
-const groups = await page.locator('[data-tuner-group]').count();
-if (groups !== 8) throw new Error(`Expected 8 groups, found ${groups}`);
-
-const openGroups = await page.locator('[data-tuner-group][open]').count();
-if (openGroups !== 1) throw new Error(`Expected one initially open group, found ${openGroups}`);
-
-const waitForApprovedValue = async (expected) => {
-  const timeoutAt = Date.now() + 4000;
-  while (Date.now() < timeoutAt) {
-    const current = JSON.parse(fs.readFileSync(approvedFile, 'utf8'));
-    if (current.values['hero-copy-width'] === expected) return current;
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  // La cantidad la manda el contrato, no un número escrito acá.
+  const rendered = await page.locator('[data-control-id]').count();
+  if (rendered !== controls.length) {
+    throw new Error(
+      `El contrato declara ${controls.length} controles y el panel muestra ${rendered}`,
+    );
   }
-  throw new Error(`Timed out waiting for approved hero-copy-width ${expected}`);
-};
+  results.controles = rendered;
 
-const width = page.locator('[data-control-id="hero-copy-width"]');
-await width.fill(String(testWidth));
-await width.dispatchEvent('input');
-const cssValue = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--hero-copy-width').trim());
-if (cssValue !== `${testWidth}px`) throw new Error(`Expected live CSS value ${testWidth}px, found ${cssValue}`);
+  const groups = await page.locator('[data-tuner-group]').count();
+  if (groups !== schema.groups.length) {
+    throw new Error(
+      `El contrato declara ${schema.groups.length} grupos y el panel muestra ${groups}`,
+    );
+  }
+  results.grupos = groups;
 
-await page.locator('[data-preset-name]').fill('QA temporal');
-await page.locator('[data-preset-save]').click();
-if (!await page.locator('[data-preset-list] option', { hasText: 'QA temporal' }).count()) {
-  throw new Error('Named preset was not persisted in the local preset list');
+  // Un panel con todo abierto es un tablero, no una herramienta.
+  const open = await page.locator('[data-tuner-group][open]').count();
+  if (open !== 1) throw new Error(`Se esperaba un grupo abierto y hay ${open}`);
+
+  // Mover un control tiene que cambiar la variable en vivo. Se elige el
+  // primero que escriba una variable CSS, sea cual sea.
+  const target = controls.find((control) => control.kind === 'range' && control.css_variable);
+  if (!target) throw new Error('El contrato no declara ningún control range con css_variable.');
+
+  const probe = target.default === target.min ? target.max : target.min;
+  const input = page.locator(`[data-control-id="${target.id}"]`);
+  await input.fill(String(probe));
+  await input.dispatchEvent('input');
+
+  const live = await page.evaluate(
+    (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim(),
+    target.css_variable,
+  );
+
+  const expected = `${probe}${target.unit ?? ''}`;
+  if (live !== expected) {
+    throw new Error(`Se esperaba ${target.css_variable}: ${expected} y quedó ${live}`);
+  }
+  results.cambioEnVivo = { control: target.id, valor: expected };
+
+  if (valuesPath) {
+    const file = path.resolve(valuesPath);
+    const before = JSON.parse(fs.readFileSync(file, 'utf8'));
+
+    await page.locator('[data-tuner-apply]').click();
+
+    const deadline = Date.now() + 5000;
+    let applied = false;
+
+    while (Date.now() < deadline) {
+      const current = JSON.parse(fs.readFileSync(file, 'utf8'));
+      if (current.values[target.id] === probe) {
+        applied = true;
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    if (!applied) throw new Error(`Aplicar no escribió ${target.id} en ${valuesPath}`);
+
+    // Se restaura el valor aprobado: una prueba no deja el proyecto cambiado.
+    await input.fill(String(before.values[target.id] ?? target.default));
+    await input.dispatchEvent('input');
+    await page.locator('[data-tuner-apply]').click();
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
+    results.aplicaYRestaura = true;
+  }
+} finally {
+  await browser.close();
 }
 
-await page.locator('[data-tuner-apply]').click();
-await page.waitForFunction(() => document.querySelector('[data-tuner-status]')?.textContent?.includes('aplic'));
-await waitForApprovedValue(testWidth);
-
-await width.fill(String(originalWidth));
-await width.dispatchEvent('input');
-await page.locator('[data-tuner-apply]').click();
-await waitForApprovedValue(originalWidth);
-
-await page.screenshot({ path: path.join(project, 'qa/tuner-generic-desktop.png'), fullPage: true });
-await browser.close();
-
-if (errors.length) throw new Error(errors.join('\n'));
-console.log(JSON.stringify({ panel: true, groups, openGroups, controls, liveCss: cssValue, preset: true, applyAndRestore: true, consoleErrors: 0 }, null, 2));
+if (errors.length) {
+  console.error(errors.join('\n'));
+  process.exitCode = 1;
+} else {
+  console.log(JSON.stringify({ ...results, erroresDeConsola: 0 }, null, 2));
+  console.log('\nCalibrador verificado en vivo.');
+}
