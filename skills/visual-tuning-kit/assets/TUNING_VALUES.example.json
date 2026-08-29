@@ -1,0 +1,15 @@
+{
+  "version": "0.1",
+  "schema": "example-home",
+  "status": "draft",
+  "values": {
+    "hero-title-size": 8,
+    "hero-alignment": "start",
+    "hero-title": ["A precise", "editorial statement"],
+    "hero-image": "/assets/editable/hero-default.webp",
+    "home-section-order": ["hero", "story", "proof", "contact"],
+    "show-guides": false
+  },
+  "approved_by": null,
+  "approved_at": null
+}

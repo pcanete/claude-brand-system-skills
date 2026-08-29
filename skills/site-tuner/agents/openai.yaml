@@ -1,4 +1,0 @@
-interface:
-  display_name: "Site Tuner"
-  short_description: "Calibra un sitio ya construido, dentro de límites declarados"
-  default_prompt: "Usa $site-tuner para instalar el calibrador en este proyecto y declarar los controles que necesito para el ajuste fino."

@@ -77,7 +77,7 @@ const skillNames = [
   "brand-dna-scanner",
   "reference-scanner",
   "reference-to-astro",
-  "site-tuner",
+  "visual-tuning-kit",
   "wordpress-publisher"
 ];
 
@@ -390,76 +390,48 @@ runNode("Evasive Brand DNA fixture is malformed beyond the gates", [
   "--lenient"
 ]);
 
-// --- site-tuner --------------------------------------------------------
+// --- visual-tuning-kit -------------------------------------------------
 // El contrato del calibrador es lo único que separa una herramienta acotada
-// de un editor de CSS con pasos extra. El ejemplo tiene que pasar, y un
-// contrato incoherente tiene que fallar.
-const tuningValidator = path.join(
-  root,
-  "skills",
-  "site-tuner",
-  "scripts",
-  "validate-tuning.mjs"
-);
+// de un editor de CSS con pasos extra. Derivarlo del proyecto tiene que
+// producir algo que su propio validador acepte: si no, la cadena se corta
+// justo donde debía encadenarse.
+const kitScripts = path.join(root, "skills", "visual-tuning-kit", "scripts");
+const derivedDir = fs.mkdtempSync(path.join(os.tmpdir(), "cbss-derive-"));
+const derivedSchema = path.join(derivedDir, "TUNING_SCHEMA.json");
+const derivedValues = path.join(derivedDir, "TUNING_VALUES.json");
 
-runNode("Tuning example rejected by its own validator", [
-  tuningValidator,
-  "--schema",
-  path.join(root, "skills", "site-tuner", "assets", "tuning.schema.example.json"),
-  "--values",
-  path.join(root, "skills", "site-tuner", "assets", "tuning.values.example.json")
-]);
-
-const incoherentTuning = path.join(
-  fs.mkdtempSync(path.join(os.tmpdir(), "cbss-tuning-")),
-  "tuning.schema.json"
-);
-
-fs.writeFileSync(
-  incoherentTuning,
-  JSON.stringify({
-    version: "1.0",
-    id: "incoherente",
-    title: "Incoherente",
-    groups: [
-      {
-        id: "g",
-        label: "G",
-        controls: [
-          // Sin efecto declarado: ocupa lugar en el panel y no hace nada.
-          { id: "muerto", kind: "boolean", label: "Sin efecto", default: false }
-        ]
-      }
-    ]
-  })
-);
-
-// El generador tiene que producir un contrato que su propio validador acepte.
-// Si el contrato generado no valida, la cadena se corta justo donde debía
-// encadenarse.
-const generatedTuning = path.join(
-  fs.mkdtempSync(path.join(os.tmpdir(), "cbss-generated-")),
-  "tuning.schema.json"
-);
-
-runNode("Tuning generator failed on the fixture project", [
-  path.join(root, "skills", "site-tuner", "scripts", "generate-tuning.mjs"),
+runNode("Schema derivation failed on the fixture project", [
+  path.join(kitScripts, "derive-schema.mjs"),
   "--project",
   path.join(root, "tests", "tuning-fixture"),
+  "--id",
+  "fixture-home",
   "--out",
-  generatedTuning
+  derivedSchema,
+  "--values-out",
+  derivedValues
 ]);
 
-runNode("Generated tuning contract rejected by its own validator", [
-  tuningValidator,
+runNode("Derived tuning contract rejected by the kit's own validator", [
+  path.join(kitScripts, "validate-tuning.mjs"),
   "--schema",
-  generatedTuning,
-  "--lenient"
+  derivedSchema,
+  "--values",
+  derivedValues,
+  "--allow-draft"
 ]);
 
+// Los valores se emiten en borrador y sin firmar. Que pasen como aprobados
+// sería la herramienta aprobando en nombre del usuario.
 runNode(
-  "Incoherent tuning contract was accepted: the tuner gate is not working",
-  [tuningValidator, "--schema", incoherentTuning, "--lenient"],
+  "Draft values were accepted as approved: the approval gate is not working",
+  [
+    path.join(kitScripts, "validate-tuning.mjs"),
+    "--schema",
+    derivedSchema,
+    "--values",
+    derivedValues
+  ],
   { expect: "fail" }
 );
 

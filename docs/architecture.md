@@ -78,7 +78,7 @@ stopped working and the repository check fails.
 El recorrido no termina en el build. Dos pasos quedaban a mano, y son los que
 más se repiten en un trabajo real.
 
-**site-tuner** cubre el ajuste fino. Su contrato es lo único que separa un
+**visual-tuning-kit** cubre el ajuste fino. Su contrato es lo único que separa un
 calibrador de un editor de CSS con pasos extra: sólo existe lo que el proyecto
 declaró. El panel vive en desarrollo y escribe un archivo de valores aprobados
 que sí se compila — probar y decidir son dos estados distintos a propósito.

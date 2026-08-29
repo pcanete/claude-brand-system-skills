@@ -1,0 +1,5 @@
+interface:
+  display_name: "Visual Tuning Kit"
+  short_description: "Agrega edición visual acotada y auditable a Astro"
+  default_prompt: "Usa $visual-tuning-kit para crear un calibrador visual acotado para este sitio Astro sin convertirlo en un page builder libre."
+

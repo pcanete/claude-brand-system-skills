@@ -8,7 +8,7 @@ Skills disponibles:
 - `skills/brand-dna-scanner` — opcional, sólo si además se adopta la identidad de una marca
 - `skills/reference-scanner`
 - `skills/reference-to-astro`
-- `skills/site-tuner`
+- `skills/visual-tuning-kit`
 - `skills/wordpress-publisher`
 
 El recorrido completo no exige tener los cinco. Instalá los que use el trabajo

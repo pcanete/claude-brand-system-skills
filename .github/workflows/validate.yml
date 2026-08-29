@@ -23,7 +23,7 @@ jobs:
             skills/brand-dna-scanner/package-lock.json
             skills/reference-scanner/package-lock.json
             skills/reference-to-astro/package-lock.json
-            skills/site-tuner/package-lock.json
+            skills/visual-tuning-kit/package-lock.json
 
       - name: Install Brand DNA validator dependencies
         run: npm ci --prefix skills/brand-dna-scanner
@@ -35,7 +35,7 @@ jobs:
         run: npm ci --prefix skills/reference-to-astro
 
       - name: Install site tuner validator dependencies
-        run: npm ci --prefix skills/site-tuner
+        run: npm ci --prefix skills/visual-tuning-kit
 
       - name: Validate repository
         run: npm test

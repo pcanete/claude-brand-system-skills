@@ -1,0 +1,15 @@
+{
+  "name": "visual-tuning-kit-skill",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Bounded visual tuning contracts for Astro projects",
+  "scripts": {
+    "validate": "node scripts/validate-tuning.mjs --schema assets/TUNING_SCHEMA.example.json --values assets/TUNING_VALUES.example.json --allow-draft",
+    "test": "npm run validate && node scripts/test-runtime.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8",
+    "ajv-formats": "^3"
+  }
+}

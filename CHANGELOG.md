@@ -2,6 +2,45 @@
 
 ## Unreleased
 
+`visual-tuning-kit` 0.3.0 — el editor de la otra línea, con derivación automática
+
+El editor visual que faltaba ya existía: la línea de Codex lo tenía terminado
+—selección contextual, edición de texto en la página, elección de imagen
+acotada a una carpeta, orden de secciones, changeset auditable, panel aislado
+con Shadow DOM— mientras acá se construía otro en paralelo. Se adopta ese, y el
+`site-tuner` propio se retira.
+
+La auditoría cruzada funcionó; llegó tarde. Antes de abrir un frente conviene
+mirar qué hizo el otro motor: un `git fetch` y leer el CHANGELOG habría evitado
+el trabajo duplicado.
+
+Lo que esta línea aporta al kit, que es justo su punto débil —el trabajo manual
+por proyecto—:
+
+**`derive-schema.mjs`.** El contrato se escribía a mano, control por control.
+Ahora se deriva del código: cada `var(--nombre, valor)` es un punto de ajuste
+que el autor ya declaró, con su default al lado; también cuenta el mismo patrón
+leído desde JavaScript. El rango sale del valor que el proyecto eligió, y cada
+control lleva un `rationale` que nombra el archivo del que salió, para que se
+pueda revisar en vez de creer. Contra un proyecto real recuperó los 28
+controles escritos a mano, ninguno menos, y propuso doce más que el proyecto ya
+parametrizaba.
+
+Los valores se emiten en **borrador y sin firmar**. Aprobar es del usuario, y
+la revisión del repositorio comprueba que un borrador no pase como aprobado.
+
+**`map-content.mjs`.** Los controles de texto necesitan un `content_path`, y
+saber qué elemento tiene qué campo suele exigir anotar cada componente. No hace
+falta: el texto del manifiesto es su propia señal. Un campo que aparece
+exactamente una vez queda vinculado; uno ambiguo o ausente se informa y no se
+ofrece para editar. Contra un sitio real vinculó 36 de 40 textos sin tocar un
+solo componente.
+
+**Unidades ampliadas en el contrato.** El enum admitía `px`, `rem`, `vw`, `vh`,
+`%` y `deg`. Un proyecto real usa además `ch` para ancho de texto, y `s` y `ms`
+para duraciones: sin ellas, esos controles no se pueden declarar. Es una
+divergencia deliberada respecto de la otra línea, disponible para que la tome.
+
 Publicación inicial de la línea Claude, con los tres skills base y las dos
 herramientas que faltaban para llegar de una referencia a una web publicada.
 

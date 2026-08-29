@@ -21,7 +21,7 @@ contenido del cliente ──> CONTENT_MANIFEST ──────────┤
                                                      │
                                     ┌────────────────┴────────────────┐
                                     v                                 v
-                              site-tuner                    wordpress-publisher
+                              visual-tuning-kit                    wordpress-publisher
                           (el ajuste fino)                 (la portada, dentro
                                                             de un WordPress vivo)
 ```
@@ -36,7 +36,7 @@ El caso más frecuente no empieza en la marca. Empieza en una referencia:
 2. **Reconstruir con el contenido del cliente** usando `reference-to-astro`.
    La referencia aporta lógica visual; el cliente aporta identidad y
    contenido. Sale un proyecto Astro verificado.
-3. **Afinar** con `site-tuner`. Lo que queda después de reconstruir: bajar el
+3. **Afinar** con `visual-tuning-kit`. Lo que queda después de reconstruir: bajar el
    titular, acercar el visual, cambiar dónde corta una línea. Dentro de límites
    declarados, no con CSS libre.
 4. **Publicar** con `wordpress-publisher` cuando el cliente ya tiene un
@@ -73,7 +73,7 @@ revisión del repositorio falla.
 | `brand-dna-scanner` | ¿Qué hace reconocible a esta marca? | `BRAND_DNA`, reglas verificables |
 | `reference-scanner` | ¿Cómo funciona esta web de referencia? | `STYLE_DNA`, evidencia |
 | `reference-to-astro` | ¿Cómo se reconstruye con el contenido del cliente? | Proyecto Astro verificado |
-| `site-tuner` | ¿Cómo se afina sin volver a tocar el código? | Valores aprobados que se compilan |
+| `visual-tuning-kit` | ¿Cómo se afina sin volver a tocar el código? | Valores aprobados que se compilan |
 | `wordpress-publisher` | ¿Cómo entra esta portada en un WordPress vivo? | Plugin instalable y verificado |
 
 Cada uno se instala por separado. Los contratos compartidos viajan duplicados a
@@ -130,7 +130,7 @@ npm ci --prefix skills/reference-to-astro
 ```
 
 ```bash
-npm ci --prefix skills/site-tuner
+npm ci --prefix skills/visual-tuning-kit
 ```
 
 ```bash

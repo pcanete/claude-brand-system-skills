@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/tuning-values.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "schema", "status", "values", "approved_by", "approved_at"],
+  "properties": {
+    "version": { "const": "0.1" },
+    "schema": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["draft", "changes-requested", "approved"] },
+    "values": { "type": "object" },
+    "approved_by": { "type": ["string", "null"] },
+    "approved_at": { "type": ["string", "null"], "format": "date-time" }
+  }
+}

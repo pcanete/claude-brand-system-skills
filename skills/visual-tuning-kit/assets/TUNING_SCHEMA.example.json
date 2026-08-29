@@ -1,0 +1,89 @@
+{
+  "version": "0.1",
+  "id": "example-home",
+  "title": "Example visual tuning",
+  "query_parameter": "tune",
+  "development_only": true,
+  "groups": [
+    {
+      "id": "hero-composition",
+      "label": "Hero composition",
+      "controls": [
+        {
+          "id": "hero-title-size",
+          "kind": "range",
+          "label": "Title size",
+          "rationale": "Fine tune the approved headline scale without changing hierarchy.",
+          "default": 8,
+          "target": { "css_variable": "--hero-title-size" },
+          "min": 5,
+          "max": 11,
+          "step": 0.1,
+          "unit": "vw"
+        },
+        {
+          "id": "hero-alignment",
+          "kind": "select",
+          "label": "Title alignment",
+          "rationale": "Compare only the alignments allowed by the approved composition.",
+          "default": "start",
+          "target": { "css_variable": "--hero-alignment" },
+          "options": [
+            { "value": "start", "label": "Start" },
+            { "value": "center", "label": "Center" }
+          ]
+        },
+        {
+          "id": "hero-title",
+          "kind": "text-lines",
+          "label": "Headline lines",
+          "rationale": "Review line breaks while preserving the approved message.",
+          "default": ["A precise", "editorial statement"],
+          "target": { "content_path": "pages.home.sections.hero.heading", "preview_id": "hero-title", "render": "lines" },
+          "max_length": 180
+        },
+        {
+          "id": "hero-image",
+          "kind": "image",
+          "label": "Hero image",
+          "rationale": "Choose only an existing asset from the declared project folder.",
+          "default": "/assets/editable/hero-default.webp",
+          "target": {
+            "content_path": "pages.home.sections.hero.image",
+            "preview_id": "hero-image",
+            "asset_folder": "public/assets/editable",
+            "public_base": "/assets/editable"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page-structure",
+      "label": "Page structure",
+      "controls": [
+        {
+          "id": "home-section-order",
+          "kind": "section-order",
+          "label": "Section order",
+          "rationale": "Compare a fixed set of existing sections without creating new layout nodes.",
+          "default": ["hero", "story", "proof", "contact"],
+          "target": { "content_path": "pages.home.section_order", "container": "#main-content" },
+          "options": [
+            { "value": "hero", "label": "Hero" },
+            { "value": "story", "label": "Story" },
+            { "value": "proof", "label": "Proof" },
+            { "value": "contact", "label": "Contact" }
+          ]
+        },
+        {
+          "id": "show-guides",
+          "kind": "boolean",
+          "label": "Show composition guides",
+          "rationale": "Inspection-only overlay that never ships to production.",
+          "default": false,
+          "target": { "class_name": "tune-guides" }
+        }
+      ]
+    }
+  ]
+}
