@@ -1,0 +1,100 @@
+{
+  "version": "1.0",
+  "base_url": "http://127.0.0.1:4321",
+  "load_settle_ms": 3000,
+  "reduced_motion_viewport": "mobile",
+  "ignore_console": [
+    "favicon.ico",
+    "ERR_BLOCKED_BY_CLIENT"
+  ],
+  "viewports": [
+    {
+      "id": "desktop-large",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "desktop",
+      "width": 1280,
+      "height": 800
+    },
+    {
+      "id": "tablet",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "mobile",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "routes": [
+    {
+      "id": "home",
+      "path": "/"
+    }
+  ],
+  "interactions": [
+    {
+      "id": "nav-open",
+      "route": "home",
+      "viewports": [
+        "desktop-large",
+        "mobile"
+      ],
+      "steps": [
+        {
+          "action": "click",
+          "selector": "[data-qa='menu-trigger']"
+        },
+        {
+          "action": "wait",
+          "ms": 600
+        }
+      ]
+    },
+    {
+      "id": "project-hover",
+      "route": "home",
+      "viewports": [
+        "desktop-large"
+      ],
+      "steps": [
+        {
+          "action": "hover",
+          "selector": "[data-qa='project-01']"
+        },
+        {
+          "action": "wait",
+          "ms": 500
+        }
+      ]
+    },
+    {
+      "id": "project-scroll-mid",
+      "route": "home",
+      "viewports": [
+        "desktop-large"
+      ],
+      "steps": [
+        {
+          "action": "scrollIntoView",
+          "selector": "[data-qa='project-01']"
+        },
+        {
+          "action": "wait",
+          "ms": 250
+        },
+        {
+          "action": "scrollBy",
+          "y": 360
+        },
+        {
+          "action": "wait",
+          "ms": 250
+        }
+      ]
+    }
+  ]
+}

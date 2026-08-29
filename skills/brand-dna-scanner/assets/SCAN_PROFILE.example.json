@@ -1,0 +1,47 @@
+{
+  "version": "0.1",
+  "mode": "forensic",
+  "brand": {
+    "name": "Example Brand",
+    "website": "https://example.invalid"
+  },
+  "sources": [
+    {
+      "channel": "website",
+      "url": "https://example.invalid",
+      "priority": "high"
+    },
+    {
+      "channel": "instagram",
+      "url": null,
+      "priority": "high"
+    },
+    {
+      "channel": "brand-guidelines",
+      "path": null,
+      "priority": "highest"
+    },
+    {
+      "channel": "campaign",
+      "url": null,
+      "priority": "medium"
+    }
+  ],
+  "domains": {
+    "core": true,
+    "verbal": true,
+    "visual": true,
+    "photography": true,
+    "illustration": true,
+    "motion": true,
+    "web": true,
+    "content": true,
+    "social": true,
+    "campaign": true,
+    "product_packaging": true,
+    "environmental": true,
+    "sonic": true,
+    "behavior": true,
+    "competitive": true
+  }
+}

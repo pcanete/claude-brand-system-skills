@@ -1,0 +1,17 @@
+{
+  "name": "reference-to-astro-skill",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate-inputs.mjs",
+    "audit:assets": "node scripts/audit-assets.mjs",
+    "build:check": "node scripts/build-check.mjs",
+    "qa:visual": "node scripts/visual-qa.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8",
+    "ajv-formats": "^3",
+    "playwright": "^1"
+  }
+}

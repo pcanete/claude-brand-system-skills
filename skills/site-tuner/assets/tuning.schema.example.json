@@ -1,0 +1,69 @@
+{
+  "version": "1.0",
+  "id": "ejemplo-home",
+  "title": "Calibrador de la portada",
+  "query_parameter": "tune",
+  "groups": [
+    {
+      "id": "hero",
+      "label": "Hero",
+      "controls": [
+        {
+          "id": "hero-title-lines",
+          "kind": "text-lines",
+          "label": "Saltos del titular",
+          "selector": "[data-composition-region=\"hero-title\"]",
+          "item_tag": "span",
+          "default": ["Primera línea,", "segunda línea."]
+        },
+        {
+          "id": "hero-title-desktop",
+          "kind": "range",
+          "label": "Título desktop",
+          "css_variable": "--hero-title-fluid",
+          "min": 5,
+          "max": 10,
+          "step": 0.1,
+          "unit": "vw",
+          "default": 8.3
+        },
+        {
+          "id": "hero-copy-width",
+          "kind": "range",
+          "label": "Ancho de la columna",
+          "css_variable": "--hero-copy-width",
+          "min": 320,
+          "max": 640,
+          "step": 5,
+          "unit": "px",
+          "default": 470
+        }
+      ]
+    },
+    {
+      "id": "movimiento",
+      "label": "Movimiento",
+      "controls": [
+        {
+          "id": "hero-motion",
+          "kind": "select",
+          "label": "Modo del hero",
+          "event": "hero:motion-mode",
+          "options": [
+            { "value": "ribbon", "label": "Cinta continua" },
+            { "value": "sequence", "label": "Secuencia" }
+          ],
+          "default": "ribbon"
+        },
+        {
+          "id": "freeze-motion",
+          "kind": "boolean",
+          "label": "Congelar movimiento",
+          "class_name": "is-motion-frozen",
+          "event": "motion:freeze",
+          "default": false
+        }
+      ]
+    }
+  ]
+}

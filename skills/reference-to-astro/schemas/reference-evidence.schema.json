@@ -1,0 +1,528 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reference-web-system.local/reference-evidence.schema.json",
+  "title": "Reference Web System — REFERENCE_EVIDENCE",
+  "type": "object",
+  "required": [
+    "version",
+    "reference",
+    "scan",
+    "viewports",
+    "routes",
+    "captures",
+    "interactions",
+    "motion_samples",
+    "responsive_samples",
+    "coverage",
+    "limitations"
+  ],
+  "properties": {
+    "version": { "type": "string" },
+    "reference": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "scanned_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "scan_id": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "scan": {
+      "type": "object",
+      "required": ["mode", "capabilities"],
+      "properties": {
+        "mode": {
+          "enum": ["quick", "standard", "forensic"]
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": { "type": "boolean" }
+        }
+      }
+    },
+    "viewports": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/viewport" }
+    },
+    "routes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/route" }
+    },
+    "captures": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/capture" }
+    },
+    "interactions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/interaction" }
+    },
+    "motion_samples": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/motion" }
+    },
+    "responsive_samples": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/responsive" }
+    },
+    "behavior_audits": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/behaviorAudit" }
+    },
+    "runtime_observations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/runtimeObservation" }
+    },
+    "technology_hypotheses": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/technologyHypothesis" }
+    },
+    "content_sources": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "accessibility_observations": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "coverage": {
+      "$ref": "#/$defs/coverage"
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "viewport": {
+      "type": "object",
+      "required": ["id", "width", "height"],
+      "properties": {
+        "id": { "type": "string" },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "dpr": {
+          "type": "number",
+          "minimum": 0.1
+        },
+        "device_class": {
+          "enum": ["desktop", "tablet", "mobile"]
+        },
+        "orientation": {
+          "enum": ["portrait", "landscape"]
+        },
+        "input_modes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "pointer",
+              "keyboard",
+              "touch",
+              "wheel",
+              "trackpad",
+              "drag",
+              "swipe"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "route": {
+      "type": "object",
+      "required": [
+        "path",
+        "family",
+        "importance",
+        "scan_status"
+      ],
+      "properties": {
+        "path": { "type": "string" },
+        "family": { "type": "string" },
+        "importance": {
+          "enum": [
+            "primary",
+            "secondary",
+            "utility"
+          ]
+        },
+        "scan_status": {
+          "enum": [
+            "not-scanned",
+            "partial",
+            "complete",
+            "blocked"
+          ]
+        },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "capture": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "route",
+        "artifact"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "enum": [
+            "screenshot",
+            "video",
+            "dom-snapshot",
+            "computed-style",
+            "trace",
+            "other"
+          ]
+        },
+        "route": { "type": "string" },
+        "viewport": {
+          "type": ["string", "null"]
+        },
+        "artifact": { "type": "string" },
+        "scroll_position": {
+          "type": ["number", "null"]
+        },
+        "state": { "type": "object" },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "interaction": {
+      "type": "object",
+      "required": [
+        "id",
+        "route",
+        "action",
+        "confidence"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "route": { "type": "string" },
+        "target": { "type": "object" },
+        "action": { "type": "string" },
+        "observed": { "type": "object" },
+        "before_capture": {
+          "type": ["string", "null"]
+        },
+        "after_capture": {
+          "type": ["string", "null"]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "salience": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "motion": {
+      "type": "object",
+      "required": [
+        "id",
+        "category",
+        "confidence"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "category": {
+          "enum": [
+            "entrance",
+            "exit",
+            "interaction",
+            "scroll-triggered",
+            "scroll-linked",
+            "continuous",
+            "media",
+            "page-transition",
+            "webgl"
+          ]
+        },
+        "target": {
+          "type": ["string", "object"]
+        },
+        "trigger": { "type": "object" },
+        "initial_state": { "type": "object" },
+        "final_state": { "type": "object" },
+        "timing": { "type": "object" },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "salience": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "responsive": {
+      "type": "object",
+      "required": [
+        "id",
+        "target",
+        "transformations"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "target": { "type": "string" },
+        "desktop": { "type": "object" },
+        "tablet": { "type": "object" },
+        "mobile": { "type": "object" },
+        "transformations": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "invariant",
+              "scale",
+              "reflow",
+              "reorder",
+              "replace",
+              "omit",
+              "recrop",
+              "interaction-substitution",
+              "motion-reduction",
+              "layout-mode-change"
+            ]
+          }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "salience": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "behaviorAudit": {
+      "type": "object",
+      "required": [
+        "id",
+        "route",
+        "viewport",
+        "behavior_kind",
+        "target",
+        "input_sequence",
+        "samples",
+        "classification",
+        "confidence",
+        "salience"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "route": { "type": "string" },
+        "viewport": { "type": "string" },
+        "behavior_kind": {
+          "enum": [
+            "pointer-microinteraction",
+            "keyboard-interaction",
+            "touch-interaction",
+            "stateful-component",
+            "scroll-reactive",
+            "scroll-linked",
+            "continuous-motion",
+            "page-transition",
+            "media-interaction",
+            "typography-microinteraction",
+            "responsive-substitution",
+            "other"
+          ]
+        },
+        "target": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "object" }
+          ]
+        },
+        "device_context": { "type": "object" },
+        "input_sequence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "object" }
+        },
+        "samples": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/behaviorSample" }
+        },
+        "classification": {
+          "type": "object",
+          "required": ["activation_model"],
+          "properties": {
+            "activation_model": {
+              "enum": [
+                "autonomous",
+                "scroll-triggered",
+                "scroll-linked",
+                "velocity-coupled",
+                "inertial",
+                "state-driven",
+                "continuous",
+                "unknown"
+              ]
+            },
+            "direction": { "type": ["string", "null"] },
+            "reversible": { "type": ["boolean", "null"] },
+            "interruptible": { "type": ["boolean", "null"] }
+          },
+          "additionalProperties": true
+        },
+        "threshold_probe": { "type": "object" },
+        "velocity_profile": { "type": "object" },
+        "text_probe": { "type": "object" },
+        "reverse_tested": { "type": "boolean" },
+        "idle_tested": { "type": "boolean" },
+        "moving_track": { "type": "boolean" },
+        "touch_tested": { "type": "boolean" },
+        "keyboard_tested": { "type": "boolean" },
+        "reduced_motion_tested": { "type": "boolean" },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "salience": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "behaviorSample": {
+      "type": "object",
+      "required": ["phase", "timestamp_ms", "state"],
+      "properties": {
+        "phase": {
+          "enum": [
+            "idle",
+            "before",
+            "early",
+            "middle",
+            "late",
+            "after",
+            "reverse"
+          ]
+        },
+        "timestamp_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "input_state": { "type": "object" },
+        "scroll_position": { "type": ["number", "null"] },
+        "state": { "type": "object" },
+        "measurements": { "type": "object" },
+        "capture_ref": { "type": ["string", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "runtimeObservation": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "value"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "type": "string" },
+        "value": true,
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "technologyHypothesis": {
+      "type": "object",
+      "required": [
+        "id",
+        "hypothesis",
+        "confidence"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "behavior_ref": {
+          "type": ["string", "null"]
+        },
+        "hypothesis": { "type": "string" },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "visual": { "$ref": "#/$defs/score" },
+        "typography": { "$ref": "#/$defs/score" },
+        "layout": { "$ref": "#/$defs/score" },
+        "media": { "$ref": "#/$defs/score" },
+        "interaction": { "$ref": "#/$defs/score" },
+        "motion": { "$ref": "#/$defs/score" },
+        "responsive": { "$ref": "#/$defs/score" },
+        "transition": { "$ref": "#/$defs/score" },
+        "webgl": { "$ref": "#/$defs/score" }
+      },
+      "additionalProperties": false
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "additionalProperties": true
+}

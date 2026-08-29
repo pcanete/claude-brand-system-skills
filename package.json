@@ -1,0 +1,11 @@
+{
+  "name": "brand-system-skills",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Evidence-driven Brand DNA, reference scanning, and Astro reconstruction skills",
+  "scripts": {
+    "check": "node scripts/check-repository.mjs",
+    "test": "node scripts/check-repository.mjs"
+  }
+}

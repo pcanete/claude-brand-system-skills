@@ -1,0 +1,70 @@
+{
+  "version": "0.4",
+  "mode": "forensic",
+  "reference_url": "https://example.invalid/",
+  "viewports": [
+    {
+      "id": "desktop-large",
+      "width": 1440,
+      "height": 900,
+      "device_class": "desktop",
+      "orientation": "landscape",
+      "input_modes": ["pointer", "keyboard", "wheel"]
+    },
+    {
+      "id": "desktop",
+      "width": 1280,
+      "height": 800,
+      "device_class": "desktop",
+      "orientation": "landscape",
+      "input_modes": ["pointer", "keyboard", "wheel"]
+    },
+    {
+      "id": "tablet",
+      "width": 768,
+      "height": 1024,
+      "device_class": "tablet",
+      "orientation": "portrait",
+      "input_modes": ["touch", "swipe"]
+    },
+    {
+      "id": "mobile",
+      "width": 390,
+      "height": 844,
+      "device_class": "mobile",
+      "orientation": "portrait",
+      "input_modes": ["touch", "swipe"]
+    }
+  ],
+  "priorities": {
+    "visual": "high",
+    "interaction": "high",
+    "motion": "high",
+    "responsive": "high",
+    "webgl": "evidence-driven"
+  },
+  "behavior_passes": {
+    "desktop": [
+      "pointer",
+      "keyboard",
+      "scroll-down",
+      "scroll-up",
+      "idle"
+    ],
+    "mobile": [
+      "tap",
+      "swipe",
+      "scroll-down",
+      "scroll-up",
+      "idle"
+    ],
+    "temporal_phases": [
+      "before",
+      "early",
+      "middle",
+      "late",
+      "after",
+      "reverse"
+    ]
+  }
+}

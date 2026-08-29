@@ -1,0 +1,152 @@
+{
+  "version": "0.3.0",
+  "reference": {
+    "url": "https://example.invalid/",
+    "scanned_at": null,
+    "scan_id": "synthetic-reference-v0.3"
+  },
+  "scan": {
+    "mode": "standard",
+    "capabilities": {
+      "dom": false,
+      "computed_css": false,
+      "screenshots": false,
+      "viewport_resize": false,
+      "pointer": false,
+      "keyboard": false,
+      "scroll": false,
+      "recording": false,
+      "network": false,
+      "source_inspection": false
+    }
+  },
+  "viewports": [],
+  "routes": [
+    {
+      "path": "/",
+      "family": "home",
+      "importance": "primary",
+      "scan_status": "partial",
+      "notes": "Structural/content evidence only."
+    },
+    {
+      "path": "/process",
+      "family": "editorial-process",
+      "importance": "secondary",
+      "scan_status": "partial",
+      "notes": ""
+    },
+    {
+      "path": "/gallery",
+      "family": "gallery",
+      "importance": "secondary",
+      "scan_status": "partial",
+      "notes": ""
+    },
+    {
+      "path": "/product",
+      "family": "product",
+      "importance": "secondary",
+      "scan_status": "partial",
+      "notes": ""
+    },
+    {
+      "path": "/accessibility",
+      "family": "utility",
+      "importance": "utility",
+      "scan_status": "partial",
+      "notes": ""
+    }
+  ],
+  "captures": [],
+  "interactions": [],
+  "motion_samples": [],
+  "responsive_samples": [],
+  "runtime_observations": [
+    {
+      "id": "synthetic-load-indicator",
+      "kind": "load-experience",
+      "value": "Visible percentage loading indicator.",
+      "confidence": 0.95
+    },
+    {
+      "id": "synthetic-gallery-filter",
+      "kind": "filtering",
+      "value": [
+        "Context",
+        "Detail",
+        "System"
+      ],
+      "confidence": 0.99
+    },
+    {
+      "id": "synthetic-product-drag",
+      "kind": "direct-manipulation",
+      "value": "Product experience instructs the user to drag around.",
+      "confidence": 0.99
+    },
+    {
+      "id": "synthetic-media-sequence",
+      "kind": "media-sequence",
+      "value": "Three-step object transformation sequence presented in explicit order.",
+      "confidence": 0.99
+    },
+    {
+      "id": "synthetic-fullscreen-media",
+      "kind": "fullscreen-media",
+      "value": "Media opens to a fullscreen view from the gallery.",
+      "confidence": 0.99
+    },
+    {
+      "id": "synthetic-editorial-register",
+      "kind": "page-composition",
+      "value": "Sections alternate long-form editorial copy with full-width image sequences; product is introduced through process rather than specification.",
+      "confidence": 0.8
+    }
+  ],
+  "technology_hypotheses": [
+    {
+      "id": "synthetic-product-renderer",
+      "behavior_ref": "synthetic-product-drag",
+      "hypothesis": "Could be WebGL, image sequence, canvas, or another interactive renderer.",
+      "confidence": 0.25,
+      "evidence": [
+        "Direct manipulation exists, rendering technology was not verified."
+      ]
+    }
+  ],
+  "content_sources": [
+    {
+      "id": "synthetic-inquiry-journey",
+      "kind": "primary-cta",
+      "value": "Every section terminates in an inquiry call to action; no cart or checkout exists.",
+      "confidence": 0.9
+    }
+  ],
+  "accessibility_observations": [
+    {
+      "id": "synthetic-accessibility-target",
+      "category": "conformance-target",
+      "declared_target": "WCAG 2.1 AA",
+      "observed_behavior": null,
+      "confidence": 0.99
+    }
+  ],
+  "coverage": {
+    "visual": 0.4,
+    "typography": 0.3,
+    "layout": 0.4,
+    "media": 0.65,
+    "interaction": 0.45,
+    "motion": 0.15,
+    "responsive": 0.05,
+    "transition": 0.05,
+    "webgl": 0.1
+  },
+  "limitations": [
+    "No direct browser runtime interaction capture in this checkpoint.",
+    "No multi-viewport evidence.",
+    "No temporal motion recording.",
+    "Direct manipulation rendering technology remains unknown."
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "version": "0.1.0",
+  "brand": {
+    "name": "Example Brand"
+  },
+  "scan": {
+    "mode": "forensic",
+    "capabilities": {
+      "web": true,
+      "images": true,
+      "video": false,
+      "social": true,
+      "documents": true
+    }
+  },
+  "sources": [
+    {
+      "id": "src-campaign",
+      "url": null,
+      "path": null,
+      "channel": "campaign",
+      "date": null,
+      "campaign": "Campaign 01",
+      "locale": "en",
+      "authority": "official-current-campaign",
+      "status": "current"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-campaign-01",
+      "type": "visual",
+      "source_refs": [
+        "src-campaign"
+      ],
+      "artifact": null,
+      "description": "Campaign typography repeats oversized display behavior.",
+      "observed": {
+        "display_type": "oversized"
+      },
+      "notes": ""
+    }
+  ],
+  "coverage": {
+    "core": 0.75,
+    "verbal": 0.8,
+    "visual": 0.9,
+    "photography": 0.7,
+    "motion": 0.45,
+    "web": 0.8,
+    "social": 0.4,
+    "product": 0.2
+  },
+  "limitations": [
+    "Deliberately unsupported fixture. The validator must reject it."
+  ]
+}

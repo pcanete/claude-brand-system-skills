@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pcanete/claude-brand-system-skills/schemas/tuning-contract.schema.json",
+  "title": "TUNING_SCHEMA",
+  "description": "El contrato del calibrador de un proyecto: qué controles existen, sobre qué actúan y entre qué límites. Es lo que separa un calibrador de un editor visual — lo que no está declarado acá no se puede tocar.",
+  "type": "object",
+  "required": [
+    "version",
+    "id",
+    "title",
+    "groups"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifica este contrato. El endpoint rechaza un guardado cuyo payload declare otro id."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "query_parameter": {
+      "type": "string",
+      "default": "tune",
+      "description": "Parámetro que habilita el panel en desarrollo."
+    },
+    "groups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "controls"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "controls": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/control"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "control": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "label",
+        "default"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "kind": {
+          "enum": [
+            "range",
+            "select",
+            "boolean",
+            "text-lines"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "default": true,
+        "css_variable": {
+          "type": "string",
+          "pattern": "^--[a-z0-9-]+$",
+          "description": "Variable CSS que el control escribe. Sólo para range."
+        },
+        "unit": {
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "step": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "selector": {
+          "type": "string",
+          "description": "Región que el control edita. Sólo para text-lines."
+        },
+        "item_tag": {
+          "type": "string"
+        },
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": [
+              "value",
+              "label"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "class_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Clase que el control activa o desactiva en el documento. Para efectos que no son un valor: mostrar guías, congelar movimiento."
+        },
+        "event": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Evento que el control despacha para que el componente reaccione. Un modo de movimiento no es una variable CSS: el componente tiene que enterarse."
+        },
+        "event_detail": {
+          "description": "Payload del evento. Su forma la define quien lo escucha."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "range"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "min",
+              "max",
+              "css_variable"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "select"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "options"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "text-lines"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "selector"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

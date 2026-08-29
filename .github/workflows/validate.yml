@@ -1,0 +1,41 @@
+name: Validate skills
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            skills/brand-dna-scanner/package-lock.json
+            skills/reference-scanner/package-lock.json
+            skills/reference-to-astro/package-lock.json
+            skills/site-tuner/package-lock.json
+
+      - name: Install Brand DNA validator dependencies
+        run: npm ci --prefix skills/brand-dna-scanner
+
+      - name: Install reference scanner validator dependencies
+        run: npm ci --prefix skills/reference-scanner
+
+      - name: Install Astro builder validator dependencies
+        run: npm ci --prefix skills/reference-to-astro
+
+      - name: Install site tuner validator dependencies
+        run: npm ci --prefix skills/site-tuner
+
+      - name: Validate repository
+        run: npm test

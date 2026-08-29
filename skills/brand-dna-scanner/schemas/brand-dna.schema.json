@@ -1,0 +1,374 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://brand-dna-scanner.local/brand-dna.schema.json",
+  "title": "Brand DNA",
+  "type": "object",
+  "required": [
+    "version",
+    "brand",
+    "coverage",
+    "core",
+    "verbal",
+    "visual",
+    "distinctive_assets",
+    "rules",
+    "observations"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "brand": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "website": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        },
+        "scan_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scanned_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Date or date-time. A scan records the day it happened.",
+          "anyOf": [
+            {
+              "format": "date"
+            },
+            {
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      }
+    },
+    "core": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "positioning": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "personality": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "verbal": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "semantic_territory": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "visual": {
+      "type": "object",
+      "properties": {
+        "logo": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "color": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "typography": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "layout": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "shape_language": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "surfaces": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "photography": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "illustration": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "iconography": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "cgi_3d": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "motion": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "web_experience": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "ui": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "storytelling": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "social": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "campaigns": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "product_packaging": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "environmental": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "sonic": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "behavior": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "temporal": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "competitive": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "distinctive_assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/distinctiveAsset"
+      }
+    },
+    "recognition_model": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "relationship_graph": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "contradictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "rules": {
+      "type": "object",
+      "required": [
+        "must_preserve",
+        "may_adapt",
+        "must_not_introduce"
+      ],
+      "properties": {
+        "must_preserve": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "may_adapt": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "must_not_introduce": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "channel_specific": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "campaign_specific": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "observation": {
+      "type": "object",
+      "required": [
+        "path",
+        "value",
+        "mode",
+        "confidence",
+        "salience",
+        "recurrence",
+        "consistency",
+        "distinctiveness"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "value": true,
+        "mode": {
+          "enum": [
+            "exact",
+            "derived",
+            "inferred",
+            "adaptive",
+            "unknown"
+          ]
+        },
+        "confidence": {
+          "$ref": "#/$defs/score"
+        },
+        "salience": {
+          "$ref": "#/$defs/score"
+        },
+        "recurrence": {
+          "$ref": "#/$defs/score"
+        },
+        "consistency": {
+          "$ref": "#/$defs/score"
+        },
+        "distinctiveness": {
+          "$ref": "#/$defs/score"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "distinctiveAsset": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "salience",
+        "recurrence",
+        "consistency",
+        "distinctiveness"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "salience": {
+          "$ref": "#/$defs/score"
+        },
+        "recurrence": {
+          "$ref": "#/$defs/score"
+        },
+        "consistency": {
+          "$ref": "#/$defs/score"
+        },
+        "distinctiveness": {
+          "$ref": "#/$defs/score"
+        },
+        "ownership_confidence": {
+          "$ref": "#/$defs/score"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "additionalProperties": true
+}

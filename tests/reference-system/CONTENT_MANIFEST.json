@@ -1,0 +1,81 @@
+{
+  "version": "1.0",
+  "brand": {
+    "name": "Example Brand",
+    "short_name": "Example",
+    "tagline": "Example tagline",
+    "description": "Example description",
+    "logo": "/assets/logo.svg",
+    "favicon": "/favicon.svg"
+  },
+  "navigation": [
+    {
+      "label": "Work",
+      "href": "/work",
+      "target": "_self"
+    },
+    {
+      "label": "About",
+      "href": "/about",
+      "target": "_self"
+    }
+  ],
+  "pages": {
+    "home": {
+      "route": "/",
+      "seo": {
+        "title": "Example Brand",
+        "description": "Example website"
+      },
+      "sections": [
+        {
+          "id": "hero",
+          "type": "hero",
+          "eyebrow": "Independent studio",
+          "title": "Building what comes next.",
+          "body": "Example body copy.",
+          "cta": {
+            "label": "View work",
+            "href": "/work"
+          },
+          "media": [
+            "hero-image"
+          ]
+        }
+      ]
+    }
+  },
+  "assets": [
+    {
+      "id": "hero-image",
+      "type": "image",
+      "src": "/assets/hero.webp",
+      "alt": "Example hero image",
+      "focal_point": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "usage": [
+        "home.hero"
+      ]
+    }
+  ],
+  "links": {},
+  "social": {},
+  "journeys": [
+    {
+      "id": "primary",
+      "goal": "Contact the studio",
+      "entry_points": [
+        "/"
+      ],
+      "steps": [
+        "/",
+        "/contact"
+      ],
+      "conversion": "/contact",
+      "priority": "high"
+    }
+  ],
+  "metadata": {}
+}

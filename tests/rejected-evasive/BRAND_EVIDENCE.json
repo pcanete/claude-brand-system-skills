@@ -1,0 +1,52 @@
+{
+  "version": "0.1.0",
+  "brand": {
+    "name": "Example Brand"
+  },
+  "scan": {
+    "mode": "standard",
+    "capabilities": {
+      "web": false,
+      "images": false,
+      "video": false,
+      "social": false,
+      "documents": false
+    }
+  },
+  "sources": [
+    {
+      "id": "src-web",
+      "url": "https://example.invalid",
+      "path": null,
+      "channel": "website",
+      "date": null,
+      "campaign": null,
+      "locale": "en",
+      "authority": "inferred",
+      "status": "current"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-none",
+      "type": "visual",
+      "source_refs": [
+        "src-web"
+      ],
+      "artifact": null,
+      "description": "Placeholder with nothing observed.",
+      "observed": {},
+      "notes": ""
+    }
+  ],
+  "coverage": {
+    "core": 0.55,
+    "verbal": 0.55,
+    "visual": 0.55,
+    "photography": 0.55,
+    "motion": 0.4
+  },
+  "limitations": [
+    "Deliberately evasive fixture. The validator must reject it."
+  ]
+}

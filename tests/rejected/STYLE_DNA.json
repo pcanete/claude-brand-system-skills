@@ -1,0 +1,122 @@
+{
+  "version": "0.3.0",
+  "reference": {
+    "url": "https://example.invalid/",
+    "scanned_at": null,
+    "scan_id": "synthetic-reference-v0.3",
+    "routes_observed": [
+      "/",
+      "/process",
+      "/gallery",
+      "/product",
+      "/accessibility"
+    ],
+    "viewports_observed": [],
+    "notes": "Partial benchmark data. Runtime interaction evidence not yet captured."
+  },
+  "art_direction": {
+    "summary": "Synthetic editorial product experience where expressive typography and image sequences frame a configurable object through a narrative process.",
+    "keywords": [
+      "precise",
+      "editorial",
+      "photographic",
+      "object-led",
+      "narrative"
+    ]
+  },
+  "tokens": {},
+  "layout": {},
+  "typography": {},
+  "components": [],
+  "media": {
+    "sequences": [
+      {
+        "id": "object-process-sequence",
+        "semantic_role": "process-transformation",
+        "items": [
+          "Your object",
+          "From source",
+          "To artifact"
+        ],
+        "ordering": "explicit",
+        "confidence": 0.99,
+        "salience": 0.95
+      }
+    ],
+    "interactive_scenes": [
+      {
+        "id": "product-viewer",
+        "semantic_role": "object-inspection",
+        "interaction": "drag",
+        "rendering_technology": "unknown",
+        "confidence": 0.72,
+        "salience": 0.92
+      }
+    ]
+  },
+  "interaction": {
+    "navigation": {
+      "state_machine": {
+        "states": [
+          "closed",
+          "open"
+        ],
+        "transition_states": [
+          "opening",
+          "closing"
+        ],
+        "transition_behavior": "unknown"
+      }
+    },
+    "filtering": [
+      {
+        "id": "gallery-filter",
+        "options": [
+          "Context",
+          "Detail",
+          "System"
+        ],
+        "confidence": 0.99,
+        "salience": 0.77
+      }
+    ],
+    "fullscreen_media": {
+      "enabled": true,
+      "confidence": 0.99
+    },
+    "direct_manipulation": [
+      {
+        "id": "product-drag",
+        "input": "drag",
+        "behavior": "spatial inspection",
+        "technology": "unknown",
+        "confidence": 0.72,
+        "salience": 0.92
+      }
+    ]
+  },
+  "motion": {},
+  "experience": {
+    "load": {
+      "enabled": true,
+      "progress_indicator": "percentage",
+      "observed_initial_value": "0%",
+      "completion_behavior": "unknown"
+    }
+  },
+  "content_behavior": {
+    "primary_journey": "inquiry"
+  },
+  "responsive": {},
+  "webgl": {
+    "required": "unknown",
+    "observed_effects": [],
+    "fallback": null
+  },
+  "constraints": {
+    "must_preserve": [],
+    "may_adapt": [],
+    "must_not_introduce": []
+  },
+  "observations": []
+}

@@ -1,0 +1,83 @@
+{
+  "version": "0.3.0",
+  "reference": {
+    "url": "https://example.invalid/",
+    "scanned_at": null,
+    "scan_id": "synthetic-reference-v0.3"
+  },
+  "scan": {
+    "mode": "standard",
+    "capabilities": {
+      "dom": false,
+      "computed_css": false,
+      "screenshots": false,
+      "viewport_resize": false,
+      "pointer": false,
+      "keyboard": false,
+      "scroll": false,
+      "recording": false,
+      "network": false,
+      "source_inspection": false
+    }
+  },
+  "viewports": [],
+  "routes": [
+    {
+      "path": "/",
+      "family": "home",
+      "importance": "primary",
+      "scan_status": "partial",
+      "notes": "Structural/content evidence only."
+    },
+    {
+      "path": "/process",
+      "family": "editorial-process",
+      "importance": "secondary",
+      "scan_status": "partial",
+      "notes": ""
+    },
+    {
+      "path": "/gallery",
+      "family": "gallery",
+      "importance": "secondary",
+      "scan_status": "partial",
+      "notes": ""
+    },
+    {
+      "path": "/product",
+      "family": "product",
+      "importance": "secondary",
+      "scan_status": "partial",
+      "notes": ""
+    },
+    {
+      "path": "/accessibility",
+      "family": "utility",
+      "importance": "utility",
+      "scan_status": "partial",
+      "notes": ""
+    }
+  ],
+  "captures": [],
+  "interactions": [],
+  "motion_samples": [],
+  "responsive_samples": [],
+  "runtime_observations": [],
+  "technology_hypotheses": [],
+  "content_sources": [],
+  "accessibility_observations": [],
+  "coverage": {
+    "visual": 0.9,
+    "typography": 0.85,
+    "layout": 0.8,
+    "media": 0.8,
+    "interaction": 0.75,
+    "motion": 0.7,
+    "responsive": 0.7,
+    "transition": 0.6,
+    "webgl": 0.6
+  },
+  "limitations": [
+    "Deliberately unsupported fixture. The validator must reject it."
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reference-web-system.local/content-manifest.schema.json",
+  "title": "Reference Web System — CONTENT_MANIFEST",
+  "type": "object",
+  "required": [
+    "version",
+    "brand",
+    "pages",
+    "assets"
+  ],
+  "properties": {
+    "version": { "type": "string" },
+    "brand": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "short_name": { "type": "string" },
+        "tagline": { "type": "string" },
+        "description": { "type": "string" },
+        "logo": {
+          "type": ["string", "null"]
+        },
+        "favicon": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "navigation": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/link" }
+    },
+    "pages": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/page"
+      }
+    },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/asset" }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "social": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "journeys": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "link": {
+      "type": "object",
+      "required": ["label", "href"],
+      "properties": {
+        "label": { "type": "string" },
+        "href": { "type": "string" },
+        "target": {
+          "enum": ["_self", "_blank"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "page": {
+      "type": "object",
+      "required": ["route", "sections"],
+      "properties": {
+        "route": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "seo": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "image": {
+              "type": ["string", "null"]
+            }
+          },
+          "additionalProperties": true
+        },
+        "sections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/section" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "section": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eyebrow": { "type": "string" },
+        "title": { "type": "string" },
+        "body": {
+          "type": ["string", "array"]
+        },
+        "cta": { "$ref": "#/$defs/link" },
+        "media": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "items": { "type": "array" },
+        "data": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "asset": {
+      "type": "object",
+      "required": ["id", "type", "src"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": [
+            "image",
+            "video",
+            "audio",
+            "logo",
+            "icon",
+            "font",
+            "document",
+            "other"
+          ]
+        },
+        "src": {
+          "type": "string",
+          "minLength": 1
+        },
+        "alt": { "type": "string" },
+        "caption": { "type": "string" },
+        "focal_point": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "y": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "required": ["x", "y"],
+          "additionalProperties": false
+        },
+        "usage": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "metadata": { "type": "object" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

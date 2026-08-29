@@ -1,0 +1,39 @@
+---
+interface Control {
+  id: string;
+  kind: string;
+  css_variable?: string;
+  unit?: string;
+  default?: unknown;
+}
+
+interface Schema {
+  groups: Array<{ controls: Control[] }>;
+}
+
+interface Values {
+  values?: Record<string, unknown>;
+}
+
+interface Props {
+  schema: Schema;
+  approved: Values;
+}
+
+const { schema, approved } = Astro.props;
+const declarations = schema.groups
+  .flatMap((group) => group.controls)
+  .filter((control) => control.kind === 'range' && control.css_variable)
+  .map((control) => {
+    const value = approved.values?.[control.id] ?? control.default;
+    return `${control.css_variable}: ${value}${control.unit ?? ''};`;
+  })
+  .join('');
+---
+
+<!--
+  `html:root` intentionally has more specificity than the default `:root`
+  tokens emitted by global.css. This keeps approved tuner values authoritative
+  even when a production optimizer or WordPress changes stylesheet order.
+-->
+<style is:global set:html={`html:root{${declarations}}`}></style>

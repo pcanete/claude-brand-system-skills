@@ -1,0 +1,211 @@
+{
+  "version": "0.1.0",
+  "brand": {
+    "name": "Example Brand",
+    "website": "https://example.invalid",
+    "scan_id": "example-brand-001",
+    "scanned_at": null
+  },
+  "coverage": {
+    "core": 0.75,
+    "verbal": 0.8,
+    "visual": 0.9,
+    "photography": 0.7,
+    "motion": 0.45,
+    "web": 0.8,
+    "social": 0.4,
+    "product": 0.2
+  },
+  "core": {
+    "essence": "Technical precision presented as cultural confidence."
+  },
+  "positioning": {},
+  "personality": {
+    "primary_traits": [
+      "precise",
+      "confident",
+      "restrained",
+      "cultured"
+    ]
+  },
+  "verbal": {
+    "signature": "Concise, authoritative language balanced by occasional conceptual phrasing."
+  },
+  "semantic_territory": {},
+  "visual": {
+    "logo": {},
+    "color": {},
+    "typography": {},
+    "layout": {},
+    "shape_language": {},
+    "surfaces": {}
+  },
+  "photography": {},
+  "illustration": {},
+  "iconography": {},
+  "cgi_3d": {},
+  "motion": {},
+  "web_experience": {},
+  "ui": {},
+  "content": {},
+  "storytelling": {},
+  "social": {},
+  "campaigns": {},
+  "product_packaging": {},
+  "environmental": {},
+  "sonic": {},
+  "behavior": {},
+  "temporal": {},
+  "competitive": {},
+  "distinctive_assets": [
+    {
+      "id": "display-type",
+      "type": "typography",
+      "description": "Oversized controlled display typography.",
+      "salience": 0.95,
+      "recurrence": 0.9,
+      "consistency": 0.88,
+      "distinctiveness": 0.76,
+      "ownership_confidence": 0.68,
+      "evidence_refs": [
+        "ev-web-home",
+        "ev-campaign-01"
+      ]
+    }
+  ],
+  "recognition_model": {
+    "minimum_set": [
+      "display-type",
+      "controlled-grid",
+      "sculptural-photography"
+    ]
+  },
+  "relationship_graph": [
+    {
+      "principle": "Precision with cultural confidence",
+      "expressions": {
+        "verbal": "Short authoritative claims.",
+        "typography": "Controlled oversized display type.",
+        "photography": "Objects treated sculpturally.",
+        "motion": "Restrained motion with minimal overshoot."
+      }
+    }
+  ],
+  "contradictions": [],
+  "rules": {
+    "must_preserve": [
+      "Strong controlled typographic hierarchy.",
+      "Precise visual rhythm."
+    ],
+    "may_adapt": [
+      "Literal type size.",
+      "Image subject matter."
+    ],
+    "must_not_introduce": [
+      "Generic playful startup illustration.",
+      "Excessive decorative gradients."
+    ],
+    "channel_specific": [],
+    "campaign_specific": []
+  },
+  "observations": [
+    {
+      "path": "visual.typography.display_behavior",
+      "value": "Oversized controlled display typography",
+      "mode": "derived",
+      "confidence": 0.9,
+      "salience": 0.95,
+      "recurrence": 0.9,
+      "consistency": 0.88,
+      "distinctiveness": 0.76,
+      "evidence_refs": [
+        "ev-web-home",
+        "ev-campaign-01"
+      ],
+      "notes": ""
+    },
+    {
+      "path": "core.essence",
+      "value": "Technical precision presented as cultural confidence",
+      "mode": "derived",
+      "confidence": 0.72,
+      "salience": 0.85,
+      "recurrence": 0.7,
+      "consistency": 0.8,
+      "distinctiveness": 0.6,
+      "evidence_refs": [
+        "ev-web-copy",
+        "ev-campaign-copy"
+      ],
+      "notes": "Inferred from language across two channels; not a declared statement."
+    },
+    {
+      "path": "verbal.tone.register",
+      "value": "short declarative claims without superlatives",
+      "mode": "exact",
+      "confidence": 0.88,
+      "salience": 0.8,
+      "recurrence": 0.75,
+      "consistency": 0.82,
+      "distinctiveness": 0.55,
+      "evidence_refs": [
+        "ev-web-copy",
+        "ev-campaign-copy"
+      ],
+      "notes": "Register is shared; distinctiveness is category-average."
+    },
+    {
+      "path": "photography.subject_treatment",
+      "value": "single object, hard directional light, neutral ground",
+      "mode": "exact",
+      "confidence": 0.9,
+      "salience": 0.86,
+      "recurrence": 0.7,
+      "consistency": 0.78,
+      "distinctiveness": 0.7,
+      "evidence_refs": [
+        "ev-web-photography",
+        "ev-social-photography"
+      ],
+      "notes": ""
+    },
+    {
+      "path": "web_experience.navigation.header",
+      "value": "persistent minimal header with one primary action",
+      "mode": "exact",
+      "confidence": 0.9,
+      "salience": 0.62,
+      "recurrence": 0.3,
+      "consistency": 0.5,
+      "distinctiveness": 0.3,
+      "evidence_refs": [
+        "ev-web-navigation"
+      ],
+      "notes": "Website only. Channel-specific: a single source cannot establish recurrence."
+    },
+    {
+      "path": "personality.primary_traits",
+      "value": [
+        "precise",
+        "confident",
+        "restrained",
+        "cultured"
+      ],
+      "mode": "derived",
+      "confidence": 0.7,
+      "salience": 0.75,
+      "recurrence": 0.7,
+      "consistency": 0.78,
+      "distinctiveness": 0.5,
+      "evidence_refs": [
+        "ev-web-copy",
+        "ev-campaign-copy"
+      ],
+      "notes": "Traits are read from language across two channels. Personality is the easiest thing to project onto a brand: without copy behind it, this stays unwritten."
+    }
+  ],
+  "limitations": [
+    "Synthetic example. No motion, product or environmental material was inventoried.",
+    "Web experience rests on a single source, so it stays channel-specific."
+  ]
+}

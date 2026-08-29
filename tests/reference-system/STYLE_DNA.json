@@ -1,0 +1,238 @@
+{
+  "version": "0.3.0",
+  "reference": {
+    "url": "https://example.invalid/",
+    "scanned_at": null,
+    "scan_id": "synthetic-reference-v0.3",
+    "routes_observed": [
+      "/",
+      "/process",
+      "/gallery",
+      "/product",
+      "/accessibility"
+    ],
+    "viewports_observed": [],
+    "notes": "Partial benchmark data. Runtime interaction evidence not yet captured."
+  },
+  "art_direction": {
+    "summary": "Synthetic editorial product experience where expressive typography and image sequences frame a configurable object through a narrative process.",
+    "keywords": [
+      "precise",
+      "editorial",
+      "photographic",
+      "object-led",
+      "narrative"
+    ]
+  },
+  "tokens": {},
+  "layout": {},
+  "typography": {},
+  "components": [],
+  "media": {
+    "sequences": [
+      {
+        "id": "object-process-sequence",
+        "semantic_role": "process-transformation",
+        "items": [
+          "Your object",
+          "From source",
+          "To artifact"
+        ],
+        "ordering": "explicit",
+        "confidence": 0.99,
+        "salience": 0.95
+      }
+    ],
+    "interactive_scenes": [
+      {
+        "id": "product-viewer",
+        "semantic_role": "object-inspection",
+        "interaction": "drag",
+        "rendering_technology": "unknown",
+        "confidence": 0.72,
+        "salience": 0.92
+      }
+    ]
+  },
+  "interaction": {
+    "navigation": {
+      "state_machine": {
+        "states": [
+          "closed",
+          "open"
+        ],
+        "transition_states": [
+          "opening",
+          "closing"
+        ],
+        "transition_behavior": "unknown"
+      }
+    },
+    "filtering": [
+      {
+        "id": "gallery-filter",
+        "options": [
+          "Context",
+          "Detail",
+          "System"
+        ],
+        "confidence": 0.99,
+        "salience": 0.77
+      }
+    ],
+    "fullscreen_media": {
+      "enabled": true,
+      "confidence": 0.99
+    },
+    "direct_manipulation": [
+      {
+        "id": "product-drag",
+        "input": "drag",
+        "behavior": "spatial inspection",
+        "technology": "unknown",
+        "confidence": 0.72,
+        "salience": 0.92
+      }
+    ]
+  },
+  "motion": {},
+  "experience": {
+    "load": {
+      "enabled": true,
+      "progress_indicator": "percentage",
+      "observed_initial_value": "0%",
+      "completion_behavior": "unknown"
+    }
+  },
+  "content_behavior": {
+    "primary_journey": "inquiry"
+  },
+  "responsive": {},
+  "webgl": {
+    "required": "unknown",
+    "observed_effects": [],
+    "fallback": null
+  },
+  "constraints": {
+    "must_preserve": [
+      "editorial positioning over conventional ecommerce language",
+      "photography as primary narrative material",
+      "strong relationship between typography and image sequencing",
+      "inquiry CTA as recurring business priority",
+      "process narrative as part of product value"
+    ],
+    "may_adapt": [
+      "literal gallery image count",
+      "product imagery",
+      "inquiry pricing"
+    ],
+    "must_not_introduce": [
+      "generic ecommerce product-grid aesthetic",
+      "dashboard-like interaction patterns",
+      "dense conventional product cards"
+    ]
+  },
+  "observations": [
+    {
+      "path": "experience.load.progress_indicator",
+      "value": "percentage",
+      "mode": "exact",
+      "confidence": 0.95,
+      "salience": 0.72,
+      "evidence_refs": [
+        "synthetic-load-indicator"
+      ],
+      "source": "website structure",
+      "notes": ""
+    },
+    {
+      "path": "interaction.filtering.gallery",
+      "value": [
+        "Context",
+        "Detail",
+        "System"
+      ],
+      "mode": "exact",
+      "confidence": 0.99,
+      "salience": 0.77,
+      "evidence_refs": [
+        "synthetic-gallery-filter"
+      ],
+      "source": "gallery structure",
+      "notes": ""
+    },
+    {
+      "path": "interaction.direct_manipulation.product",
+      "value": "drag-based spatial inspection",
+      "mode": "inferred",
+      "confidence": 0.72,
+      "salience": 0.92,
+      "evidence_refs": [
+        "synthetic-product-drag"
+      ],
+      "source": "product interaction instruction",
+      "notes": "Rendering technology remains unknown."
+    },
+    {
+      "path": "media.sequences.object_process",
+      "value": "explicitly ordered three-step transformation sequence",
+      "mode": "exact",
+      "confidence": 0.99,
+      "salience": 0.95,
+      "evidence_refs": [
+        "synthetic-media-sequence"
+      ],
+      "source": "page content order",
+      "notes": ""
+    },
+    {
+      "path": "media.interactive_scenes.product_viewer",
+      "value": "drag-inspected product scene",
+      "mode": "inferred",
+      "confidence": 0.72,
+      "salience": 0.92,
+      "evidence_refs": [
+        "synthetic-product-drag"
+      ],
+      "source": "product interaction instruction",
+      "notes": "Rendering technology remains unknown."
+    },
+    {
+      "path": "interaction.fullscreen_media",
+      "value": "gallery media opens fullscreen",
+      "mode": "exact",
+      "confidence": 0.99,
+      "salience": 0.7,
+      "evidence_refs": [
+        "synthetic-fullscreen-media"
+      ],
+      "source": "gallery structure",
+      "notes": ""
+    },
+    {
+      "path": "art_direction.summary",
+      "value": "editorial narrative framing of a configurable object",
+      "mode": "derived",
+      "confidence": 0.8,
+      "salience": 0.85,
+      "evidence_refs": [
+        "synthetic-editorial-register",
+        "synthetic-media-sequence"
+      ],
+      "source": "section composition",
+      "notes": "Derived from section order and sequence roles, not from a stated positioning."
+    },
+    {
+      "path": "content_behavior.primary_journey",
+      "value": "inquiry",
+      "mode": "exact",
+      "confidence": 0.9,
+      "salience": 0.65,
+      "evidence_refs": [
+        "synthetic-inquiry-journey"
+      ],
+      "source": "call-to-action inventory",
+      "notes": ""
+    }
+  ]
+}

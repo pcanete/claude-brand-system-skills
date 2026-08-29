@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reference Scanner"
+  short_description: "Extrae ADN visual y comportamiento web desktop/móvil"
+  default_prompt: "Usa $reference-scanner para analizar esta web de referencia en desktop y móvil, probar sus interacciones y movimiento, y generar evidencia, STYLE_DNA y un informe de estilo."

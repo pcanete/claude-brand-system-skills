@@ -1,0 +1,4 @@
+interface:
+  display_name: "Brand DNA Scanner"
+  short_description: "Extrae un ADN de marca basado en evidencia"
+  default_prompt: "Usa $brand-dna-scanner para analizar estos materiales y crear un ADN de marca reutilizable, con evidencia, reglas y límites claros."

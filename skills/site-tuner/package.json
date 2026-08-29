@@ -1,0 +1,13 @@
+{
+  "name": "site-tuner-skill",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Calibrador acotado para un sitio ya construido",
+  "scripts": {
+    "validate": "node scripts/validate-tuning.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "version": "0.1.0",
+  "brand": { "name": "Example Brand" },
+  "rules": [
+    {
+      "id": "no-rhetorical-opening",
+      "kind": "forbid",
+      "statement": "Never open with a rhetorical question.",
+      "rationale": "Every piece in the inventory opens by asserting. The question opening belongs to the category, not to this brand.",
+      "scope": ["opening"],
+      "severity": "block",
+      "evidence_refs": ["ev-web-copy", "ev-campaign-copy"],
+      "detect": {
+        "type": "regex",
+        "pattern": "^\\s*(¿|\\?|did you know|ever wonder|what if)[^\\n]*\\?",
+        "flags": "i"
+      }
+    },
+    {
+      "id": "no-superlative-cta",
+      "kind": "forbid",
+      "statement": "No superlative calls to action.",
+      "rationale": "The brand states costs, it does not promise transformation.",
+      "scope": ["cta", "closing"],
+      "severity": "block",
+      "evidence_refs": ["ev-campaign-copy"],
+      "detect": {
+        "type": "regex",
+        "pattern": "\\b(now|today only|unlock|supercharge|revolution\\w*|transform your)\\b",
+        "flags": "i"
+      }
+    },
+    {
+      "id": "figures-carry-a-source",
+      "kind": "require",
+      "statement": "Any percentage or statistic carries a named source, or is marked illustrative.",
+      "rationale": "Observed in every piece that cites a number.",
+      "scope": ["all"],
+      "severity": "warn",
+      "evidence_refs": ["ev-web-copy"],
+      "detect": {
+        "type": "regex",
+        "pattern": "(\\d+\\s?%[\\s\\S]{0,400}?(source|fuente|according to|https?://))|^(?![\\s\\S]*\\d+\\s?%)",
+        "flags": "i"
+      }
+    },
+    {
+      "id": "turn-implicates-the-reader",
+      "kind": "require",
+      "statement": "The argument turns on something that costs the reader, not only the market.",
+      "rationale": "The distinctive move in the observed pieces. Cannot be matched by pattern.",
+      "scope": ["body"],
+      "severity": "block",
+      "evidence_refs": ["ev-campaign-copy"],
+      "detect": {
+        "type": "manual",
+        "asks": "Does the piece name something the reader stands to lose, rather than only diagnosing the market?"
+      }
+    }
+  ]
+}

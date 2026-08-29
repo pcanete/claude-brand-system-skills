@@ -1,0 +1,76 @@
+/*
+ * WordPress compatibility preflight.
+ *
+ * It loads after wp_head() and before the compiled Astro stylesheet. The body
+ * class keeps every rule inside the plugin front page; the Astro component rules
+ * load afterwards and remain the final design authority.
+ */
+
+:where(body.{{slug}}) {
+  color: var(--paper, #f2f2f2);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+:where(body.{{slug}}) :where(
+  address,
+  blockquote,
+  dd,
+  dl,
+  dt,
+  fieldset,
+  figure,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  hr,
+  legend,
+  li,
+  ol,
+  p,
+  pre,
+  ul
+) {
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  margin: 0;
+  padding: 0;
+  text-transform: inherit;
+}
+
+:where(body.{{slug}}) :where(a) {
+  color: inherit;
+  text-decoration: none;
+}
+
+:where(body.{{slug}}) :where(button, input, select, textarea) {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+:where(body.{{slug}}) :where(button) {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+:where(body.{{slug}}) :where(img, picture, svg, video) {
+  border: 0;
+  box-shadow: none;
+}

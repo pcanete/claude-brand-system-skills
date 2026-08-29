@@ -1,0 +1,13 @@
+node_modules/
+qa/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+
+# El fixture de WordPress necesita su build: es lo que el exportador consume.
+!tests/wordpress-fixture/dist/

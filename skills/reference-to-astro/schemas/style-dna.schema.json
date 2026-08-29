@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reference-web-system.local/style-dna.schema.json",
+  "title": "Reference Web System — STYLE_DNA",
+  "type": "object",
+  "required": [
+    "version",
+    "reference",
+    "art_direction",
+    "tokens",
+    "layout",
+    "interaction",
+    "motion",
+    "responsive",
+    "constraints",
+    "observations"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$"
+    },
+    "reference": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "scanned_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "scan_id": { "type": ["string", "null"] },
+        "routes_observed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "viewports_observed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "art_direction": {
+      "type": "object",
+      "properties": {
+        "summary": { "type": "string" },
+        "keywords": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "density": { "type": "string" },
+        "visual_tension": { "type": "string" },
+        "editorial_character": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "tokens": {
+      "type": "object",
+      "properties": {
+        "colors": { "type": "object" },
+        "typography": { "type": "object" },
+        "spacing": { "type": "object" },
+        "grid": { "type": "object" },
+        "radii": { "type": "object" },
+        "borders": { "type": "object" },
+        "easing": { "type": "object" },
+        "durations": { "type": "object" },
+        "layers": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "layout": {
+      "type": "object",
+      "properties": {
+        "container_behavior": { "type": "object" },
+        "grid_behavior": { "type": "object" },
+        "section_rhythm": { "type": "object" },
+        "alignment_logic": { "type": "object" },
+        "negative_space": { "type": "object" },
+        "overlap_rules": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "typography": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/component" }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "interaction": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "motion": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "experience": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "content_behavior": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "responsive": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "webgl": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "const": "unknown" }
+          ]
+        },
+        "observed_effects": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "fallback": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "constraints": {
+      "type": "object",
+      "required": [
+        "must_preserve",
+        "may_adapt",
+        "must_not_introduce"
+      ],
+      "properties": {
+        "must_preserve": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "may_adapt": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "must_not_introduce": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "observations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/observation" }
+    }
+  },
+  "$defs": {
+    "observation": {
+      "type": "object",
+      "required": [
+        "path",
+        "value",
+        "mode",
+        "confidence",
+        "salience"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": true,
+        "mode": {
+          "enum": [
+            "exact",
+            "derived",
+            "inferred",
+            "adaptive",
+            "unknown"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "salience": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "source": {
+          "type": ["string", "null"]
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "component": {
+      "type": "object",
+      "required": ["id", "role"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "anatomy": { "type": "object" },
+        "style": { "type": "object" },
+        "states": { "type": "object" },
+        "interaction": { "type": "object" },
+        "responsive": { "type": "object" },
+        "mode": {
+          "enum": [
+            "exact",
+            "derived",
+            "inferred",
+            "adaptive",
+            "unknown"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "salience": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

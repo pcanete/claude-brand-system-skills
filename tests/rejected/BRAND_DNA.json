@@ -1,0 +1,129 @@
+{
+  "version": "0.1.0",
+  "brand": {
+    "name": "Example Brand",
+    "website": "https://example.invalid",
+    "scan_id": "example-brand-001",
+    "scanned_at": null
+  },
+  "coverage": {
+    "core": 0.75,
+    "verbal": 0.8,
+    "visual": 0.9,
+    "photography": 0.7,
+    "motion": 0.45,
+    "web": 0.8,
+    "social": 0.4,
+    "product": 0.2
+  },
+  "core": {
+    "essence": "Technical precision presented as cultural confidence."
+  },
+  "positioning": {},
+  "personality": {
+    "primary_traits": [
+      "precise",
+      "confident",
+      "restrained",
+      "cultured"
+    ]
+  },
+  "verbal": {
+    "signature": "Concise, authoritative language balanced by occasional conceptual phrasing."
+  },
+  "semantic_territory": {},
+  "visual": {
+    "logo": {},
+    "color": {},
+    "typography": {},
+    "layout": {},
+    "shape_language": {},
+    "surfaces": {}
+  },
+  "photography": {},
+  "illustration": {},
+  "iconography": {},
+  "cgi_3d": {},
+  "motion": {},
+  "web_experience": {},
+  "ui": {},
+  "content": {},
+  "storytelling": {},
+  "social": {},
+  "campaigns": {},
+  "product_packaging": {},
+  "environmental": {},
+  "sonic": {},
+  "behavior": {},
+  "temporal": {},
+  "competitive": {},
+  "distinctive_assets": [
+    {
+      "id": "display-type",
+      "type": "typography",
+      "description": "Oversized controlled display typography.",
+      "salience": 0.95,
+      "recurrence": 0.9,
+      "consistency": 0.88,
+      "distinctiveness": 0.76,
+      "ownership_confidence": 0.68,
+      "evidence_refs": [
+        "ev-campaign-01"
+      ]
+    }
+  ],
+  "recognition_model": {
+    "minimum_set": [
+      "display-type",
+      "controlled-grid",
+      "sculptural-photography"
+    ]
+  },
+  "relationship_graph": [
+    {
+      "principle": "Precision with cultural confidence",
+      "expressions": {
+        "verbal": "Short authoritative claims.",
+        "typography": "Controlled oversized display type.",
+        "photography": "Objects treated sculpturally.",
+        "motion": "Restrained motion with minimal overshoot."
+      }
+    }
+  ],
+  "contradictions": [],
+  "rules": {
+    "must_preserve": [
+      "Strong controlled typographic hierarchy.",
+      "Precise visual rhythm."
+    ],
+    "may_adapt": [
+      "Literal type size.",
+      "Image subject matter."
+    ],
+    "must_not_introduce": [
+      "Generic playful startup illustration.",
+      "Excessive decorative gradients."
+    ],
+    "channel_specific": [],
+    "campaign_specific": []
+  },
+  "observations": [
+    {
+      "path": "visual.typography.display_behavior",
+      "value": "Oversized controlled display typography",
+      "mode": "derived",
+      "confidence": 0.9,
+      "salience": 0.95,
+      "recurrence": 0.9,
+      "consistency": 0.88,
+      "distinctiveness": 0.76,
+      "evidence_refs": [
+        "ev-campaign-01"
+      ],
+      "notes": "One campaign, declared as brand core."
+    }
+  ],
+  "limitations": [
+    "Deliberately unsupported fixture. The validator must reject it."
+  ]
+}

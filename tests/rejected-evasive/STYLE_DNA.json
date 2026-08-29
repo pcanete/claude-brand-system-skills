@@ -1,0 +1,108 @@
+{
+  "version": "0.3.0",
+  "reference": {
+    "url": "https://example.invalid/",
+    "scanned_at": null,
+    "scan_id": "synthetic-reference-v0.3",
+    "routes_observed": [
+      "/",
+      "/process",
+      "/gallery",
+      "/product",
+      "/accessibility"
+    ],
+    "viewports_observed": [],
+    "notes": "Partial benchmark data. Runtime interaction evidence not yet captured."
+  },
+  "art_direction": {
+    "summary": "Synthetic editorial product experience where expressive typography and image sequences frame a configurable object through a narrative process.",
+    "keywords": [
+      "precise",
+      "editorial",
+      "photographic",
+      "object-led",
+      "narrative"
+    ]
+  },
+  "tokens": {},
+  "layout": {
+    "grid": {
+      "columns": 12,
+      "gutter": "2vw",
+      "confidence": 0.98
+    }
+  },
+  "typography": {
+    "display": {
+      "family": "Söhne",
+      "weight": 700,
+      "tracking": "-0.03em",
+      "confidence": 0.99
+    }
+  },
+  "components": [],
+  "media": {
+    "sequences": [
+      {
+        "id": "hero-seq",
+        "items": [
+          "a",
+          "b"
+        ],
+        "confidence": 0.99
+      }
+    ]
+  },
+  "interaction": {
+    "filtering": {
+      "gallery": [
+        "A",
+        "B"
+      ],
+      "confidence": 0.99
+    }
+  },
+  "motion": {
+    "philosophy": "heavy inertial",
+    "easing": "expo.out",
+    "confidence": 0.97
+  },
+  "experience": {
+    "load": {
+      "enabled": true,
+      "progress_indicator": "percentage",
+      "observed_initial_value": "0%",
+      "completion_behavior": "unknown"
+    }
+  },
+  "content_behavior": {
+    "primary_journey": "inquiry"
+  },
+  "responsive": {},
+  "webgl": {
+    "required": "unknown",
+    "observed_effects": [],
+    "fallback": null
+  },
+  "constraints": {
+    "must_preserve": [
+      "editorial rhythm"
+    ],
+    "may_adapt": [],
+    "must_not_introduce": []
+  },
+  "observations": [
+    {
+      "path": "experience.load.progress_indicator",
+      "value": "percentage",
+      "mode": "inferred",
+      "confidence": 0.5,
+      "salience": 0.5,
+      "evidence_refs": [],
+      "notes": "low confidence, no evidence"
+    }
+  ],
+  "limitations": [
+    "Deliberately evasive fixture: every claim is real, every score is modest, no evidence exists. The validator must reject it."
+  ]
+}

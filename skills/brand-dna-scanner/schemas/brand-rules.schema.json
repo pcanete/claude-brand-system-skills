@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/pcanete/brand-system-skills/schemas/brand-rules.schema.json",
+  "title": "BRAND_RULES",
+  "description": "Operational brand rules in a form a machine can check. BRAND_RULES.md stays the human read; this is the same rules expressed so a piece can be tested against them before it ships.",
+  "type": "object",
+  "required": ["version", "brand", "rules"],
+  "additionalProperties": true,
+  "properties": {
+    "version": { "type": "string" },
+    "brand": {
+      "type": "object",
+      "required": ["name"],
+      "properties": { "name": { "type": "string", "minLength": 1 } },
+      "additionalProperties": true
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/rule" }
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "required": ["id", "kind", "statement", "detect"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": {
+          "enum": ["forbid", "require"],
+          "description": "forbid: the piece must not match. require: the piece must match."
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The rule as a person would state it."
+        },
+        "rationale": { "type": "string" },
+        "scope": {
+          "type": "array",
+          "items": {
+            "enum": ["all", "opening", "closing", "headline", "body", "caption", "cta"]
+          },
+          "description": "Where the rule applies. Defaults to all."
+        },
+        "severity": {
+          "enum": ["block", "warn"],
+          "description": "block fails the check; warn reports without failing. Defaults to block."
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Evidence in BRAND_EVIDENCE that this rule was derived from, not invented."
+        },
+        "detect": { "$ref": "#/$defs/detect" }
+      }
+    },
+    "detect": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "enum": ["regex", "manual"],
+          "description": "regex: checkable automatically. manual: needs human or agent judgement, and is reported as unverified rather than silently passed."
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Required when type is regex."
+        },
+        "flags": { "type": "string", "default": "i" },
+        "asks": {
+          "type": "string",
+          "description": "For manual rules: the question a reviewer has to answer."
+        }
+      }
+    }
+  }
+}

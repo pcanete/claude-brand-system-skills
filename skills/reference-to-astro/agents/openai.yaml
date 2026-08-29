@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reference to Astro"
+  short_description: "Convierte referencias y contenido en sitios Astro"
+  default_prompt: "Usa $reference-to-astro para construir en Astro el sitio definido por mi referencia, STYLE_DNA y contenido del cliente."

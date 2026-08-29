@@ -1,0 +1,165 @@
+{
+  "version": "0.1.0",
+  "brand": {
+    "name": "Example Brand"
+  },
+  "scan": {
+    "mode": "forensic",
+    "capabilities": {
+      "web": true,
+      "images": true,
+      "video": false,
+      "social": true,
+      "documents": true
+    }
+  },
+  "sources": [
+    {
+      "id": "src-web",
+      "url": "https://example.invalid",
+      "path": null,
+      "channel": "website",
+      "date": null,
+      "campaign": null,
+      "locale": "en",
+      "authority": "official-current-owned",
+      "status": "current"
+    },
+    {
+      "id": "src-campaign",
+      "url": null,
+      "path": null,
+      "channel": "campaign",
+      "date": null,
+      "campaign": "Campaign 01",
+      "locale": "en",
+      "authority": "official-current-campaign",
+      "status": "current"
+    },
+    {
+      "id": "src-social",
+      "url": "https://social.example.invalid/example-brand",
+      "path": null,
+      "channel": "social",
+      "date": null,
+      "campaign": null,
+      "locale": "en",
+      "authority": "official-current-owned",
+      "status": "current"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-web-home",
+      "type": "visual",
+      "source_refs": [
+        "src-web"
+      ],
+      "artifact": null,
+      "description": "Homepage typography and composition.",
+      "observed": {
+        "display_type": "oversized",
+        "layout": "controlled editorial grid"
+      },
+      "notes": ""
+    },
+    {
+      "id": "ev-campaign-01",
+      "type": "visual",
+      "source_refs": [
+        "src-campaign"
+      ],
+      "artifact": null,
+      "description": "Campaign typography repeats oversized display behavior.",
+      "observed": {
+        "display_type": "oversized"
+      },
+      "notes": ""
+    },
+    {
+      "id": "ev-web-copy",
+      "type": "verbal",
+      "source_refs": [
+        "src-web"
+      ],
+      "artifact": null,
+      "description": "Homepage and product copy: short declarative claims, no superlatives.",
+      "observed": {
+        "sentence_length": "short",
+        "claim_style": "declarative",
+        "superlatives": "absent"
+      },
+      "notes": ""
+    },
+    {
+      "id": "ev-campaign-copy",
+      "type": "verbal",
+      "source_refs": [
+        "src-campaign"
+      ],
+      "artifact": null,
+      "description": "Campaign headlines repeat the declarative register of the site.",
+      "observed": {
+        "claim_style": "declarative"
+      },
+      "notes": "Same register observed in a second channel."
+    },
+    {
+      "id": "ev-web-photography",
+      "type": "photography",
+      "source_refs": [
+        "src-web"
+      ],
+      "artifact": null,
+      "description": "Product photography: single object, hard directional light, neutral ground.",
+      "observed": {
+        "subject": "single object",
+        "lighting": "hard directional",
+        "background": "neutral"
+      },
+      "notes": ""
+    },
+    {
+      "id": "ev-social-photography",
+      "type": "photography",
+      "source_refs": [
+        "src-social"
+      ],
+      "artifact": null,
+      "description": "Social grid repeats the single-object, hard-light treatment.",
+      "observed": {
+        "subject": "single object",
+        "lighting": "hard directional"
+      },
+      "notes": "Same treatment observed in a second channel."
+    },
+    {
+      "id": "ev-web-navigation",
+      "type": "interaction",
+      "source_refs": [
+        "src-web"
+      ],
+      "artifact": null,
+      "description": "Persistent minimal header with a single primary action.",
+      "observed": {
+        "header": "persistent",
+        "primary_actions": 1
+      },
+      "notes": "Observed on the website only."
+    }
+  ],
+  "coverage": {
+    "core": 0.75,
+    "verbal": 0.8,
+    "visual": 0.9,
+    "photography": 0.7,
+    "motion": 0.45,
+    "web": 0.8,
+    "social": 0.4,
+    "product": 0.2
+  },
+  "limitations": [
+    "Synthetic example. No motion, product or environmental material was inventoried.",
+    "Web experience rests on a single source, so it cannot demonstrate recurrence."
+  ]
+}

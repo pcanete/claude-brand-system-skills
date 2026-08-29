@@ -1,0 +1,111 @@
+{
+  "version": "0.1.0",
+  "brand": {
+    "name": "Example Brand",
+    "website": "https://example.invalid",
+    "scan_id": "evasive-001",
+    "scanned_at": null
+  },
+  "coverage": {
+    "core": 0.55,
+    "verbal": 0.55,
+    "visual": 0.55,
+    "photography": 0.55,
+    "motion": 0.4,
+    "web": 0.55,
+    "social": 0.3,
+    "product": 0.2
+  },
+  "core": {
+    "essence": "Technical precision presented as cultural confidence."
+  },
+  "positioning": {
+    "territory": "engineered objects for design-literate buyers"
+  },
+  "personality": {
+    "primary_traits": [
+      "precise",
+      "confident",
+      "restrained",
+      "cultured"
+    ]
+  },
+  "verbal": {
+    "signature": "Concise, authoritative language.",
+    "banned": [
+      "playful",
+      "quirky"
+    ]
+  },
+  "semantic_territory": {},
+  "visual": {
+    "logo": {},
+    "color": {
+      "primary": "#101010",
+      "accent": "#FF3B00"
+    },
+    "typography": {
+      "display": "grotesque, tight tracking"
+    },
+    "layout": {},
+    "shape_language": {},
+    "surfaces": {}
+  },
+  "photography": {
+    "lighting": "hard directional",
+    "subject": "single object",
+    "grade": "cool neutral"
+  },
+  "illustration": {},
+  "iconography": {},
+  "cgi_3d": {},
+  "motion": {
+    "philosophy": "restrained, inertial"
+  },
+  "web_experience": {},
+  "ui": {},
+  "content": {},
+  "storytelling": {},
+  "social": {},
+  "campaigns": {},
+  "product_packaging": {},
+  "environmental": {},
+  "sonic": {},
+  "behavior": {},
+  "temporal": {},
+  "competitive": {},
+  "distinctive_assets": [],
+  "recognition_model": {
+    "minimum_set": [
+      "display-type"
+    ]
+  },
+  "relationship_graph": [],
+  "contradictions": [],
+  "rules": {
+    "must_preserve": [
+      "Controlled typographic hierarchy."
+    ],
+    "may_adapt": [],
+    "must_not_introduce": [],
+    "channel_specific": [],
+    "campaign_specific": []
+  },
+  "observations": [
+    {
+      "path": "visual.color.accent",
+      "value": "#FF3B00",
+      "mode": "inferred",
+      "confidence": 0.5,
+      "salience": 0.5,
+      "recurrence": 0.4,
+      "consistency": 0.4,
+      "distinctiveness": 0.4,
+      "evidence_refs": [],
+      "notes": "no evidence recorded"
+    }
+  ],
+  "limitations": [
+    "Deliberately evasive fixture: concrete claims, modest scores, no evidence. The validator must reject it."
+  ]
+}
