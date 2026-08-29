@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+`reference-lab-builder` 0.2.0 — cuatro demos mostraban algo distinto de lo que declaraban
+
+El primer uso contra un escaneo real —siete demos sobre 27 rutas de STYLE_DNA y
+27 ids de evidencia— encontró que el laboratorio tenía la misma falla que el
+repositorio entero existe para impedir: mostrar valores que nadie midió.
+
+**`typography` no podía mostrar una escala.** Renderizaba el primer nivel en una
+etiqueta y concatenaba todos los demás en un solo titular. Cinco niveles
+declarados salían como dos tamaños. Peor: la demo citaba el registro tipográfico
+como fuente y después generaba una escala propia. Contra la referencia real,
+mostraba 1.21x entre display y titular donde lo medido era 2.25x. Ahora el spec
+declara `sizes_px`, `line_height_px` y `tracking_px`, la demo los usa tal cual y
+escribe la razón entre niveles consecutivos. Sin ellos cae a una escala
+adaptativa y lo dice en pantalla.
+
+**`marquee` se comía la velocidad medida.** La duración salía de
+`Math.max(8, 2400 / velocidad)`: cualquier medición por encima de 300 px/s daba
+exactamente 8 s. Los 302 px/s medidos en la referencia rendían igual que 900.
+Ahora sale del ancho real de la pista y la velocidad declarada.
+
+**`parallax` ignoraba su propia configuración.** Tres formas fijas con tres
+ratios fijos, declarara el spec seis actores o dos. Ahora usa `items` y `ratio`.
+
+**El nivel más chico de la escala adaptativa caía a 6 px**, ilegible. El piso no
+baja de 0.72rem: una etiqueta técnica sigue siendo texto que hay que poder leer
+para juzgar la escala.
+
+Ninguno de los cuatro rompía nada ni fallaba una compuerta. Se ven usando la
+herramienta con datos reales y mirando la página, que es exactamente para lo que
+sirve un checkpoint.
+
 `reference-to-astro` 1.0.0, `brand-manual-builder` 0.1.0, `reference-lab-builder` 0.1.0 — el plan aprobado, y los dos checkpoints que lo preceden
 
 Traído de la línea de Codex por auditoría cruzada. Las compuertas de esta línea
