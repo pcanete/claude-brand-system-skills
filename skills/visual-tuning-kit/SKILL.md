@@ -3,7 +3,7 @@ name: visual-tuning-kit
 description: Adds a bounded, development-only visual tuning layer to an Astro site so users can adjust declared typography, spacing, grid, alignment, content, section order, and behavior variants without becoming a free-form page builder. Produces validated tuning schema, approved values, and an auditable changeset. Use after an initial Astro implementation exists. Not for reference scanning, initial site generation, production CMS editing, or arbitrary drag-and-drop layout.
 license: MIT
 metadata:
-  version: "0.4.0"
+  version: "0.6.0"
 ---
 
 # Visual Tuning Kit
@@ -35,63 +35,27 @@ Expose only deliberate controls:
 - text and line breaks mapped to a content path;
 - images chosen from a declared folder inside `public/`;
 - section order chosen from a fixed set;
+- navigation items with bounded labels, validated destinations, visibility and order;
 - grid span, alignment and bounded offsets represented as tokens or enums.
 
 Do not expose arbitrary CSS, raw HTML, executable JavaScript, unrestricted
 selectors, free absolute positioning, or unconstrained drag-and-drop.
-
-## Deriving the schema instead of writing it
-
-Declaring thirty controls by hand for each project is the work that keeps this
-kit from existing on the next site. The code already says where the adjustment
-points are: every `var(--name, value)` is a variable the author decided to leave
-adjustable, with its default beside it. So is the same pattern written from
-JavaScript — a helper reading the variable with a fallback, which is how the
-values that scripts animate get declared.
-
-```bash
-node scripts/derive-schema.mjs --project .   --out TUNING_SCHEMA.json --values-out TUNING_VALUES.json
-```
-
-The range comes from the value the project chose, never from a table: a ratio
-between 0 and 1 is clamped to 0–1, an angle opens symmetrically around zero, a
-length opens both ways. Each control carries a `rationale` naming the file it
-came from, so a reviewer can check it rather than trust it.
-
-Values are emitted as a **draft**, unsigned. Approving is the user's act.
-
-It is a starting point, not the final contract. The generator proposes
-everything the project parameterised; whatever does not deserve a slider gets
-removed by hand, and text, image and section-order controls are added on top —
-those cannot be derived from CSS variables.
-
-If the generator misses something you want to tune, the answer is not to add it
-to the contract: it is to parameterise it in the code. A control pointing at a
-variable nobody reads does nothing.
-
-## Mapping content to the page
-
-Text controls need a `content_path`, and knowing which element holds which
-field usually means annotating every component.
-
-```bash
-node scripts/map-content.mjs --manifest CONTENT_MANIFEST.json   --url http://localhost:4321
-```
-
-The manifest text is its own signal. A field appearing exactly once on the page
-is linked; one appearing twice or not at all is reported and **not** offered for
-editing, because guessing which one it was would write into the contract
-something nobody asked for. For those, a component can declare
-`data-content-key`, which takes precedence.
-
-The report is worth reading on its own: it measures how much of the page
-actually comes from the manifest. A declared field that never appears is
-hardcoded, stale, or its section does not render.
+Navigation controls must reject unknown protocols and absolute URLs outside
+their declared `allowed_hosts`.
 
 ## Workflow
 
-1. Derive controls with `scripts/derive-schema.mjs`, then review them against
-   the implementation and approved blueprint.
+1. Derive an initial numerical-control draft from CSS custom properties when useful:
+
+```bash
+node scripts/derive-schema.mjs --project /path/to/astro-project \
+  --out TUNING_SCHEMA.json --values-out TUNING_VALUES.json
+```
+
+   Generation never approves values. It stops on contradictory defaults unless
+   `--allow-conflicts` is explicitly used for diagnosis. Review zero-based
+   ranges, labels, control membership and `preview_id`; then derive remaining
+   text, image, order and enumerated controls from the approved blueprint.
 2. Give every control a reason, safe range or option set, and production target.
 3. Validate schema and values:
 
@@ -121,12 +85,38 @@ node scripts/build-approved-css.mjs --schema TUNING_SCHEMA.json \
   --values TUNING_VALUES.json --out src/styles/tuning-approved.css
 ```
 
+   Audit how much visible page content is bound to the manifest with:
+
+```bash
+node scripts/map-content.mjs --manifest CONTENT_MANIFEST.json \
+  --url http://localhost:4321 --page home --out qa/CONTENT_MAP.json
+```
+
+   Add `data-content-path` when an exact binding is known. The audit prefers
+   that attribute, then stable `data-rta-id`, and only then exact rendered text.
+   Missing and ambiguous values remain report findings; the tool never writes
+   content back or guesses a destination.
+   It uses the project's Playwright installation. When Playwright is already
+   installed in a separate QA skill, pass its directory with
+   `--playwright-root /path/to/that/skill` instead of duplicating it.
+
 7. Open the local site with `?tune=1` and experiment. Unapproved experiments
    stay in local storage.
+   On desktop, drag the tuner by its header to uncover the page beneath it. Its
+   viewport-bounded position is remembered locally; Reset also restores the
+   default panel position. The panel remains fixed on narrow mobile viewports.
    Elements with `data-tune-id` become contextual targets: click one to isolate
    its control, and double-click declared text to edit it inline. Image controls
    list only files from their declared `public/` folder. Section order changes
-   only direct children inside the declared container id.
+   only direct children inside the declared container id. Control groups are
+   collapsible and the relevant group opens automatically after contextual
+   selection so larger schemas remain usable.
+   Give each declared preview target both its `data-tune-id` and a stable
+   semantic `data-rta-id`. The latter survives compilation for later review
+   packages; it does not make compiled HTML the source of truth. Multiple
+   related controls may share one `preview_id`, allowing a click on a title or
+   image to reveal its content, scale, measure and bounded-position controls
+   together.
 8. Saving creates a complete validated `TUNING_VALUES.json` and an auditable
    `TUNING_CHANGESET.json`.
 9. Once a person approves the values, fold the content controls back into the
@@ -137,14 +127,14 @@ node scripts/apply-content.mjs --schema TUNING_SCHEMA.json   --values TUNING_VAL
 ```
 
    Controls with `target.css_variable` reach production through the CSS above.
-   Controls with `target.content_path` — `text`, `text-lines`, `image` and
-   `section-order` — reach it only through this step. Without it an approved
-   text edit is lost on the next build, which is the whole reason daily edits
-   feel more expensive than they should.
+   Controls with `target.content_path` — `text`, `text-lines`, `image`,
+   `section-order` and `navigation` — reach it only through this step. Without
+   it an approved text edit is lost on the next build, which is the whole reason
+   daily edits feel more expensive than they should.
 
    It refuses draft values, writes nothing at all if any path fails to resolve,
-   and is safe to run twice. Add `--dry-run` to see the changes first.
-   Rebuild the site afterwards.
+   and is safe to run twice. Add `--dry-run` to see the changes first. Rebuild
+   the site afterwards.
 10. Production consumes approved values but never ships the tuner panel or save endpoint.
 
 Run `scripts/test-runtime.mjs` when changing the development plugin, client or
@@ -152,15 +142,16 @@ production helpers.
 
 ## Approval and source of truth
 
-`TUNING_VALUES.json` is data, not an invisible code mutation. The project must
-bind CSS controls through custom properties and content controls through stable
-ids or content paths.
-
 The content contract stays the source of truth. The panel proposes; once a
 person approves, `apply-content.mjs` writes the change back into
 `CONTENT_MANIFEST.json` and the site is rebuilt from there. Values that only
 live in the tuning file are a second copy of the content waiting to disagree
 with the first.
+
+`TUNING_VALUES.json` is data, not an invisible code mutation. The project must
+bind CSS controls through custom properties and content controls through stable
+ids or content paths. Approved values may be folded back into source later, but
+that is a separate reviewed change.
 
 The agent must not mark values approved on the user's behalf.
 
@@ -169,6 +160,7 @@ The agent must not mark values approved on the user's behalf.
 - Every value matches a declared control.
 - Every control has a bounded target and rationale.
 - Text controls map to known content paths.
+- Every declared preview target has a unique, stable `data-rta-id`.
 - Image controls map to known content paths and a folder contained by `public/`.
 - Order controls list every allowed section exactly once.
 - The tuner and save endpoint are absent from production output.

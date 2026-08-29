@@ -687,6 +687,21 @@ fs.writeFileSync(
           label: "Contenido",
           controls: [
             {
+              id: "menu-principal",
+              kind: "navigation",
+              label: "Primary navigation",
+              rationale: "Destinations change when a section opens or closes.",
+              max_length: 24,
+              min_items: 1,
+              max_items: 6,
+              allowed_hosts: ["shop.example.invalid"],
+              allow_relative: true,
+              default: [
+                { id: "work", label: "Work", href: "/work", target: "_self", visible: true }
+              ],
+              target: { content_path: "navigation", event_name: "nav:update" }
+            },
+            {
               id: "seccion-titulo",
               kind: "text",
               label: "Section heading",
@@ -715,7 +730,13 @@ const approvedValues = {
   status: "approved",
   approved_by: "repository check",
   approved_at: "2026-01-01T00:00:00Z",
-  values: { "seccion-titulo": roundTripText }
+  values: {
+    "seccion-titulo": roundTripText,
+    "menu-principal": [
+      { id: "work", label: "Work", href: "/work", target: "_self", visible: true },
+      { id: "shop", label: "Shop", href: "https://shop.example.invalid", target: "_blank", visible: false }
+    ]
+  }
 };
 
 fs.writeFileSync(contentValues, `${JSON.stringify(approvedValues, null, 2)}
@@ -759,7 +780,37 @@ if (roundTripped.pages[firstPageId].sections.length !== firstPage.sections.lengt
   fail("Content round trip changed how many sections the page has");
 }
 
+if (roundTripped.navigation?.length !== 2 || roundTripped.navigation[1].visible !== false) {
+  fail("Content round trip did not write the approved navigation back into the contract");
+}
+
 runNode("Applying approved content twice was not idempotent", [applyContent, ...contentArgs]);
+
+// Un destino mal formado no puede aplicarse a medias.
+const brokenNav = path.join(contentRoot, "TUNING_VALUES.broken-nav.json");
+fs.writeFileSync(
+  brokenNav,
+  `${JSON.stringify(
+    {
+      ...approvedValues,
+      values: {
+        ...approvedValues.values,
+        "menu-principal": [
+          { id: "work", label: "Work", href: "/work", target: "_parent", visible: true }
+        ]
+      }
+    },
+    null,
+    2
+  )}
+`
+);
+
+runNode(
+  "An invalid navigation target was written into the content contract",
+  [applyContent, "--schema", contentSchema, "--values", brokenNav, "--content", contentManifest],
+  { expect: "fail" }
+);
 
 fs.rmSync(contentRoot, { recursive: true, force: true });
 

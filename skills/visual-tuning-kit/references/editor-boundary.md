@@ -13,6 +13,14 @@ The tuner exists for final design judgement, not page construction.
 - ordering of existing sections;
 - inspection guides and motion pause.
 
+Every exposed preview target also carries a semantic `data-rta-id`. This is a
+review anchor for compiled output, not permission to write arbitrary edited
+HTML back into Astro source.
+
+Controls that describe the same visible target may share its `preview_id`.
+Group only controls that truly affect that target; do not attach whole-page
+settings merely to make them easier to find.
+
 ## Controls that cross the boundary
 
 - drawing arbitrary boxes;

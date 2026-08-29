@@ -149,51 +149,6 @@ sistema?" con un sí que deja afuera lo más caro de equivocar.
 secciones `webgl-policy.md` y `motion-system.md` de `reference-to-astro` no se
 cruzan.
 
-### El checkpoint content-architecture no tiene herramienta
-
-`SITE_BLUEPRINT` exige tres checkpoints. Dos tienen skill que los produce
-—`brand-manual-builder` y `reference-lab-builder`—; el tercero se aprueba a
-mano contra el `CONTENT_MANIFEST`, sin artefacto que revisar. En la práctica va
-a terminar en `waived` con un motivo escrito de apuro, que es el modo en que un
-checkpoint deja de significar algo.
-
-**Origen:** misma auditoría. La asimetría es visible en el propio esquema.
-
-### Qué se demuestra y qué se puede citar
-
-`reference-lab-builder` puede demostrar cualquier dato registrado;
-`reference-to-astro` solo puede citar observaciones. Los dos criterios son
-correctos por separado —demostrar no es justificar— y la distancia entre ellos
-resultó ser más chica de lo que parecía.
-
-Medido sobre un proyecto real, antes y después de corregir las rutas de
-observación de su escaneo: las rutas compartidas entre el laboratorio y el
-blueprint pasaron de 0 a 5, y las del laboratorio que además son observaciones,
-de 0 a 8 sobre 18. La mayor parte de lo que parecían dos vocabularios era el
-índice mal direccionado, que la compuerta 7 ahora impide.
-
-Lo que queda es legítimo: 10 rutas que el laboratorio demuestra y el escáner
-nunca promovió a observación. Falta decidir si el laboratorio debería marcar
-cuáles de sus demos se apoyan en una observación con evidencia y cuáles solo en
-un dato registrado, para que la diferencia se vea sin leer código. Es una
-distinción real y hoy la página no la muestra.
-
-**Origen:** primer SITE_BLUEPRINT contra contratos reales, 2026-08-29, y la
-migración del escaneo que siguió.
-
-### Las auditorías de comportamiento no se pueden citar como evidencia
-
-`collectEvidenceIds` recorre ocho colecciones y `behavior_audits` no está entre
-ellas. Son la evidencia más fuerte del documento —auditorías temporales y entre
-dispositivos, con su propia compuerta que verifica que lo sean— y un blueprint
-que declara un comportamiento atado al scroll no puede citarlas.
-
-El laboratorio sí las acepta, porque recorre el documento entero juntando
-cualquier objeto con `id`. La misma referencia vale en un skill y no en el otro.
-
-**Origen:** mismo blueprint. Hubo que sacar ocho referencias `audit-*` que eran
-justo las que respaldaban los tres revelados de scroll.
-
 ## Transversales
 
 ### El peso de los skills

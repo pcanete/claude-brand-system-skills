@@ -3,7 +3,7 @@ name: reference-to-astro
 description: Builds a website in Astro from an analyzed reference and an approved SITE_BLUEPRINT that maps client content to evidenced visual, responsive and behavioral patterns. Use when reference contracts and real content must become a verified implementation. Not for inventing a visual direction, scanning the reference, or packaging the result for WordPress.
 license: MIT
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Reference-to-Astro
@@ -70,6 +70,7 @@ at the points named below.
 | `node scripts/build-check.mjs` | after the structural build, and again before QA |
 | `node scripts/audit-assets.mjs` | once supplied media is wired in |
 | `node scripts/visual-qa.mjs` | during QA, once the site serves |
+| `node scripts/build-content-architecture.mjs` | before implementation, to review routes, content mapping and conversion paths |
 
 All four accept `--project <dir>` and write their reports under `qa/` in that
 project. Install their dependencies once with `npm install` inside the skill
@@ -261,6 +262,11 @@ Do not fragment every wrapper into a component.
 
 Read `references/component-strategy.md`.
 
+Give every user-reviewable content or structural region a stable semantic
+`data-rta-id`. Read `references/stable-review-anchors.md`. These identifiers
+must survive Astro compilation so a later HTML review can describe changes
+without treating compiled HTML as source.
+
 ## Design tokens
 
 Before detailed construction derive reusable implementation tokens from
@@ -305,6 +311,17 @@ Map:
 ### Phase 2 — Implementation plan
 
 Read `references/site-blueprint.md`.
+
+Render the content-architecture checkpoint before requesting approval:
+
+```bash
+node scripts/build-content-architecture.mjs   --content CONTENT_MANIFEST.json --blueprint SITE_BLUEPRINT.json   --out content-architecture/index.html
+```
+
+The output is a review surface, not a page builder. It exposes route and section
+order, content mappings, planned components, responsive intent, excluded
+content, conversion journeys and checkpoint state. It never approves the
+blueprint or writes back to either contract.
 
 If no approved SITE_BLUEPRINT exists, create the draft checkpoint now. It must
 map every supplied content section or explicitly exclude it with a reason, and

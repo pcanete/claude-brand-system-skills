@@ -6,9 +6,9 @@
 //     --values TUNING_VALUES.json --content CONTENT_MANIFEST.json
 //
 // `build-approved-css.mjs` cierra el circuito de los controles con
-// `css_variable`. Los que tienen `content_path` —texto, líneas, imagen y orden
-// de secciones— no tenían quién los llevara a ningún lado: se editaban, se
-// aprobaban y el siguiente build los perdía.
+// `css_variable`. Los que tienen `content_path` —texto, líneas, imagen, orden
+// de secciones y navegación— no tenían quién los llevara a ningún lado: se
+// editaban, se aprobaban y el siguiente build los perdía.
 //
 // El archivo canónico es el CONTENT_MANIFEST. El calibrador propone; acá el
 // cambio aprobado vuelve al contrato, y el sitio se reconstruye desde ahí.
@@ -97,6 +97,33 @@ export function coerce(kind, value, current) {
       // en su orden original, en vez de desaparecer del sitio en silencio.
       const rest = current.filter((item) => !wanted.includes(item?.id));
       return [...wanted.map((id) => byId.get(id)), ...rest];
+    }
+
+    case 'navigation': {
+      // El endpoint de guardado ya validó destinos, límites y unicidad de ids
+      // contra el control. Acá se comprueba la forma, porque un valor puede
+      // llegar de un archivo escrito a mano y no del panel.
+      if (!Array.isArray(value)) throw new Error('un control navigation escribe una lista');
+      const ids = new Set();
+      return value.map((item) => {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) {
+          throw new Error('cada elemento de navegación es un objeto');
+        }
+        for (const field of ['id', 'label', 'href']) {
+          if (typeof item[field] !== 'string' || !item[field].trim()) {
+            throw new Error(`falta '${field}' en un elemento de navegación`);
+          }
+        }
+        if (ids.has(item.id)) throw new Error(`id de navegación repetido: ${item.id}`);
+        ids.add(item.id);
+        if (!['_self', '_blank'].includes(item.target)) {
+          throw new Error(`'target' de '${item.id}' tiene que ser _self o _blank`);
+        }
+        if (typeof item.visible !== 'boolean') {
+          throw new Error(`'visible' de '${item.id}' tiene que ser booleano`);
+        }
+        return { id: item.id, label: item.label, href: item.href, target: item.target, visible: item.visible };
+      });
     }
 
     default:

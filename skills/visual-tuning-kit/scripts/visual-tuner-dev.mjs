@@ -40,6 +40,35 @@ const hydrateImageControls = async (schema, cwd) => {
   return hydrated;
 };
 
+const validNavigationHref = (control, href) => {
+  if (typeof href !== "string" || href.length < 1 || href.length > 500) return false;
+  if (control.allow_hash !== false && /^#[A-Za-z][A-Za-z0-9:._-]*$/.test(href)) return true;
+  if (control.allow_relative !== false && /^\/(?!\/)[^\s]*$/.test(href)) return true;
+  try {
+    const url = new URL(href);
+    return ["http:", "https:"].includes(url.protocol)
+      && (control.allowed_hosts || []).some((host) => url.hostname === host || url.hostname.endsWith(`.${host}`));
+  } catch {
+    return false;
+  }
+};
+
+export const validNavigation = (control, value) => {
+  if (!Array.isArray(value) || value.length < (control.min_items || 1) || value.length > (control.max_items || 12)) return false;
+  const ids = new Set();
+  return value.every((item) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return false;
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.id || "") || ids.has(item.id)) return false;
+    ids.add(item.id);
+    return typeof item.label === "string"
+      && item.label.trim().length > 0
+      && item.label.length <= (control.max_length || 60)
+      && validNavigationHref(control, item.href)
+      && ["_self", "_blank"].includes(item.target)
+      && typeof item.visible === "boolean";
+  });
+};
+
 const valid = (control, value) => {
   if (control.kind === "range") return typeof value === "number" && Number.isFinite(value) && value >= control.min && value <= control.max;
   if (control.kind === "select") return typeof value === "string" && control.options.some((option) => option.value === value);
@@ -51,6 +80,7 @@ const valid = (control, value) => {
     const allowed = control.options.map((option) => option.value);
     return Array.isArray(value) && value.length === allowed.length && new Set(value).size === allowed.length && value.every((item) => allowed.includes(item));
   }
+  if (control.kind === "navigation") return validNavigation(control, value);
   return false;
 };
 

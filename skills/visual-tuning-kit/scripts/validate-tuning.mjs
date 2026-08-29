@@ -6,6 +6,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
+import { validNavigation } from "./visual-tuner-dev.mjs";
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 function arg(name) { const index = process.argv.indexOf(name); return index === -1 ? null : process.argv[index + 1]; }
@@ -22,6 +23,7 @@ function validValue(control, value) {
     const allowed = control.options.map((option) => option.value);
     return Array.isArray(value) && value.length === allowed.length && new Set(value).size === allowed.length && value.every((item) => allowed.includes(item));
   }
+  if (control.kind === "navigation") return validNavigation(control, value);
   return false;
 }
 
@@ -32,7 +34,7 @@ async function main() {
   const ajv=new Ajv2020({allErrors:true,strict:false});addFormats(ajv);
   for(const [label,data,contract] of [["TUNING_SCHEMA",schema,schemaContract],["TUNING_VALUES",values,valuesContract]]){const validate=ajv.compile(contract);if(!validate(data))throw new Error(`${label} invalid\n${validate.errors.map(error=>`  - ${error.instancePath||"/"}: ${error.message}`).join("\n")}`)}
   const issues=[],controls=schema.groups.flatMap(group=>group.controls),ids=new Set();
-  for(const control of controls){if(ids.has(control.id))issues.push(`duplicate control '${control.id}'`);ids.add(control.id);if(!validValue(control,control.default))issues.push(`invalid default for '${control.id}'`);if(control.kind==="range"&&(!control.target.css_variable||control.min===undefined||control.max===undefined||control.step===undefined))issues.push(`range '${control.id}' requires css_variable, min, max and step`);if(["select","section-order"].includes(control.kind)&&!control.options)issues.push(`'${control.id}' requires options`);if(["text","text-lines"].includes(control.kind)&&(!control.target.content_path||!control.target.preview_id||!control.max_length))issues.push(`text control '${control.id}' requires content_path, preview_id and max_length`);if(control.kind==="image"&&(!control.target.content_path||!control.target.preview_id||!control.target.asset_folder||!control.target.public_base))issues.push(`image control '${control.id}' requires content_path, preview_id, asset_folder and public_base`);if(control.kind==="section-order"&&!control.target.container)issues.push(`section-order '${control.id}' requires a bounded container id`)}
+  for(const control of controls){if(ids.has(control.id))issues.push(`duplicate control '${control.id}'`);ids.add(control.id);if(!validValue(control,control.default))issues.push(`invalid default for '${control.id}'`);if(control.kind==="range"&&(!control.target.css_variable||control.min===undefined||control.max===undefined||control.step===undefined))issues.push(`range '${control.id}' requires css_variable, min, max and step`);if(["select","section-order"].includes(control.kind)&&!control.options)issues.push(`'${control.id}' requires options`);if(["text","text-lines"].includes(control.kind)&&(!control.target.content_path||!control.target.preview_id||!control.max_length))issues.push(`text control '${control.id}' requires content_path, preview_id and max_length`);if(control.kind==="image"&&(!control.target.content_path||!control.target.preview_id||!control.target.asset_folder||!control.target.public_base))issues.push(`image control '${control.id}' requires content_path, preview_id, asset_folder and public_base`);if(control.kind==="section-order"&&!control.target.container)issues.push(`section-order '${control.id}' requires a bounded container id`);if(control.kind==="navigation"&&(!control.target.content_path||!control.target.event_name||!control.allowed_hosts||!control.min_items||!control.max_items||!control.max_length))issues.push(`navigation control '${control.id}' requires content_path, event_name, allowed_hosts, item bounds and max_length`)}
   if(values.schema!==schema.id)issues.push("values.schema does not match schema.id");
   for(const key of Object.keys(values.values)){if(!ids.has(key))issues.push(`unknown value '${key}'`)}
   for(const control of controls){if(!(control.id in values.values))issues.push(`missing value '${control.id}'`);else if(!validValue(control,values.values[control.id]))issues.push(`invalid value '${control.id}'`)}

@@ -1,44 +1,36 @@
 #!/usr/bin/env node
 
-// Vincula el CONTENT_MANIFEST con la página renderizada: qué texto del
-// contrato aparece en pantalla y dónde.
-//
-//   node scripts/map-content.mjs --manifest CONTENT_MANIFEST.json \
-//     --url http://localhost:4321
-//
-//   --page <id>   página del manifiesto (por defecto, la primera)
-//   --out <file>  guarda el mapeo en JSON
-//
-// No hace falta anotar los componentes: el texto del manifiesto es su propia
-// señal. Si un campo aparece una vez en la página, queda vinculado sin
-// ambigüedad y es editable. Si aparece dos veces o ninguna, se informa y no se
-// ofrece para editar — adivinar cuál de los dos era llevaría a escribir en el
-// contrato lo que nadie pidió.
-//
-// El reporte vale por sí solo: mide cuánto de la página sale realmente del
-// manifiesto. Un campo que no aparece está hardcodeado, quedó viejo o su
-// sección no se renderiza; un texto que nadie declaró no se puede editar sin
-// tocar el código.
+import { readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import process from "node:process";
+import { createRequire } from "node:module";
+import { pathToFileURL } from "node:url";
 
-import { readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-import process from 'node:process';
-import { createRequire } from 'node:module';
-import { pathToFileURL } from 'node:url';
-
-function arg(name, fallback) {
+function arg(name, fallback = null) {
   const index = process.argv.indexOf(`--${name}`);
-  if (index === -1) return fallback;
-  return process.argv[index + 1];
+  return index === -1 ? fallback : process.argv[index + 1];
 }
 
-const TEXT_FIELDS = ['eyebrow', 'title', 'subtitle', 'body', 'cta', 'label', 'note', 'answer', 'question', 'items'];
+const TEXT_FIELDS = new Set([
+  "eyebrow", "kicker", "title", "subtitle", "heading", "intro", "lede",
+  "body", "copy", "cta", "label", "note", "answer", "question", "caption",
+  "description", "tagline", "steps", "items"
+]);
 
-// Guardan identificadores de archivo o de destino, no contenido editable.
-const NOT_CONTENT = new Set(['media', 'assets', 'id', 'type', 'href', 'url', 'links', 'title_lines']);
+const NOT_VISIBLE_CONTENT = new Set([
+  "id", "type", "route", "seo", "href", "url", "target", "media", "assets",
+  "links", "section_order", "title_lines", "focal_point", "usage", "metadata"
+]);
 
-/** Cada texto del manifiesto con la ruta exacta donde vive. */
-export function collectTexts(manifest, pageId) {
+function normalize(value) {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function rtaSegment(value) {
+  return String(value).replaceAll("_", "-").replace(/[^a-zA-Z0-9.-]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+export function collectTexts(manifest, pageId, { includeShared = false } = {}) {
   const pages = manifest.pages || {};
   const id = pageId || Object.keys(pages)[0];
   const page = pages[id];
@@ -46,161 +38,168 @@ export function collectTexts(manifest, pageId) {
 
   const texts = [];
 
-  const push = (route, value) => {
-    if (typeof value === 'string' && value.trim().length > 1) {
-      texts.push({ route, value: value.trim() });
-    }
-  };
+  function push(contentPath, rtaId, value) {
+    if (typeof value !== "string") return;
+    const clean = normalize(value);
+    if (clean.length <= 1) return;
+    texts.push({ content_path: contentPath, rta_id: rtaId, value: clean });
+  }
 
-  // Sólo se recorren campos de texto declarados. `media` y `assets` guardan
-  // identificadores de archivo, no contenido: tratarlos como texto llenaba el
-  // informe de ausencias que no significan nada.
-  const walk = (node, route) => {
+  function walk(node, contentPath, rtaId, textContext = false) {
     if (Array.isArray(node)) {
-      node.forEach((item, index) => walk(item, `${route}[${index}]`));
+      node.forEach((item, index) => walk(item, `${contentPath}.${index}`, `${rtaId}.${index}`, textContext));
       return;
     }
 
-    if (node && typeof node === 'object') {
+    if (node && typeof node === "object") {
       for (const [key, value] of Object.entries(node)) {
-        // title_lines es composición, no contenido: lo afina el calibrador.
-        if (NOT_CONTENT.has(key)) continue;
-        if (TEXT_FIELDS.includes(key)) walk(value, `${route}.${key}`);
-        else if (value && typeof value === 'object' && !Array.isArray(value)) {
-          walk(value, `${route}.${key}`);
-        }
+        if (NOT_VISIBLE_CONTENT.has(key)) continue;
+        const nextContext = textContext || TEXT_FIELDS.has(key);
+        if (!nextContext && (typeof value !== "object" || value === null)) continue;
+        walk(value, `${contentPath}.${key}`, `${rtaId}.${rtaSegment(key)}`, nextContext);
       }
       return;
     }
 
-    push(route, node);
-  };
+    if (textContext) push(contentPath, rtaId, node);
+  }
 
-  (page.sections || []).forEach((section, index) => {
-    walk(section, `pages.${id}.sections[${index}]`);
-  });
+  for (const [key, value] of Object.entries(page)) {
+    if (NOT_VISIBLE_CONTENT.has(key) || key === "sections") continue;
+    walk(value, `pages.${id}.${key}`, `${id}.${rtaSegment(key)}`, TEXT_FIELDS.has(key));
+  }
+
+  for (const [index, section] of (page.sections || []).entries()) {
+    const sectionId = section.id || `section-${index}`;
+    for (const [key, value] of Object.entries(section)) {
+      if (NOT_VISIBLE_CONTENT.has(key)) continue;
+      walk(
+        value,
+        `pages.${id}.sections.${sectionId}.${key}`,
+        `${id}.${rtaSegment(sectionId)}.${rtaSegment(key)}`,
+        TEXT_FIELDS.has(key)
+      );
+    }
+  }
+
+  if (includeShared) {
+    walk(manifest.brand, "brand", "shared.brand", false);
+    walk(manifest.navigation, "navigation", "shared.navigation", true);
+  }
 
   return { pageId: id, texts };
 }
 
-const normalize = (value) => value.replace(/\s+/g, ' ').trim();
+export function summarizeMappings(mapped) {
+  const linked = mapped.filter((item) => item.matches === 1);
+  const missing = mapped.filter((item) => item.matches === 0);
+  const ambiguous = mapped.filter((item) => item.matches > 1);
+  return {
+    declared: mapped.length,
+    linked: linked.length,
+    missing: missing.length,
+    ambiguous: ambiguous.length,
+    coverage: mapped.length ? Math.round((linked.length / mapped.length) * 100) : 0
+  };
+}
 
-async function main() {
-  const manifestPath = arg('manifest', 'CONTENT_MANIFEST.json');
-  const url = arg('url', 'http://localhost:4321');
-  const outPath = arg('out', null);
-
-  const manifest = JSON.parse(await readFile(path.resolve(manifestPath), 'utf8'));
-  const { pageId, texts } = collectTexts(manifest, arg('page', null));
-
-  const fromProject = createRequire(path.join(process.cwd(), 'noop.js'));
-  let chromium;
-  try {
-    ({ chromium } = fromProject('playwright'));
-  } catch {
-    ({ chromium } = await import('playwright').catch(() => {
-      throw new Error('Playwright no está disponible. Instalalo en el proyecto: npm i -D playwright');
-    }));
+async function loadChromium(playwrightRoot) {
+  const roots = [process.cwd(), playwrightRoot].filter(Boolean);
+  for (const root of roots) {
+    try {
+      return createRequire(path.join(path.resolve(root), "package.json"))("playwright").chromium;
+    } catch {}
   }
 
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const module = await import("playwright").catch(() => null);
+  if (module) return module.chromium;
+  throw new Error(
+    "Playwright no está disponible. Instalalo en el proyecto o indicá el skill que ya lo posee con --playwright-root /ruta/al/skill."
+  );
+}
 
+async function main() {
+  const manifestPath = path.resolve(arg("manifest", "CONTENT_MANIFEST.json"));
+  const url = arg("url", "http://localhost:4321");
+  const outPath = arg("out");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const { pageId, texts } = collectTexts(manifest, arg("page"), {
+    includeShared: process.argv.includes("--include-shared")
+  });
+  const chromium = await loadChromium(arg("playwright-root"));
+  const browser = await chromium.launch({ headless: true });
   let mapped;
 
   try {
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => {});
+    const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+    await page.goto(url, { waitUntil: "domcontentloaded" });
 
     mapped = await page.evaluate((wanted) => {
-      const clean = (value) => value.replace(/\s+/g, ' ').trim();
+      const clean = (value) => value.replace(/\s+/g, " ").trim();
+      const all = [...document.body.querySelectorAll("*")].filter((element) => !element.closest("[data-visual-tuner]"));
+      const explicitContent = all.filter((element) => element.hasAttribute("data-content-path"));
+      const legacyContent = all.filter((element) => element.hasAttribute("data-content-key"));
+      const explicitRta = all.filter((element) => element.hasAttribute("data-rta-id"));
 
-      // Sólo nodos que contienen texto propio: un contenedor que envuelve al
-      // titular no es el titular.
-      const candidates = [];
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
-
-      while (walker.nextNode()) {
-        const el = walker.currentNode;
-        if (el.closest('[data-visual-tuner]')) continue;
-        const own = [...el.childNodes]
-          .filter((n) => n.nodeType === Node.TEXT_NODE)
-          .map((n) => n.textContent)
-          .join(' ');
-        const text = clean(own);
-        if (text.length > 1) candidates.push({ el, text });
-      }
-
-      const describe = (el) => {
-        const section = el.closest('section, header, footer, main');
+      const describe = (element) => {
+        const region = element.closest("section, header, footer, main");
         return {
-          tag: el.tagName.toLowerCase(),
-          section: section?.getAttribute('id') || section?.tagName.toLowerCase() || null,
+          tag: element.tagName.toLowerCase(),
+          region: region?.getAttribute("id") || region?.tagName.toLowerCase() || null,
+          rta_id: element.getAttribute("data-rta-id") || element.closest("[data-rta-id]")?.getAttribute("data-rta-id") || null,
+          tune_id: element.getAttribute("data-tune-id") || element.closest("[data-tune-id]")?.getAttribute("data-tune-id") || null
         };
       };
 
+      const exactTextMatches = (value) => {
+        const matches = all.filter((element) => clean(element.textContent || "") === value);
+        return matches.filter((element) => !matches.some((other) => other !== element && element.contains(other)));
+      };
+
       return wanted.map((item) => {
-        // Una marca explícita gana sobre la coincidencia de texto: es la
-        // salida para los casos que el texto no puede resolver — dos botones
-        // que dicen lo mismo, o un campo que se renderiza de otra forma.
-        const declared = document.querySelector(
-          `[data-content-key="${item.route.replace(/"/g, '\\"')}"]`,
-        );
-
-        if (declared) {
-          return { route: item.route, value: item.value, matches: 1, by: 'data-content-key', where: describe(declared) };
-        }
-
-        const hits = candidates.filter((c) => c.text === item.value);
+        const contentHits = explicitContent.filter((element) => element.getAttribute("data-content-path") === item.content_path);
+        const legacyHits = legacyContent.filter((element) => element.getAttribute("data-content-key") === item.content_path);
+        const rtaHits = explicitRta.filter((element) => element.getAttribute("data-rta-id") === item.rta_id);
+        const preferred = contentHits.length ? [contentHits, "data-content-path"]
+          : legacyHits.length ? [legacyHits, "data-content-key"]
+            : rtaHits.length ? [rtaHits, "data-rta-id"]
+              : [exactTextMatches(item.value), "text"];
+        const [hits, by] = preferred;
 
         return {
-          route: item.route,
-          value: item.value,
+          ...item,
           matches: hits.length,
-          by: hits.length === 1 ? 'texto' : null,
-          where: hits.length === 1 ? describe(hits[0].el) : null,
+          by: hits.length ? by : null,
+          where: hits.length === 1 ? describe(hits[0]) : null
         };
       });
-    }, texts.map(({ route, value }) => ({ route, value: normalize(value) })));
+    }, texts);
   } finally {
     await browser.close();
   }
 
-  const linked = mapped.filter((item) => item.matches === 1);
-  const missing = mapped.filter((item) => item.matches === 0);
-  const ambiguous = mapped.filter((item) => item.matches > 1);
+  const summary = summarizeMappings(mapped);
+  const report = {
+    version: "0.1",
+    page: pageId,
+    url,
+    manifest: manifestPath.replaceAll("\\", "/"),
+    summary,
+    mapped
+  };
 
-  console.log(`Página "${pageId}": ${texts.length} textos declarados en el manifiesto.\n`);
-  console.log(`  vinculados sin ambigüedad : ${linked.length}`);
-  console.log(`  no encontrados            : ${missing.length}`);
-  console.log(`  ambiguos                  : ${ambiguous.length}`);
-
-  if (missing.length) {
-    console.log('\nDeclarados y ausentes de la página — hardcodeados, viejos o no renderizados:');
-    for (const item of missing.slice(0, 12)) {
-      console.log(`  ${item.route}\n    "${item.value.slice(0, 70)}"`);
-    }
-    if (missing.length > 12) console.log(`  … y ${missing.length - 12} más`);
-  }
-
-  if (ambiguous.length) {
-    console.log('\nAparecen más de una vez — no se ofrecen para editar:');
-    for (const item of ambiguous) {
-      console.log(`  ${item.route} (${item.matches} veces): "${item.value.slice(0, 50)}"`);
-    }
-  }
+  console.log(`Página "${pageId}": ${summary.declared} textos visibles declarados.`);
+  console.log(`  vinculados sin ambigüedad : ${summary.linked}`);
+  console.log(`  no encontrados            : ${summary.missing}`);
+  console.log(`  ambiguos                  : ${summary.ambiguous}`);
+  console.log(`  cobertura                 : ${summary.coverage}%`);
 
   if (outPath) {
-    await writeFile(
-      path.resolve(outPath),
-      `${JSON.stringify({ page: pageId, url, mapped }, null, 2)}\n`,
-      'utf8',
-    );
-    console.log(`\nmapeo escrito: ${outPath}`);
+    await writeFile(path.resolve(outPath), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+    console.log(`reporte escrito: ${outPath}`);
   }
 
-  const coverage = texts.length ? Math.round((linked.length / texts.length) * 100) : 0;
-  console.log(`\n${coverage}% del contenido declarado es editable desde la página.`);
+  if (summary.missing || summary.ambiguous) process.exitCode = 2;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

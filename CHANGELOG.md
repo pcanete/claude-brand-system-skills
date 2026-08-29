@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+`visual-tuning-kit` 0.6.0, `reference-to-astro` 1.3.0 — auditoría cruzada: el editor de la otra línea, y el checkpoint que faltaba
+
+La línea de Codex adoptó `derive-schema.mjs`, `map-content.mjs`, el enum de
+unidades extendido y el `wordpress-publisher` completo. Reescribieron la lógica
+a sus convenciones; los algoritmos son los mismos. De vuelta viene más de lo que
+fue.
+
+**El checkpoint `content-architecture` ya no está sin herramienta.**
+`build-content-architecture.mjs` renderiza el SITE_BLUEPRINT como página de
+revisión: rutas, recorrido de lectura, mapeo de cada sección a su contenido y a
+sus patrones de referencia, intención responsive, contenido excluido, recorridos
+de conversión y el estado de los checkpoints, con sello de aprobación a la
+vista. Era el hueco que este repositorio había registrado: dos checkpoints
+tenían skill que producía un artefacto y el tercero se aprobaba contra nada.
+
+**Anclas estables de revisión.** `data-rta-id` sobre el HTML compilado, con
+rutas semánticas que sobreviven al build. La frontera está escrita: la
+exportación de un editor externo es evidencia de revisión, no código fuente.
+
+**Un tipo de control `navigation`.** Editar el menú con etiquetas acotadas,
+destinos validados contra una lista de dominios, visibilidad y orden. La
+validación vive en el endpoint de guardado y no en el cliente, que es el lugar
+correcto. `apply-content.mjs` ahora lo lleva al contrato de contenido junto con
+texto, líneas, imagen y orden de secciones, comprobando la forma de cada
+elemento: un `target` inválido no aplica nada.
+
+**`editor-boundary.md`**, que escribe la doctrina que faltaba: qué controles
+pertenecen al ajuste final y cuáles cruzan al constructor de páginas. La línea
+que importa — el arrastre libre optimiza un viewport rompiendo otro, así que el
+movimiento se representa como intención de grilla, alineación, span, orden o un
+desplazamiento óptico acotado.
+
 `visual-tuning-kit` 0.4.0, `wordpress-publisher` 0.3.0, `reference-to-astro` 1.2.0 — el día después de la primera versión
 
 Lo que se gana generando la primera versión de un sitio se pierde después si
