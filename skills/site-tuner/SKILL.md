@@ -3,7 +3,7 @@ name: site-tuner
 description: Instala y opera un calibrador acotado sobre un sitio Astro ya construido, para el ajuste fino que queda después de reconstruir una referencia: mover, achicar, cambiar un salto de línea. Los controles se declaran en un contrato por proyecto y los valores aprobados se compilan al sitio. Usar cuando un sitio ya está armado y hay que afinarlo sin volver a tocar el código a mano. No usar para construir el sitio —eso es reference-to-astro— ni para cambiar contenido, que vuelve al CONTENT_MANIFEST.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Site Tuner
@@ -73,6 +73,35 @@ El motor no sabe nada del proyecto. Todo lo específico vive en el contrato.
 `assets/tuning.schema.example.json` y `assets/tuning.values.example.json` son
 un par de ejemplo verificado: muestran los cuatro tipos de control y la forma
 del archivo de valores aprobados.
+
+## Generar el contrato, no escribirlo
+
+Declarar treinta controles a mano por proyecto es trabajo que no hace falta.
+El código ya dice cuáles son los puntos de ajuste: cada `var(--nombre, valor)`
+es una variable que quien construyó el sitio decidió dejar regulable, con su
+valor por defecto al lado. Lo mismo un helper que lee la variable desde
+JavaScript con un default.
+
+```bash
+node scripts/generate-tuning.mjs --project . --style STYLE_DNA.json   --out src/config/tuning.schema.json
+```
+
+Recorre el proyecto, junta esos puntos de ajuste, agrupa por sección según el
+prefijo del nombre y deriva el rango del valor que el proyecto eligió: nunca de
+una tabla. Una proporción entre 0 y 1 se acota a 0–1; un ángulo se abre
+simétrico alrededor de cero; una longitud se abre hacia abajo y hacia arriba.
+
+Cada control anota en `derived_from` el archivo de donde salió. Un control sin
+ese campo lo decidió una persona, y está bien que se note la diferencia.
+
+**Es un punto de partida, no el contrato final.** El generador propone todo lo
+que el proyecto parametrizó; lo que no merece estar en el panel se saca a mano.
+Si el generador no encuentra algo que querés afinar, la respuesta no es
+agregarlo al contrato: es parametrizarlo en el código con `var(--nombre,
+default)`. Un control que apunta a una variable que nadie lee no hace nada.
+
+También informa las variables que aparecen con más de un valor por defecto —se
+queda con el primero— porque suele ser un descuido del código, no una decisión.
 
 ## Declarar controles
 

@@ -1,0 +1,28 @@
+---
+const title = 'Fixture';
+---
+<section class="hero">
+  <h1>{title}</h1>
+</section>
+
+<style>
+  .hero h1 {
+    font-size: var(--hero-title-size, 7.5vw);
+    line-height: var(--hero-title-leading, 0.9);
+    max-width: var(--hero-copy-width, 460px);
+  }
+  .hero {
+    padding-block: var(--hero-padding, 6vh);
+    transform: rotate(var(--hero-tilt, 2deg));
+    opacity: var(--hero-veil, 0.85);
+  }
+</style>
+
+<script>
+  const numericToken = (name, fallback) => {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
+    return Number.parseFloat(raw) || fallback;
+  };
+  const speed = numericToken('--hero-speed', 42);
+  void speed;
+</script>

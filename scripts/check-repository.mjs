@@ -434,6 +434,29 @@ fs.writeFileSync(
   })
 );
 
+// El generador tiene que producir un contrato que su propio validador acepte.
+// Si el contrato generado no valida, la cadena se corta justo donde debía
+// encadenarse.
+const generatedTuning = path.join(
+  fs.mkdtempSync(path.join(os.tmpdir(), "cbss-generated-")),
+  "tuning.schema.json"
+);
+
+runNode("Tuning generator failed on the fixture project", [
+  path.join(root, "skills", "site-tuner", "scripts", "generate-tuning.mjs"),
+  "--project",
+  path.join(root, "tests", "tuning-fixture"),
+  "--out",
+  generatedTuning
+]);
+
+runNode("Generated tuning contract rejected by its own validator", [
+  tuningValidator,
+  "--schema",
+  generatedTuning,
+  "--lenient"
+]);
+
 runNode(
   "Incoherent tuning contract was accepted: the tuner gate is not working",
   [tuningValidator, "--schema", incoherentTuning, "--lenient"],

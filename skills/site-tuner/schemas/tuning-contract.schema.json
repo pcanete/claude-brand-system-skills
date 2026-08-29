@@ -150,6 +150,10 @@
         },
         "event_detail": {
           "description": "Payload del evento. Su forma la define quien lo escucha."
+        },
+        "derived_from": {
+          "type": "string",
+          "description": "De dónde salió este control cuando lo generó una herramienta: el archivo o archivos del proyecto donde la variable se usa con valor por defecto. Un control sin origen es una decisión de quien escribió el contrato, y está bien que se note la diferencia."
         }
       },
       "allOf": [

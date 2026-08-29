@@ -5,6 +5,29 @@
 Publicación inicial de la línea Claude, con los tres skills base y las dos
 herramientas que faltaban para llegar de una referencia a una web publicada.
 
+### site-tuner 0.2.0 — el contrato se genera
+
+Declarar treinta controles a mano por proyecto era el trabajo que impedía que
+el calibrador existiera para el segundo sitio. `generate-tuning.mjs` lo deriva
+del código.
+
+La señal estaba a la vista: cada `var(--nombre, valor)` es una variable que
+quien construyó el sitio decidió dejar regulable, con su valor por defecto al
+lado. También cuenta el mismo patrón escrito desde JavaScript, un helper que
+lee la variable con un default — que es como se declara justo lo que los
+scripts animan.
+
+El rango sale del valor que el proyecto eligió, nunca de una tabla: una
+proporción entre 0 y 1 se acota a 0–1, un ángulo se abre simétrico alrededor de
+cero, una longitud se abre hacia abajo y hacia arriba. Cada control anota en
+`derived_from` el archivo de donde salió; un control sin ese campo lo decidió
+una persona, y conviene que se note.
+
+Contra un proyecto real recuperó los 28 controles que un humano había escrito a
+mano, y propuso otros doce que el proyecto parametriza y nadie había expuesto.
+Por eso es un punto de partida y no el contrato final: lo que no merece estar
+en el panel se saca.
+
 ### site-tuner 0.1.0
 
 El ajuste fino que quedaba a mano después de reconstruir una referencia:
