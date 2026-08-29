@@ -3,7 +3,7 @@ name: site-tuner
 description: Instala y opera un calibrador acotado sobre un sitio Astro ya construido, para el ajuste fino que queda después de reconstruir una referencia: mover, achicar, cambiar un salto de línea. Los controles se declaran en un contrato por proyecto y los valores aprobados se compilan al sitio. Usar cuando un sitio ya está armado y hay que afinarlo sin volver a tocar el código a mano. No usar para construir el sitio —eso es reference-to-astro— ni para cambiar contenido, que vuelve al CONTENT_MANIFEST.
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # Site Tuner
@@ -121,6 +121,30 @@ la impresión de que algo cambió.
 
 Agrupá los controles por sección del sitio. El panel abre un grupo por vez: un
 calibrador con treinta controles abiertos es un tablero, no una herramienta.
+
+## Vincular el contenido con la página
+
+Antes de poder editar textos hay que saber cuál es cuál. `map-content.mjs`
+resuelve eso sin obligar a anotar los componentes:
+
+```bash
+node scripts/map-content.mjs --manifest CONTENT_MANIFEST.json   --url http://localhost:4321
+```
+
+El texto del manifiesto es su propia señal. Si un campo aparece exactamente una
+vez en la página, queda vinculado; si aparece dos veces o ninguna, se informa y
+**no** se ofrece para editar. Adivinar cuál de los dos era terminaría
+escribiendo en el contrato algo que nadie pidió.
+
+Para los casos que el texto no puede resolver —dos botones que dicen lo mismo,
+un campo que se renderiza de otra forma— el componente puede declarar
+`data-content-key="pages.home.sections[0].title"`, que tiene prioridad sobre la
+coincidencia.
+
+**El informe vale por sí solo**, aun sin editar nada: mide cuánto de la página
+sale realmente del manifiesto. Un campo declarado que no aparece está escrito
+en duro, quedó viejo, o su sección no se renderiza — y eso es una divergencia
+entre el contrato y el sitio que conviene conocer antes de regenerar.
 
 ## Verificación
 

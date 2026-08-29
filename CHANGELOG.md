@@ -5,6 +5,24 @@
 Publicación inicial de la línea Claude, con los tres skills base y las dos
 herramientas que faltaban para llegar de una referencia a una web publicada.
 
+### site-tuner 0.3.0 — el contrato se genera y el contenido se vincula
+
+`map-content.mjs` vincula el CONTENT_MANIFEST con la página renderizada: qué
+texto del contrato aparece en pantalla y dónde. Es el paso previo a editar
+textos, y no exige anotar los componentes — el texto del manifiesto es su
+propia señal.
+
+Un campo que aparece exactamente una vez queda vinculado. Uno que aparece dos
+veces o ninguna se informa y no se ofrece para editar: adivinar cuál era
+terminaría escribiendo en el contrato algo que nadie pidió. Para esos casos, un
+componente puede declarar `data-content-key`, que tiene prioridad.
+
+El informe vale aunque no se edite nada: mide cuánto de la página sale
+realmente del manifiesto. Contra un sitio real, 36 de 40 textos quedaron
+vinculados sin tocar un solo componente, y los cuatro restantes resultaron ser
+divergencias reales —un título que se renderiza como líneas sueltas, dos
+botones con el mismo texto— y no fallas del método.
+
 ### site-tuner 0.2.0 — el contrato se genera
 
 Declarar treinta controles a mano por proyecto era el trabajo que impedía que
