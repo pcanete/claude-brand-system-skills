@@ -53,6 +53,26 @@ The required checkpoint ids are:
 
 Strict validation rejects pending checkpoints and undocumented waivers.
 
+## Fidelity target and ceremony
+
+`project.fidelity_target` decides how much protocol strict validation demands.
+It never changes what may be claimed.
+
+| Target | Checkpoints | Open decisions | Patterns |
+| --- | --- | --- | --- |
+| `directional` | may stay pending | allowed, recorded | any mode |
+| `high` | approved or waived with a reason | none | any mode |
+| `forensic` | approved or waived with a reason | none | no `inferred` |
+
+`directional` is the common case: the reference is a starting point rather than
+something to reproduce, and often there is no brand scan at all. Recording an
+open decision is better than closing it to satisfy a validator.
+
+Human approval is required at every level. So are the gates that prevent
+invention: the plan must cover the supplied content, and every pattern must
+resolve to a recorded observation with evidence. Lowering the target lowers the
+protocol, never the honesty.
+
 ## Coverage rule
 
 Every section in the content manifest must either:

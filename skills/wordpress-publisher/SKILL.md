@@ -3,7 +3,7 @@ name: wordpress-publisher
 description: Convierte un sitio Astro ya construido en un plugin de WordPress que reemplaza únicamente la portada, dejando que WordPress siga atendiendo cuenta, registro, tienda, búsqueda y administración. Genera el paquete, verifica que sea instalable y produce un ZIP. Usar cuando la portada nueva tiene que convivir con un WordPress existente en lugar de reemplazarlo. No usar para publicar un sitio estático completo, que no necesita WordPress en el medio.
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # WordPress Publisher
@@ -55,26 +55,29 @@ cliente; aislar de menos deja la portada peleando con el tema.
    instalada sin que nadie se entere. El validador rechaza un paquete cuya
    cabecera no declare un `x.y.z` válido.
 
-2. Construir el sitio y exportar:
+2. Publicar:
 
    ```bash
-   npm run build
-   node scripts/export-plugin.mjs --project . --config wordpress.config.json
+   node scripts/publish.mjs --project .
    ```
 
-3. Verificar el paquete **antes** de subirlo:
+   Construye, exporta, verifica y empaqueta, en ese orden y cortando en el
+   primer fallo. Es un solo paso porque los cuatro van siempre juntos: la
+   fricción no está en cada uno, está en acordarse de los cuatro cada vez que
+   se corrige una palabra, y en que saltear la verificación no cuesta nada. Un
+   ZIP que sale de un paquete no verificado es peor que no tener ZIP, porque se
+   sube igual y rompe la portada en vivo.
 
-   ```bash
-   node scripts/validate-plugin.mjs --plugin wordpress/build/portada-astro
-   ```
+   `--skip-build` sirve cuando el `dist/` ya está al día.
 
-4. Empaquetar:
+3. Subir el ZIP desde el panel de WordPress: Plugins → Añadir nuevo → Subir
+   plugin, y activarlo. Es lo único manual, y es a propósito: instalar plugins
+   por API pide credenciales del sitio, que es una decisión de quien lo opera y
+   no algo que esta herramienta deba tomar.
 
-   ```bash
-   node scripts/package-plugin.mjs --plugin wordpress/build/portada-astro
-   ```
-
-5. Subir el ZIP desde el panel de WordPress.
+Los tres pasos internos se pueden correr sueltos cuando hace falta mirar uno:
+`scripts/export-plugin.mjs`, `scripts/validate-plugin.mjs` y
+`scripts/package-plugin.mjs` aceptan `--project`, `--plugin` y `--out`.
 
 El empaquetado no usa la herramienta del sistema a propósito. `Compress-Archive`
 en Windows guarda las rutas con barra invertida y el formato ZIP exige barra
@@ -125,5 +128,13 @@ usa para acotar sus reglas. Nada de lo que hace se derrama al resto del sitio.
 
 ## Actualizar la portada
 
-Volver a construir, volver a exportar, volver a validar y subir el ZIP nuevo.
-El plugin no guarda estado propio: todo lo que muestra viene del build.
+Subir `version` en `wordpress.config.json`, correr `scripts/publish.mjs` y subir
+el ZIP nuevo. El plugin no guarda estado propio: todo lo que muestra viene del
+build, así que reemplazarlo no pierde nada.
+
+Si lo que cambió es contenido y no diseño, el cambio no empieza acá: empieza en
+el contrato de contenido del proyecto. El calibrador de `visual-tuning-kit`
+propone, una persona aprueba, `apply-content.mjs` lo escribe en el manifiesto, y
+recién entonces se publica. Editar el HTML compilado o la plantilla del plugin
+deja el sitio y su contrato diciendo cosas distintas, y el siguiente build
+revierte el cambio sin avisar.

@@ -2,6 +2,50 @@
 
 ## Unreleased
 
+`visual-tuning-kit` 0.4.0, `wordpress-publisher` 0.3.0, `reference-to-astro` 1.2.0 — el día después de la primera versión
+
+Lo que se gana generando la primera versión de un sitio se pierde después si
+corregir una palabra cuesta cuatro pasos y encima no sobrevive. Tres cambios
+sobre esa parte del recorrido.
+
+**Cuatro de los siete tipos de control no llegaban a producción.**
+`build-approved-css.mjs` sólo emite variables CSS, así que los controles con
+`content_path` —`text`, `text-lines`, `image` y `section-order`— se editaban en
+el panel, se aprobaban, y el siguiente build los perdía. El contrato ya preveía
+`target.content_path`; faltaba quien lo escribiera.
+
+`apply-content.mjs` lleva el valor aprobado de vuelta al `CONTENT_MANIFEST`, que
+es el archivo canónico: el panel propone, una persona aprueba, el contrato se
+actualiza y el sitio se reconstruye desde ahí. Rechaza borradores con la misma
+regla que el CSS, no escribe nada si alguna ruta no resuelve —en vez de aplicar
+la mitad—, no crea claves que no existan, y correrlo dos veces no cambia nada.
+Reordenar secciones no descarta las que el orden no nombra: quedan al final, en
+su orden original, en lugar de desaparecer del sitio en silencio.
+
+**Publicar es un paso.** `publish.mjs` construye, exporta, verifica y empaqueta,
+cortando en el primer fallo. La fricción no estaba en cada comando: estaba en
+acordarse de los cuatro cada vez, y en que saltear la verificación no costaba
+nada. Un ZIP que sale de un paquete no verificado se sube igual y rompe la
+portada en vivo. Lo único manual sigue siendo subirlo, y es a propósito.
+
+**`fidelity_target` gobierna la ceremonia.** Era un campo obligatorio del
+contrato que nadie leía, mientras el escáner ya graduaba su profundidad. Ahora:
+
+| Objetivo | Checkpoints | Decisiones abiertas | Patrones |
+| --- | --- | --- | --- |
+| `directional` | pueden quedar pendientes | permitidas, registradas | cualquier modo |
+| `high` | aprobados o saltados con motivo | ninguna | cualquier modo |
+| `forensic` | aprobados o saltados con motivo | ninguna | sin `inferred` |
+
+`directional` es el caso frecuente: la referencia es un punto de partida y a
+menudo no hay escaneo de marca. Registrar una decisión abierta es mejor que
+cerrarla para conformar a un validador.
+
+La aprobación humana se pide en los tres niveles, y las compuertas que impiden
+inventar —que el plan cubra el contenido y que cada patrón resuelva en una
+observación con evidencia— son idénticas. **Bajar el objetivo baja el protocolo,
+nunca la honestidad.**
+
 `reference-scanner` 0.8.0, `reference-to-astro` 1.1.0 — una observación tiene que apuntar a lo que el documento dice
 
 **Compuerta 7: las rutas de observación resuelven en el documento.**

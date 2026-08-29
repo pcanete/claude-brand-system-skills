@@ -82,7 +82,30 @@ function checkSectionAssets(content) {
   return issues;
 }
 
+// El objetivo de fidelidad declarado gobierna cuánta ceremonia se exige, y solo
+// eso. Las compuertas que impiden inventar —que el plan cubra el contenido y
+// que cada patrón resuelva en una observación con evidencia— son iguales en los
+// tres niveles. Bajar el objetivo baja el protocolo, nunca la honestidad.
+//
+//   directional  la referencia es un punto de partida. Los checkpoints pueden
+//                quedar pendientes y las decisiones abiertas; una persona sigue
+//                teniendo que aprobar el plan.
+//   high         los checkpoints se resuelven —aprobados o saltados con motivo—
+//                y no quedan decisiones abiertas.
+//   forensic     como high, y además ningún patrón puede declararse `inferred`:
+//                una reconstrucción forense no se apoya en conjeturas.
+function ceremonyFor(blueprint) {
+  const target = blueprint.project?.fidelity_target || "high";
+  return {
+    target,
+    requiresResolvedCheckpoints: target !== "directional",
+    requiresClosedDecisions: target !== "directional",
+    forbidsInferredPatterns: target === "forensic"
+  };
+}
+
 function checkBlueprintCheckpoints(blueprint, { strict }) {
+  const ceremony = ceremonyFor(blueprint);
   const required = new Set([
     "brand-manual",
     "reference-lab",
@@ -101,8 +124,10 @@ function checkBlueprintCheckpoints(blueprint, { strict }) {
       issues.push(`${checkpoint.id}: waived checkpoint requires a reason`);
     }
 
-    if (strict && checkpoint.status === "pending") {
-      issues.push(`${checkpoint.id}: checkpoint is still pending`);
+    if (strict && ceremony.requiresResolvedCheckpoints && checkpoint.status === "pending") {
+      issues.push(
+        `${checkpoint.id}: checkpoint is still pending (fidelity_target '${ceremony.target}')`
+      );
     }
   }
 
@@ -120,10 +145,16 @@ function checkBlueprintApproval(blueprint, { strict }) {
 
   if (!unique(ids)) issues.push("decision ids must be unique");
 
+  const ceremony = ceremonyFor(blueprint);
+
   if (strict) {
-    for (const decision of decisions) {
-      if (decision.status === "open") {
-        issues.push(`${decision.id}: decision is still open`);
+    if (ceremony.requiresClosedDecisions) {
+      for (const decision of decisions) {
+        if (decision.status === "open") {
+          issues.push(
+            `${decision.id}: decision is still open (fidelity_target '${ceremony.target}')`
+          );
+        }
       }
     }
 
@@ -131,6 +162,21 @@ function checkBlueprintApproval(blueprint, { strict }) {
       issues.push(
         `approval.status is '${blueprint.approval?.status || "missing"}', expected 'approved'`
       );
+    }
+  }
+
+  if (strict && ceremony.forbidsInferredPatterns) {
+    for (const [pageId, page] of Object.entries(blueprint.pages || {})) {
+      for (const section of page.sections || []) {
+        for (const pattern of section.reference_patterns || []) {
+          if (pattern.mode === "inferred") {
+            issues.push(
+              `${pageId}/${section.id}: pattern '${pattern.style_path}' is 'inferred', ` +
+                `which a forensic reconstruction cannot build on`
+            );
+          }
+        }
+      }
     }
   }
 

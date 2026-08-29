@@ -8,9 +8,9 @@ Cada skill se versiona por separado.
 | brand-manual-builder | 0.1.0 | Brand manual spec 0.1.x |
 | reference-scanner | 0.8.0 | Web reference schemas 0.3.x |
 | reference-lab-builder | 0.2.1 | Reference lab spec 0.1.x |
-| reference-to-astro | 1.1.0 | Web reference schemas 0.3.x, SITE_BLUEPRINT 0.1.x |
-| visual-tuning-kit | 0.3.0 | Tuning contract 0.1 |
-| wordpress-publisher | 0.2.0 | Plugin template 0.1.x |
+| reference-to-astro | 1.2.0 | Web reference schemas 0.3.x, SITE_BLUEPRINT 0.1.x |
+| visual-tuning-kit | 0.4.0 | Tuning contract 0.1 |
+| wordpress-publisher | 0.3.0 | Plugin template 0.1.x |
 
 La versión vive en el frontmatter del `SKILL.md`. La revisión del repositorio
 falla si deja de coincidir con esta tabla: una tabla que nada puede contradecir

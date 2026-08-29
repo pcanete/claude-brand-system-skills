@@ -3,7 +3,7 @@ name: visual-tuning-kit
 description: Adds a bounded, development-only visual tuning layer to an Astro site so users can adjust declared typography, spacing, grid, alignment, content, section order, and behavior variants without becoming a free-form page builder. Produces validated tuning schema, approved values, and an auditable changeset. Use after an initial Astro implementation exists. Not for reference scanning, initial site generation, production CMS editing, or arbitrary drag-and-drop layout.
 license: MIT
 metadata:
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # Visual Tuning Kit
@@ -129,7 +129,23 @@ node scripts/build-approved-css.mjs --schema TUNING_SCHEMA.json \
    only direct children inside the declared container id.
 8. Saving creates a complete validated `TUNING_VALUES.json` and an auditable
    `TUNING_CHANGESET.json`.
-9. Production consumes approved values but never ships the tuner panel or save endpoint.
+9. Once a person approves the values, fold the content controls back into the
+   content contract:
+
+```bash
+node scripts/apply-content.mjs --schema TUNING_SCHEMA.json   --values TUNING_VALUES.json --content CONTENT_MANIFEST.json
+```
+
+   Controls with `target.css_variable` reach production through the CSS above.
+   Controls with `target.content_path` — `text`, `text-lines`, `image` and
+   `section-order` — reach it only through this step. Without it an approved
+   text edit is lost on the next build, which is the whole reason daily edits
+   feel more expensive than they should.
+
+   It refuses draft values, writes nothing at all if any path fails to resolve,
+   and is safe to run twice. Add `--dry-run` to see the changes first.
+   Rebuild the site afterwards.
+10. Production consumes approved values but never ships the tuner panel or save endpoint.
 
 Run `scripts/test-runtime.mjs` when changing the development plugin, client or
 production helpers.
@@ -138,8 +154,13 @@ production helpers.
 
 `TUNING_VALUES.json` is data, not an invisible code mutation. The project must
 bind CSS controls through custom properties and content controls through stable
-ids or content paths. Approved values may be folded back into source later, but
-that is a separate reviewed change.
+ids or content paths.
+
+The content contract stays the source of truth. The panel proposes; once a
+person approves, `apply-content.mjs` writes the change back into
+`CONTENT_MANIFEST.json` and the site is rebuilt from there. Values that only
+live in the tuning file are a second copy of the content waiting to disagree
+with the first.
 
 The agent must not mark values approved on the user's behalf.
 

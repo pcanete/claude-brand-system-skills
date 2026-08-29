@@ -3,7 +3,7 @@ name: reference-to-astro
 description: Builds a website in Astro from an analyzed reference and an approved SITE_BLUEPRINT that maps client content to evidenced visual, responsive and behavioral patterns. Use when reference contracts and real content must become a verified implementation. Not for inventing a visual direction, scanning the reference, or packaging the result for WordPress.
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Reference-to-Astro

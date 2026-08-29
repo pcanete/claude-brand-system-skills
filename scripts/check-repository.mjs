@@ -488,6 +488,57 @@ runNode("Draft SITE_BLUEPRINT cannot be validated as work in progress", [
   "--lenient"
 ]);
 
+// El objetivo de fidelidad gobierna la ceremonia y nada más. Un plan
+// direccional construye con checkpoints pendientes; uno forense no construye
+// sobre una conjetura. Las compuertas de invención son iguales en los tres.
+const directionalBlueprint = path.join(blueprintGateRoot, "SITE_BLUEPRINT.directional.json");
+const directionalDocument = JSON.parse(read(approvedBlueprint));
+directionalDocument.project.fidelity_target = "directional";
+directionalDocument.checkpoints.find(
+  (checkpoint) => checkpoint.id === "reference-lab"
+).status = "pending";
+directionalDocument.decisions.push({
+  id: "dec-open-on-purpose",
+  topic: "Typeface",
+  decision: "Still undecided while the site is used as a starting point.",
+  rationale: "A directional build records the open question instead of pretending it is closed.",
+  status: "open"
+});
+fs.writeFileSync(
+  directionalBlueprint,
+  `${JSON.stringify(directionalDocument, null, 2)}
+`
+);
+
+runNode("A directional blueprint was blocked by ceremony it does not require", [
+  builderValidator,
+  ...webFixtures("reference-system"),
+  "--content",
+  path.join(root, "tests", "reference-system", "CONTENT_MANIFEST.json"),
+  "--blueprint",
+  directionalBlueprint
+]);
+
+const forensicBlueprint = path.join(blueprintGateRoot, "SITE_BLUEPRINT.forensic.json");
+const forensicDocument = JSON.parse(read(approvedBlueprint));
+forensicDocument.project.fidelity_target = "forensic";
+Object.values(forensicDocument.pages)[0].sections[0].reference_patterns[0].mode = "inferred";
+fs.writeFileSync(forensicBlueprint, `${JSON.stringify(forensicDocument, null, 2)}
+`);
+
+runNode(
+  "A forensic blueprint was allowed to build on an inferred pattern",
+  [
+    builderValidator,
+    ...webFixtures("reference-system"),
+    "--content",
+    path.join(root, "tests", "reference-system", "CONTENT_MANIFEST.json"),
+    "--blueprint",
+    forensicBlueprint
+  ],
+  { expect: "fail" }
+);
+
 fs.rmSync(blueprintGateRoot, { recursive: true, force: true });
 
 // The gates are the product. These fixtures must fail, and must fail only
@@ -602,6 +653,115 @@ runNode(
   ],
   { expect: "fail" }
 );
+
+// El circuito del contenido: un texto aprobado tiene que volver al contrato, y
+// un borrador no puede tocarlo.
+const contentRoot = fs.mkdtempSync(path.join(os.tmpdir(), "cbss-content-"));
+const contentSchema = path.join(contentRoot, "TUNING_SCHEMA.json");
+const contentValues = path.join(contentRoot, "TUNING_VALUES.json");
+const contentDraft = path.join(contentRoot, "TUNING_VALUES.draft.json");
+const contentManifest = path.join(contentRoot, "CONTENT_MANIFEST.json");
+
+fs.copyFileSync(
+  path.join(root, "tests", "reference-system", "CONTENT_MANIFEST.json"),
+  contentManifest
+);
+
+const manifestDocument = JSON.parse(read(contentManifest));
+const firstPageId = Object.keys(manifestDocument.pages)[0];
+const firstPage = manifestDocument.pages[firstPageId];
+const firstSection = firstPage.sections[0];
+
+fs.writeFileSync(
+  contentSchema,
+  `${JSON.stringify(
+    {
+      version: "0.1",
+      id: "content-roundtrip",
+      title: "Contenido",
+      query_parameter: "tune",
+      development_only: true,
+      groups: [
+        {
+          id: "contenido",
+          label: "Contenido",
+          controls: [
+            {
+              id: "seccion-titulo",
+              kind: "text",
+              label: "Section heading",
+              rationale: "The heading is the edit people make most often.",
+              default: firstSection.heading ?? firstSection.title ?? "",
+              target: {
+                content_path: `pages.${firstPageId}.sections.${firstSection.id}.${
+                  firstSection.heading !== undefined ? "heading" : "title"
+                }`
+              }
+            }
+          ]
+        }
+      ]
+    },
+    null,
+    2
+  )}
+`
+);
+
+const roundTripText = "Edited through the review panel";
+const approvedValues = {
+  version: "0.1",
+  schema: "content-roundtrip",
+  status: "approved",
+  approved_by: "repository check",
+  approved_at: "2026-01-01T00:00:00Z",
+  values: { "seccion-titulo": roundTripText }
+};
+
+fs.writeFileSync(contentValues, `${JSON.stringify(approvedValues, null, 2)}
+`);
+fs.writeFileSync(
+  contentDraft,
+  `${JSON.stringify(
+    { ...approvedValues, status: "draft", approved_by: null, approved_at: null },
+    null,
+    2
+  )}
+`
+);
+
+const applyContent = path.join(kitScripts, "apply-content.mjs");
+const contentArgs = ["--schema", contentSchema, "--values", contentValues, "--content", contentManifest];
+
+runNode(
+  "Draft values were allowed to edit the content contract",
+  [applyContent, "--schema", contentSchema, "--values", contentDraft, "--content", contentManifest],
+  { expect: "fail" }
+);
+
+runNode("Approved content values were not applied", [applyContent, ...contentArgs]);
+
+const roundTripped = JSON.parse(read(contentManifest));
+const roundTrippedSection = roundTripped.pages[firstPageId].sections.find(
+  (item) => item.id === firstSection.id
+);
+const roundTrippedValue =
+  firstSection.heading !== undefined ? roundTrippedSection.heading : roundTrippedSection.title;
+
+if (roundTrippedValue !== roundTripText) {
+  fail(
+    `Content round trip lost the approved edit: expected "${roundTripText}", ` +
+      `content says "${roundTrippedValue}"`
+  );
+}
+
+if (roundTripped.pages[firstPageId].sections.length !== firstPage.sections.length) {
+  fail("Content round trip changed how many sections the page has");
+}
+
+runNode("Applying approved content twice was not idempotent", [applyContent, ...contentArgs]);
+
+fs.rmSync(contentRoot, { recursive: true, force: true });
 
 // --- wordpress-publisher -----------------------------------------------
 // Un paquete incompleto no falla al generarse: falla en la portada del
