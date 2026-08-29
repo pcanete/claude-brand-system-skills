@@ -2,7 +2,7 @@
 /**
  * Plugin Name: {{PLUGIN_NAME}}
  * Description: {{PLUGIN_DESCRIPTION}}
- * Version: 0.1.3
+ * Version: {{PLUGIN_VERSION}}
  * Requires at least: 6.2
  * Requires PHP: 7.4
  * Author: {{PLUGIN_AUTHOR}}
@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( '{{CONST_PREFIX}}_VERSION', '0.1.3' );
+define( '{{CONST_PREFIX}}_VERSION', '{{PLUGIN_VERSION}}' );
 define( '{{CONST_PREFIX}}_PATH', plugin_dir_path( __FILE__ ) );
 define( '{{CONST_PREFIX}}_URL', plugin_dir_url( __FILE__ ) );
 

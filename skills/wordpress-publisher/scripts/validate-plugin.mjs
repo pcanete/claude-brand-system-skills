@@ -79,6 +79,17 @@ export async function validatePlugin(pluginDir) {
   if (!main.includes('is_front_page()')) {
     issues.push('el plugin no limita su alcance a la portada (is_front_page)');
   }
+  // WordPress compara este número para decidir si hay actualización. Si queda
+  // un marcador o algo que no es x.y.z, el sitio puede quedarse con la versión
+  // vieja instalada sin avisar a nadie.
+  const declaredVersion = main.match(/^\s*\*\s*Version:\s*(.+)$/m)?.[1]?.trim();
+
+  if (!declaredVersion || !/^\d+\.\d+\.\d+$/.test(declaredVersion)) {
+    issues.push(
+      `la cabecera declara una versión inválida: "${declaredVersion ?? 'ninguna'}"`,
+    );
+  }
+
   if (!main.includes("defined( 'ABSPATH' ) || exit")) {
     issues.push('el archivo principal no corta el acceso directo (ABSPATH)');
   }

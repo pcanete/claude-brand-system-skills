@@ -35,8 +35,16 @@ export function resolveConfig(raw = {}) {
 
   const base = slug.replaceAll('-', '_');
 
+  // WordPress decide si hay actualización comparando este número. Un plugin
+  // que se reempaqueta sin subirlo puede no reemplazar al instalado.
+  const version = raw.version || '0.1.0';
+  if (!/^\d+\.\d+\.\d+$/.test(version)) {
+    throw new Error(`config.version debe ser x.y.z, no "${version}".`);
+  }
+
   return {
     slug,
+    version,
     name: raw.name || slug,
     description: raw.description || `Portada compilada para ${slug}.`,
     author: raw.author || '',
@@ -52,7 +60,8 @@ function render(source, config) {
     .replaceAll('{{slug}}', config.slug)
     .replaceAll('{{PLUGIN_NAME}}', config.name)
     .replaceAll('{{PLUGIN_DESCRIPTION}}', config.description)
-    .replaceAll('{{PLUGIN_AUTHOR}}', config.author);
+    .replaceAll('{{PLUGIN_AUTHOR}}', config.author)
+    .replaceAll('{{PLUGIN_VERSION}}', config.version);
 }
 
 function extractDocumentPart(html, expression, label) {
@@ -245,6 +254,7 @@ export async function exportPlugin({ projectRoot, config }) {
   const report = {
     generatedAt: new Date().toISOString(),
     plugin: config.slug,
+    version: config.version,
     source: path.relative(projectRoot, indexPath).replaceAll('\\', '/'),
     output: path.relative(projectRoot, pluginDir).replaceAll('\\', '/'),
     referencedAssets: assetReferences.length,

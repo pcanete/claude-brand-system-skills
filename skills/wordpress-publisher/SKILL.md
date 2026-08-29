@@ -3,7 +3,7 @@ name: wordpress-publisher
 description: Convierte un sitio Astro ya construido en un plugin de WordPress que reemplaza únicamente la portada, dejando que WordPress siga atendiendo cuenta, registro, tienda, búsqueda y administración. Genera el paquete, verifica que sea instalable y produce un ZIP. Usar cuando la portada nueva tiene que convivir con un WordPress existente en lugar de reemplazarlo. No usar para publicar un sitio estático completo, que no necesita WordPress en el medio.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # WordPress Publisher
@@ -50,6 +50,11 @@ cliente; aislar de menos deja la portada peleando con el tema.
    constantes PHP y el de las funciones. `constPrefix` y `fnPrefix` se pueden
    declarar si hace falta otra cosa.
 
+   **Subí `version` en cada entrega.** WordPress compara ese número para decidir
+   si hay actualización; reempaquetar sin cambiarlo puede dejar la versión vieja
+   instalada sin que nadie se entere. El validador rechaza un paquete cuya
+   cabecera no declare un `x.y.z` válido.
+
 2. Construir el sitio y exportar:
 
    ```bash
@@ -63,7 +68,20 @@ cliente; aislar de menos deja la portada peleando con el tema.
    node scripts/validate-plugin.mjs --plugin wordpress/build/portada-astro
    ```
 
-4. Comprimir la carpeta del plugin y subirla desde el panel de WordPress.
+4. Empaquetar:
+
+   ```bash
+   node scripts/package-plugin.mjs --plugin wordpress/build/portada-astro
+   ```
+
+5. Subir el ZIP desde el panel de WordPress.
+
+El empaquetado no usa la herramienta del sistema a propósito. `Compress-Archive`
+en Windows guarda las rutas con barra invertida y el formato ZIP exige barra
+normal: PHP puede terminar creando un archivo cuyo nombre contiene la barra
+invertida, en vez de la carpeta que correspondía, y el plugin se instala sin
+encontrar nada. El script lo escribe con `zlib`, que viene con Node, y las
+rutas quedan siempre con barra normal.
 
 ## Qué hace el exportador
 
@@ -92,7 +110,8 @@ artefacto terminado, que es lo que realmente se instala:
 - la plantilla conserva `wp_head`, `wp_body_open` y `wp_footer`;
 - el plugin limita su alcance a la portada y corta el acceso directo;
 - ninguna URL apunta a la raíz del sitio;
-- cada asset citado está dentro del paquete.
+- cada asset citado está dentro del paquete;
+- la cabecera declara una versión con forma `x.y.z`.
 
 Un paquete incompleto no falla al generarse: falla en la portada del cliente.
 
