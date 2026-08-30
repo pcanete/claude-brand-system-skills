@@ -49,35 +49,67 @@ function {{fn_prefix}}_body_class( $classes ) {
 add_filter( 'body_class', '{{fn_prefix}}_body_class' );
 
 /**
- * Detects visual styles that belong to the active theme or page builders.
+ * Decide que hojas de estilo entran en la portada compilada.
  *
- * This intentionally leaves scripts and unrelated plugin styles alone, so
- * analytics, pixels, consent tools and other WordPress integrations can keep
- * using wp_head() and wp_footer().
+ * Es una lista blanca, no negra. La portada trae su propio CSS y sus propias
+ * fuentes: nada de lo que enfile el resto del sitio le hace falta. Una lista
+ * negra obliga a perseguir cada plugin nuevo que se instale, y el que no se
+ * persiga se filtra sin que nadie lo note.
+ *
+ * Solo toca hojas de estilo. Los scripts siguen intactos, asi que analitica,
+ * pixeles, consentimiento y demas integraciones conservan wp_head() y
+ * wp_footer().
  */
 function {{fn_prefix}}_is_external_visual_style( $src, $handle = '' ) {
 	$src    = strtolower( (string) $src );
 	$handle = strtolower( (string) $handle );
 
-	$blocked_sources = array(
-		'/wp-content/themes/',
-		'/plugins/astra-addon/',
-		'/uploads/astra/',
-		'/uploads/astra-addon/',
-		'/plugins/elementor/',
-		'/plugins/elementor-pro/',
-		'/uploads/elementor/',
-		'/plugins/woocommerce/assets/',
-		'/plugins/woocommerce/packages/woocommerce-blocks/',
+	$allowed_handles = array(
+		'{{PLUGIN_SLUG}}-isolation',
+		// Interfaz de WordPress para quien esta logueado: sin esto la barra de
+		// administracion aparece rota sobre la portada.
+		'admin-bar',
+		'dashicons',
 	);
 
-	foreach ( $blocked_sources as $blocked_source ) {
-		if ( false !== strpos( $src, $blocked_source ) ) {
-			return true;
+	/*
+	 * Componentes de WordPress que la portada aloja a proposito -popups,
+	 * banners de consentimiento, chat, mini-carrito- necesitan su CSS. Se
+	 * declaran en wordpress.config.json y se auditan antes con
+	 * `scripts/audit-foreign-css.mjs`, que mide cuanto de esa hoja es global
+	 * y cuanto se acota sola.
+	 */
+	$declared = array({{ALLOWED_STYLES}});
+	$allowed_handles = array_merge( $allowed_handles, $declared );
+
+	$allowed_handles = (array) apply_filters(
+		'{{fn_prefix}}_allowed_styles',
+		$allowed_handles
+	);
+
+	foreach ( $allowed_handles as $allowed ) {
+		$allowed = strtolower( (string) $allowed );
+
+		// Un sufijo `*` permite una familia de handles generados, como los
+		// `elementor-post-1234` que Elementor emite por cada popup.
+		if ( '*' === substr( $allowed, -1 ) ) {
+			if ( 0 === strpos( $handle, substr( $allowed, 0, -1 ) ) ) {
+				return false;
+			}
+			continue;
+		}
+
+		if ( $handle === $allowed ) {
+			return false;
 		}
 	}
 
-	return 0 === strpos( $handle, 'elementor-gf-' );
+	// Lo que sirve el propio plugin pasa siempre, venga del handle que venga.
+	if ( false !== strpos( $src, '/plugins/{{PLUGIN_SLUG}}/' ) ) {
+		return false;
+	}
+
+	return true;
 }
 
 /**
@@ -97,11 +129,72 @@ function {{fn_prefix}}_dequeue_external_visual_styles() {
 		$registered = isset( $wp_styles->registered[ $handle ] ) ? $wp_styles->registered[ $handle ] : null;
 		$src        = $registered ? $registered->src : '';
 		if ( {{fn_prefix}}_is_external_visual_style( $src, $handle ) ) {
+			{{fn_prefix}}_record_removed_style( $handle, $src );
 			wp_dequeue_style( $handle );
 		}
 	}
 }
 add_action( 'wp_enqueue_scripts', '{{fn_prefix}}_dequeue_external_visual_styles', PHP_INT_MAX );
+
+/**
+ * Guarda que se quito, para poder decirlo despues.
+ */
+function {{fn_prefix}}_record_removed_style( $handle, $src = '' ) {
+	global {{const_global}};
+	if ( ! isset( {{const_global}} ) || ! is_array( {{const_global}} ) ) {
+		{{const_global}} = array();
+	}
+	{{const_global}}[ $handle ] = $src;
+}
+
+/**
+ * Informe de lo que la lista blanca dejo afuera.
+ *
+ * Cuando un componente de WordPress aparece en la portada sin estilos, la
+ * pregunta es siempre la misma: que handle hay que declarar. Adivinarlo cuesta
+ * varias vueltas de subir el plugin y mirar. Esto lo responde de una.
+ *
+ * Solo para quien puede administrar el sitio, y solo si lo pide: un visitante
+ * nunca ve nada de esto.
+ */
+function {{fn_prefix}}_report_removed_styles() {
+	if ( ! is_front_page() || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	if ( ! isset( $_GET['{{slug}}-styles'] ) || 'audit' !== $_GET['{{slug}}-styles'] ) {
+		return;
+	}
+
+	global {{const_global}};
+	$removed = ( isset( {{const_global}} ) && is_array( {{const_global}} ) ) ? {{const_global}} : array();
+
+	echo "
+<!-- {{PLUGIN_NAME}}: hojas de estilo quitadas de la portada -->
+";
+
+	if ( empty( $removed ) ) {
+		echo "<!--   ninguna: nada ajeno intento entrar -->
+";
+		return;
+	}
+
+	foreach ( $removed as $handle => $src ) {
+		$origen = $src ? preg_replace( '#^https?://[^/]+#', '', (string) $src ) : 'sin src';
+		printf(
+			"<!--   %s   %s -->
+",
+			esc_html( $handle ),
+			esc_html( $origen )
+		);
+	}
+
+	echo "<!-- Para permitir alguna, agregala a allowedStyles en wordpress.config.json -->
+";
+	echo "<!-- y audita antes su CSS con scripts/audit-foreign-css.mjs -->
+";
+}
+add_action( 'wp_footer', '{{fn_prefix}}_report_removed_styles', PHP_INT_MAX );
 
 /**
  * Last-resort guard for builder styles printed after the enqueue phase.

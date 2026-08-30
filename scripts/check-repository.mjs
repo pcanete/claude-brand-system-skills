@@ -836,6 +836,64 @@ runNode(
 
 const exportedPlugin = path.join(wordpressFixture, "wordpress", "build", "portada-fixture");
 
+// La portada puede alojar componentes de WordPress a proposito, pero solo los
+// declarados. Un handle mal escrito tiene que fallar al exportar: si no,
+// no permite nada y el componente aparece sin estilos sin explicacion.
+const configPath = path.join(wordpressFixture, "wordpress.config.json");
+const baseConfig = JSON.parse(read(configPath));
+
+fs.writeFileSync(
+  configPath,
+  `${JSON.stringify({ ...baseConfig, allowedStyles: ["elementor-frontend", "elementor-post-*"] }, null, 2)}
+`
+);
+
+runNode(
+  "Declared allowedStyles were not exported into the plugin",
+  [
+    path.join(root, "skills", "wordpress-publisher", "scripts", "export-plugin.mjs"),
+    "--project",
+    wordpressFixture
+  ],
+  { cwd: wordpressFixture }
+);
+
+const conAllowlist = read(path.join(exportedPlugin, "portada-fixture.php"));
+if (!conAllowlist.includes("'elementor-frontend', 'elementor-post-*'")) {
+  fail("allowedStyles did not reach the generated plugin");
+}
+if (!conAllowlist.includes("portada-fixture-styles")) {
+  fail("The generated plugin cannot report which styles it removed");
+}
+
+fs.writeFileSync(
+  configPath,
+  `${JSON.stringify({ ...baseConfig, allowedStyles: ["../../evil"] }, null, 2)}
+`
+);
+
+runNode(
+  "An invalid style handle was accepted",
+  [
+    path.join(root, "skills", "wordpress-publisher", "scripts", "export-plugin.mjs"),
+    "--project",
+    wordpressFixture
+  ],
+  { expect: "fail", cwd: wordpressFixture }
+);
+
+fs.writeFileSync(configPath, `${JSON.stringify(baseConfig, null, 2)}
+`);
+runNode(
+  "Re-export without allowedStyles failed",
+  [
+    path.join(root, "skills", "wordpress-publisher", "scripts", "export-plugin.mjs"),
+    "--project",
+    wordpressFixture
+  ],
+  { cwd: wordpressFixture }
+);
+
 runNode("Exported WordPress plugin rejected by its own validator", [
   path.join(root, "skills", "wordpress-publisher", "scripts", "validate-plugin.mjs"),
   "--plugin",

@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+`wordpress-publisher` 0.4.0 — cuando la portada aloja algo de WordPress
+
+La lista blanca de estilos funcionó demasiado bien: un popup montado desde el
+sitio aparecía en la portada con su markup y sin una sola regla. Es el caso que
+la inversión destapó, y no se resuelve volviendo a la lista negra.
+
+**`audit-foreign-css.mjs`.** Antes de admitir una hoja ajena, medir qué le haría
+a la página. La pregunta no es si el plugin es confiable: es cuánto de esa hoja
+se acota sola bajo su propia clase raíz y cuánto pisa la página entera. Sobre
+plugins reales: Elementor acota el 98% de sus 689 selectores y sus 13 reglas
+globales son inertes —necesitan una clase, una condición, o no aplican—; el CSS
+de un tema típico acota el 68% y trae 107 reglas que redefinen `body`, `h1` y
+`h2` con tipografía y espaciado.
+
+No decide: mide y muestra las reglas globales con sus declaraciones, porque
+juzgarlas es de una persona. Un `.animated` que necesita su clase es inerte; un
+`body:after` con `display:none` también; un `body { font-family }` no.
+
+La primera versión daba "segura" para el CSS de un tema que resetea `body` y
+todos los encabezados. La causa: `@charset "UTF-8";` es una at-rule sin bloque,
+y el parser asumía que todas tienen; desde ahí perdía sincronía y marcaba cada
+regla como condicional, es decir inofensiva. Se vio probando contra una hoja que
+debía fallar. Una compuerta que solo se prueba con casos que pasan no prueba
+nada.
+
+**`allowedStyles` en `wordpress.config.json`.** Lo que resulte seguro se declara
+por sitio, con `*` final para familias de handles generados —los
+`elementor-post-1234` que se emiten por popup—. Un handle mal escrito se rechaza
+al exportar: si no, no permitiría nada y el componente aparecería sin estilos
+sin que nadie sepa por qué.
+
+**Y la portada puede decir qué bloqueó.** Con `?<slug>-styles=audit`, estando
+logueado como administrador, el código fuente lista los handles quitados con su
+origen. Adivinar cuál declarar costaba varias vueltas de empaquetar y mirar.
+
+La plantilla del plugin pasa además de lista negra a lista blanca, con el filtro
+`<fn_prefix>_allowed_styles` para ampliarla sin reempaquetar.
+
 `reference-lab-builder` 0.3.0 — qué respalda a cada demo
 
 El laboratorio no distinguía una demo apoyada en una observación —donde el

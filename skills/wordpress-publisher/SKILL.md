@@ -3,7 +3,7 @@ name: wordpress-publisher
 description: Convierte un sitio Astro ya construido en un plugin de WordPress que reemplaza únicamente la portada, dejando que WordPress siga atendiendo cuenta, registro, tienda, búsqueda y administración. Genera el paquete, verifica que sea instalable y produce un ZIP. Usar cuando la portada nueva tiene que convivir con un WordPress existente en lugar de reemplazarlo. No usar para publicar un sitio estático completo, que no necesita WordPress en el medio.
 license: MIT
 metadata:
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # WordPress Publisher
@@ -125,6 +125,60 @@ enciende a una portada en blanco en producción.
 
 Agrega una clase estable al `body` de la portada, que la hoja de aislamiento
 usa para acotar sus reglas. Nada de lo que hace se derrama al resto del sitio.
+
+## Cuando la portada aloja algo de WordPress
+
+La portada reemplaza la página entera, así que por defecto **no entra ninguna
+hoja de estilos del sitio**. Es una lista blanca: lo que no está declarado no
+pasa, y por eso el plugin que se instale mañana tampoco se filtra.
+
+Pero una portada sigue alojando componentes de WordPress a propósito — un popup,
+un banner de consentimiento, un chat, un mini-carrito — y esos necesitan su CSS.
+
+**Primero se mide, después se declara.** Antes de admitir una hoja ajena:
+
+```bash
+node scripts/audit-foreign-css.mjs   https://sitio.com/wp-content/plugins/algo/assets/css/frontend.min.css
+```
+
+La pregunta no es si el plugin es confiable: es cuánto de esa hoja se acota sola
+bajo su propia clase raíz y cuánto pisa la página entera. Un plugin bien hecho
+escribe casi todo acotado y admitirlo no cuesta nada; uno que redefine `body`,
+`h1` o `p` a secas se lleva puesto el diseño. La herramienta cuenta las dos
+cosas y muestra las reglas globales con sus declaraciones, porque juzgarlas es
+de una persona: un `.animated` que necesita su clase es inerte, un
+`body { font-family }` no.
+
+Medido sobre plugins reales: Elementor acota el 98% de sus selectores y es
+seguro de admitir; el CSS de un tema típico acota el 68% y trae más de cien
+reglas que redefinen elementos base.
+
+Lo que resulte seguro se declara en `wordpress.config.json`:
+
+```json
+{
+  "slug": "portada-astro",
+  "allowedStyles": ["elementor-frontend", "elementor-post-*", "widget-*"]
+}
+```
+
+Un `*` final permite una familia de handles generados, como los
+`elementor-post-1234` que se emiten por cada popup. Un handle mal escrito se
+rechaza al exportar, porque si no fallaría en silencio: no permitiría nada y el
+componente aparecería sin estilos sin que nadie sepa por qué.
+
+**Si algo aparece sin estilos, preguntale a la portada qué bloqueó.** Estando
+logueado como administrador:
+
+```
+https://sitio.com/?<slug>-styles=audit
+```
+
+En el código fuente de la página quedan listados los handles quitados con su
+origen. Un visitante nunca ve nada de esto.
+
+También se puede ampliar la lista sin reempaquetar, con el filtro
+`<fn_prefix>_allowed_styles`.
 
 ## Actualizar la portada
 

@@ -20,6 +20,29 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const templateRoot = path.resolve(scriptDir, '..', 'assets', 'plugin-template');
 
+// Los handles que el sitio declara alojar a proposito. Se validan acá porque un
+// handle mal escrito no rompe nada visible: simplemente no permite nada, y el
+// componente aparece sin estilos sin que nadie sepa por que.
+function renderAllowedStyles(declared) {
+  if (declared === undefined || declared === null) return '';
+
+  if (!Array.isArray(declared)) {
+    throw new Error('`allowedStyles` tiene que ser una lista de handles');
+  }
+
+  const limpios = declared.map((handle) => {
+    if (typeof handle !== 'string' || !/^[a-z0-9][a-z0-9_-]*\*?$/i.test(handle)) {
+      throw new Error(
+        `handle invalido en allowedStyles: ${JSON.stringify(handle)}. ` +
+          'Solo letras, numeros, guiones y un `*` final para una familia.'
+      );
+    }
+    return `'${handle.toLowerCase()}'`;
+  });
+
+  return limpios.length ? ` ${limpios.join(', ')} ` : '';
+}
+
 function arg(name, fallback) {
   const index = process.argv.indexOf(`--${name}`);
   if (index === -1) return fallback;
@@ -50,6 +73,10 @@ export function resolveConfig(raw = {}) {
     author: raw.author || '',
     constPrefix: raw.constPrefix || base.toUpperCase(),
     fnPrefix: raw.fnPrefix || base,
+    // Handles de WordPress que esta portada aloja a proposito. Vacio por
+    // defecto: la portada es un reemplazo completo y no necesita nada del
+    // resto del sitio hasta que alguien declare que si.
+    allowedStyles: raw.allowedStyles || [],
   };
 }
 
@@ -61,7 +88,10 @@ function render(source, config) {
     .replaceAll('{{PLUGIN_NAME}}', config.name)
     .replaceAll('{{PLUGIN_DESCRIPTION}}', config.description)
     .replaceAll('{{PLUGIN_AUTHOR}}', config.author)
-    .replaceAll('{{PLUGIN_VERSION}}', config.version);
+    .replaceAll('{{PLUGIN_VERSION}}', config.version)
+    .replaceAll('{{PLUGIN_SLUG}}', config.slug)
+    .replaceAll('{{const_global}}', `$${config.fnPrefix}_removed_styles`)
+    .replaceAll('{{ALLOWED_STYLES}}', renderAllowedStyles(config.allowedStyles));
 }
 
 function extractDocumentPart(html, expression, label) {

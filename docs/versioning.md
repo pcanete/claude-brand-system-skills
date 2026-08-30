@@ -10,7 +10,7 @@ Cada skill se versiona por separado.
 | reference-lab-builder | 0.3.0 | Reference lab spec 0.1.x |
 | reference-to-astro | 1.4.0 | Web reference schemas 0.3.x, SITE_BLUEPRINT 0.1.x |
 | visual-tuning-kit | 0.6.0 | Tuning contract 0.1 |
-| wordpress-publisher | 0.3.0 | Plugin template 0.1.x |
+| wordpress-publisher | 0.4.0 | Plugin template 0.1.x |
 
 La versión vive en el frontmatter del `SKILL.md`. La revisión del repositorio
 falla si deja de coincidir con esta tabla: una tabla que nada puede contradecir
