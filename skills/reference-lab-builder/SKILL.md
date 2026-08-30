@@ -3,7 +3,7 @@ name: reference-lab-builder
 description: Turns evidence-backed STYLE_DNA and REFERENCE_EVIDENCE into a neutral interactive reference lab where typography, components, responsive states, motion, and behaviors can be inspected and approved before target content is applied. Use after reference-scanner and before SITE_BLUEPRINT. Not for scanning the source site, reproducing its content or brand, building the final customer website, or packaging WordPress.
 license: MIT
 metadata:
-  version: "0.2.1"
+  version: "0.3.0"
 ---
 
 # Reference Lab Builder
@@ -79,6 +79,21 @@ Show the user the lab. Record corrections in the spec. The agent must not set
 
 Once the user approves, validate without `--allow-draft`. The approved lab is
 the `reference-lab` checkpoint consumed by `SITE_BLUEPRINT` decisions.
+
+## What backs each demo
+
+A demo may rest on an observation the scanner committed to — with a mode, a
+confidence and its evidence — or on material the document records without
+asserting. Both are legitimate: demonstrating a value is not the same as citing
+it to justify a decision, and only the second needs an observation behind it.
+
+The rendered lab states which, per demo: fully observed, partially observed, or
+resting on recorded data with no observation behind it. Without that, a reviewer
+approves "we understood the system" unable to see where the scan committed and
+where it merely noted something. The `source` block spells it out path by path.
+
+A demo with no observation behind it is not a failure and is not rejected. It is
+a fact the person approving should see.
 
 ## Boundaries
 

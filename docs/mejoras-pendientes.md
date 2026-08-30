@@ -149,6 +149,19 @@ sistema?" con un sí que deja afuera lo más caro de equivocar.
 secciones `webgl-policy.md` y `motion-system.md` de `reference-to-astro` no se
 cruzan.
 
+### Las auditorías de comportamiento no se pueden citar como evidencia
+
+`collectEvidenceIds` recorre ocho colecciones y `behavior_audits` no está entre
+ellas. Son la evidencia más fuerte del documento —auditorías temporales y entre
+dispositivos, con su propia compuerta que verifica que lo sean— y un blueprint
+que declara un comportamiento atado al scroll no puede citarlas.
+
+El laboratorio sí las acepta, porque recorre el documento entero juntando
+cualquier objeto con `id`. La misma referencia vale en un skill y no en el otro.
+
+**Origen:** mismo blueprint. Hubo que sacar ocho referencias `audit-*` que eran
+justo las que respaldaban los tres revelados de scroll.
+
 ## Transversales
 
 ### El peso de los skills

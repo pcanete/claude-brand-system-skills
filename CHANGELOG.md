@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+`reference-lab-builder` 0.3.0 — qué respalda a cada demo
+
+El laboratorio no distinguía una demo apoyada en una observación —donde el
+escáner se comprometió con un modo, una confianza y su evidencia— de una
+apoyada en material que el documento registra sin afirmar. Quien aprobaba el
+checkpoint firmaba "entendimos el sistema" sin poder ver dónde el escaneo se
+había comprometido.
+
+Medido sobre un escaneo real: de las 18 rutas que citaban sus siete demos, 8
+eran observaciones y 10 no. Y la demo de aspecto más confiado —el panel de
+navegación, con cuatro rutas citadas— resultó ser la menos respaldada: 1 de 4.
+
+Ahora cada demo lleva su sello en la página y el bloque `source` lo dice ruta
+por ruta. Una demo sin observación detrás no falla ni se rechaza: es un hecho
+que la persona que aprueba tiene que ver.
+
 `reference-to-astro` 1.4.0 — traducir de vuelta lo que devuelve un editor externo
 
 Probado contra VvvebJs y la portada compilada de un sitio real. El editor
