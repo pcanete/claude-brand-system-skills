@@ -3,7 +3,7 @@ name: wordpress-publisher
 description: Convierte un sitio Astro ya construido en un plugin de WordPress que reemplaza únicamente la portada, dejando que WordPress siga atendiendo cuenta, registro, tienda, búsqueda y administración. Genera el paquete, verifica que sea instalable y produce un ZIP. Usar cuando la portada nueva tiene que convivir con un WordPress existente en lugar de reemplazarlo. No usar para publicar un sitio estático completo, que no necesita WordPress en el medio.
 license: MIT
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # WordPress Publisher
@@ -125,6 +125,30 @@ enciende a una portada en blanco en producción.
 
 Agrega una clase estable al `body` de la portada, que la hoja de aislamiento
 usa para acotar sus reglas. Nada de lo que hace se derrama al resto del sitio.
+
+## Lo primero que se verifica de un PHP es que sea PHP
+
+`scripts/validate-plugin.mjs` lo corre solo, sobre cada `.php` del paquete. No
+hace falta tener PHP instalado: `scripts/lint-php.mjs` recorre el archivo
+distinguiendo codigo de cadenas, comentarios y heredocs, y verifica que todo
+cierre.
+
+Existe porque falto. Una linea generada quedo como
+
+```php
+'<link ... onload="this.media='all';this.onload=null" />'
+```
+
+donde las comillas del JavaScript cortaron la cadena PHP. El paquete paso las
+cinco comprobaciones de instalabilidad —ninguna miraba si el PHP parseaba—, se
+empaqueto, se instalo y tiro el sitio entero.
+
+Contar comillas no alcanza: en ese archivo balanceaban, porque la cadena cerraba
+antes de `all` y volvia a abrir despues. Lo que delata el corte es que tras
+cerrar una cadena aparezca una palabra pegada, cosa que PHP nunca acepta.
+
+Una plantilla es HTML con islas de PHP, asi que fuera de las etiquetas no se
+lee nada: las comillas de un atributo HTML no son comillas de codigo.
 
 ## Cuando la portada aloja algo de WordPress
 

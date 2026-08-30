@@ -14,6 +14,7 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
+import { lintPhp } from './lint-php.mjs';
 
 function arg(name, fallback) {
   const index = process.argv.indexOf(`--${name}`);
@@ -113,6 +114,17 @@ export async function validatePlugin(pluginDir) {
 
   if (missing.length) {
     issues.push(`la plantilla cita ${missing.length} asset(s) ausentes del paquete: ${missing.slice(0, 3).join(', ')}`);
+  }
+
+  // Lo primero que hay que comprobar de un archivo PHP es que sea PHP. Sonaba
+  // tan obvio que no estaba: un paquete con un error de sintaxis paso las cinco
+  // comprobaciones anteriores, se empaqueto, se instalo y tiro el sitio entero.
+  for (const archivo of await walk(pluginDir)) {
+    if (!archivo.endsWith('.php')) continue;
+    const source = await readFile(path.join(pluginDir, archivo), 'utf8');
+    for (const problema of lintPhp(source, archivo)) {
+      issues.push(`${problema.archivo}:${problema.linea} — ${problema.mensaje}`);
+    }
   }
 
   return issues;

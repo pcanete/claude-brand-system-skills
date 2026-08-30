@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+`wordpress-publisher` 0.5.0 — lo primero que se verifica de un PHP es que sea PHP
+
+Un plugin generado tiro un sitio en produccion. La causa: una linea quedo como
+
+    '<link ... onload="this.media='all';this.onload=null" />'
+
+donde las comillas del JavaScript cortaron la cadena PHP. El paquete paso las
+cinco comprobaciones de instalabilidad —archivos presentes, sin marcadores,
+hooks intactos, alcance limitado, assets resueltos— y **ninguna miraba si el PHP
+parseaba**.
+
+`lint-php.mjs` lo comprueba sin necesitar PHP instalado: recorre el archivo
+distinguiendo codigo de cadenas, comentarios y heredocs, y verifica que todo
+cierre. `validate-plugin.mjs` lo corre sobre cada `.php` del paquete.
+
+Dos cosas que costaron y valen anotarse:
+
+**Contar comillas no alcanza.** En el archivo roto balanceaban: la cadena
+cerraba antes de `all` y volvia a abrir despues. La primera version del linter
+dio verde. Lo que delata el corte es que tras cerrar una cadena aparezca una
+palabra pegada, cosa que PHP nunca acepta.
+
+**Una plantilla es HTML con islas de PHP.** Leer todo el archivo como codigo
+convierte cualquier `front-page.php` en un falso positivo, porque las comillas
+de un atributo HTML no son comillas de codigo.
+
+Y la prueba de CI tambien estuvo mal escrita: inyectaba el error sobre una copia
+del paquete, la copia salia incompleta, y la validacion fallaba por archivos
+ausentes. La prueba pasaba con el linter apagado. Ahora se inyecta sobre el
+paquete real y se restaura, asi solo puede fallar por lo que se quiere probar
+— verificado apagando el linter.
+
+Tambien se saca el truco que causo todo: cargar el CSS ajeno con `media="print"`
+y un `onload` para no bloquear el primer pintado. Cincuenta kilobytes no
+justifican esa complejidad. Un `<link>` normal, por concatenacion, sin una sola
+barra invertida.
+
 `wordpress-publisher` 0.4.0 — cuando la portada aloja algo de WordPress
 
 La lista blanca de estilos funcionó demasiado bien: un popup montado desde el

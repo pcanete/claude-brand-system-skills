@@ -894,6 +894,47 @@ runNode(
   { cwd: wordpressFixture }
 );
 
+// Un PHP que no parsea tiene que frenar el paquete. Paso lo contrario: un
+// error de sintaxis atraveso las cinco comprobaciones de instalabilidad, se
+// empaqueto y tiro un sitio en produccion.
+// Se inyecta sobre el paquete exportado y se restaura, en vez de sobre una
+// copia: una copia incompleta hace fallar la validacion por archivos ausentes,
+// y entonces la prueba pasa por el motivo equivocado — que es exactamente como
+// estaba escrita antes, dando por bueno un linter apagado.
+const principal = path.join(exportedPlugin, "portada-fixture.php");
+const sano = read(principal);
+const marca = "defined( 'ABSPATH' ) || exit;";
+if (!sano.includes(marca)) {
+  fail("El fixture de WordPress cambio: no se puede inyectar el error de sintaxis");
+}
+
+// El mismo error que llego a produccion: una comilla del contenido corta la
+// cadena PHP. Se arma con codigos de caracter para que ninguna capa de escapes
+// lo desarme por el camino — asi fue como se genero el original.
+const comilla = String.fromCharCode(39);
+const dobleComilla = String.fromCharCode(34);
+const salto = String.fromCharCode(10);
+const inyectado =
+  salto +
+  '$x = ' + comilla + '<a onload=' + dobleComilla + 'f=' + comilla + 'y' + comilla +
+  dobleComilla + '>' + comilla + ';';
+
+fs.writeFileSync(principal, sano.replace(marca, marca + inyectado));
+
+runNode(
+  "A PHP syntax error was allowed into a package",
+  [
+    path.join(root, "skills", "wordpress-publisher", "scripts", "validate-plugin.mjs"),
+    "--plugin",
+    exportedPlugin
+  ],
+  { expect: "fail" }
+);
+
+// Restaurado. La comprobacion que sigue valida este mismo paquete y tiene que
+// pasar: si no, el error quedo puesto.
+fs.writeFileSync(principal, sano);
+
 runNode("Exported WordPress plugin rejected by its own validator", [
   path.join(root, "skills", "wordpress-publisher", "scripts", "validate-plugin.mjs"),
   "--plugin",
