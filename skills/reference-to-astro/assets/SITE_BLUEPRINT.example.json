@@ -6,7 +6,10 @@
     "framework": "astro",
     "rendering": "static",
     "fidelity_target": "high",
-    "locales": ["en"]
+    "locales": [
+      "en"
+    ],
+    "deployment": "wordpress"
   },
   "inputs": {
     "style_dna": "STYLE_DNA.json",
@@ -39,14 +42,36 @@
   ],
   "global_system": {
     "brand_application": {
-      "must_preserve": ["client name", "client copy", "client media"],
-      "may_adapt": ["copy line breaks", "media crop by viewport"],
-      "must_not_introduce": ["reference brand names", "reference proprietary assets"]
+      "must_preserve": [
+        "client name",
+        "client copy",
+        "client media"
+      ],
+      "may_adapt": [
+        "copy line breaks",
+        "media crop by viewport"
+      ],
+      "must_not_introduce": [
+        "reference brand names",
+        "reference proprietary assets"
+      ]
     },
     "reference_application": {
-      "must_preserve": ["editorial hierarchy", "spatial tension", "behavioral intent"],
-      "may_adapt": ["literal section count", "image count"],
-      "must_not_copy": ["source code", "logos", "copy", "proprietary media"]
+      "must_preserve": [
+        "editorial hierarchy",
+        "spatial tension",
+        "behavioral intent"
+      ],
+      "may_adapt": [
+        "literal section count",
+        "image count"
+      ],
+      "must_not_copy": [
+        "source code",
+        "logos",
+        "copy",
+        "proprietary media"
+      ]
     },
     "navigation": {
       "model": "persistent minimal header",
@@ -62,7 +87,11 @@
       "route": "/",
       "purpose": "Establish the studio proposition and lead to the primary inquiry journey.",
       "content_page": "home",
-      "reading_path": ["hero proposition", "supporting copy", "primary action"],
+      "reading_path": [
+        "hero proposition",
+        "supporting copy",
+        "primary action"
+      ],
       "sections": [
         {
           "id": "hero",
@@ -75,31 +104,56 @@
             "reuse_key": null
           },
           "content_policy": {
-            "must_preserve": ["title", "body", "primary CTA", "hero media"],
+            "must_preserve": [
+              "title",
+              "body",
+              "primary CTA",
+              "hero media"
+            ],
             "may_condense": false,
             "notes": "Line breaks may adapt, but the proposition and CTA meaning cannot change."
           },
           "reference_patterns": [
             {
               "style_path": "art_direction.summary",
-              "application": ["composition", "typography"],
+              "application": [
+                "composition",
+                "typography"
+              ],
               "mode": "derived",
-              "evidence_refs": ["synthetic-editorial-register", "synthetic-media-sequence"],
+              "evidence_refs": [
+                "synthetic-editorial-register",
+                "synthetic-media-sequence"
+              ],
               "rationale": "The target hero needs the same editorial dominance without reusing the reference content."
             },
             {
               "style_path": "media.sequences.object-process-sequence",
-              "application": ["media", "motion"],
+              "application": [
+                "media",
+                "motion"
+              ],
               "mode": "adaptive",
-              "evidence_refs": ["synthetic-media-sequence"],
+              "evidence_refs": [
+                "synthetic-media-sequence"
+              ],
               "rationale": "The supplied hero image becomes the first state of a sequence-ready media region."
             }
           ],
           "composition": {
             "dominant_mass": "Large proposition occupying the lower-left visual field.",
             "secondary_mass": "Supporting copy and action aligned to the opposite edge.",
-            "alignment_anchors": ["viewport left edge", "lower baseline", "media focal axis"],
-            "reading_path": ["media", "headline", "supporting copy", "CTA"],
+            "alignment_anchors": [
+              "viewport left edge",
+              "lower baseline",
+              "media focal axis"
+            ],
+            "reading_path": [
+              "media",
+              "headline",
+              "supporting copy",
+              "CTA"
+            ],
             "intended_empty_space": "Upper center remains quiet so the headline and media do not compete.",
             "figure_ground": "High-contrast type remains distinct from the active media field.",
             "media_focal_strategy": "Preserve the subject focal point and allow recrop rather than distortion."
@@ -107,20 +161,40 @@
           "responsive": {
             "desktop": {
               "layout_intent": "Asymmetric editorial split with simultaneous media and copy.",
-              "content_order": ["media", "headline", "supporting copy", "CTA"],
+              "content_order": [
+                "media",
+                "headline",
+                "supporting copy",
+                "CTA"
+              ],
               "media_behavior": "Wide crop preserving the declared focal point."
             },
             "tablet": {
               "layout_intent": "Reduced split retaining visual tension and readable copy measure.",
-              "content_order": ["media", "headline", "supporting copy", "CTA"],
+              "content_order": [
+                "media",
+                "headline",
+                "supporting copy",
+                "CTA"
+              ],
               "media_behavior": "Recrop around the focal point without changing aspect arbitrarily."
             },
             "mobile": {
               "layout_intent": "Sequential composition with headline dominance and touch-safe action.",
-              "content_order": ["headline", "media", "supporting copy", "CTA"],
+              "content_order": [
+                "headline",
+                "media",
+                "supporting copy",
+                "CTA"
+              ],
               "media_behavior": "Taller crop centered on the declared focal point."
             },
-            "transformations": ["reflow", "reorder", "recrop", "motion-reduction"]
+            "transformations": [
+              "reflow",
+              "reorder",
+              "recrop",
+              "motion-reduction"
+            ]
           },
           "behaviors": [
             {
@@ -130,17 +204,40 @@
               "desktop": "Sequence advances with the observed continuity and pacing hierarchy.",
               "mobile": "Sequence remains legible at a reduced amplitude and touch-safe pace.",
               "reduced_motion": "Show one stable representative frame with no automatic displacement.",
-              "evidence_refs": ["synthetic-media-sequence"]
+              "evidence_refs": [
+                "synthetic-media-sequence"
+              ]
             }
           ],
           "acceptance": {
-            "visual": ["Headline is the dominant painted mass.", "Media is not stretched."],
-            "content": ["All supplied hero copy and the primary CTA remain represented."],
-            "responsive": ["Mobile preserves hierarchy instead of simply shrinking desktop."],
-            "behavior": ["Reduced motion has a stable equivalent."]
+            "visual": [
+              "Headline is the dominant painted mass.",
+              "Media is not stretched."
+            ],
+            "content": [
+              "All supplied hero copy and the primary CTA remain represented."
+            ],
+            "responsive": [
+              "Mobile preserves hierarchy instead of simply shrinking desktop."
+            ],
+            "behavior": [
+              "Reduced motion has a stable equivalent."
+            ]
           },
-          "uncertainties": ["Exact transition timing remains adaptive until the reference lab is measured."
-          ]
+          "uncertainties": [
+            "Exact transition timing remains adaptive until the reference lab is measured."
+          ],
+          "runtime_content": {
+            "owner": "cms",
+            "source": "Titular y fotografia de la campana vigente, editables desde el CMS",
+            "tolerates": [
+              "Titular de hasta tres lineas a 1440; la cuarta desborda el area del hero",
+              "Sin fotografia cargada: cae al campo de color plano de la marca",
+              "Fotografia vertical: se recorta al centro y puede perder los bordes",
+              "Titular vacio: la seccion mantiene su alto y muestra solo el antetitulo"
+            ],
+            "notes": "El resto de la composicion se congela en el build: la posicion del bloque de texto y el comportamiento al hacer scroll no dependen del CMS."
+          }
         }
       ],
       "excluded_content_sections": []

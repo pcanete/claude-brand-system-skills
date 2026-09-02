@@ -5,6 +5,40 @@ and implementation. It exists because a valid `STYLE_DNA` does not decide
 which real section should use which reference pattern, and a
 `CONTENT_MANIFEST` does not decide composition.
 
+## Two questions before writing the plan
+
+Both are optional in the schema so an existing blueprint keeps validating, but
+ask them anyway. They are cheap now and expensive later.
+
+**Where will this live?** `project.deployment` — `standalone` or `wordpress`.
+
+A site that goes inside WordPress is a guest, not the owner, and that changes
+the plan itself, not just how it is packaged:
+
+- Foreign CSS from the theme and its builders is blocked on the compiled page.
+  Anything the page deliberately hosts — a popup, a consent banner, a chat —
+  has to be measured and declared before it is allowed in.
+- **The navigation cannot carry its links in the source.** The client manages
+  their menu in WordPress; a header with hardcoded links becomes a second truth
+  that silently diverges the first time they add an item.
+- Regions the client updates often should be fed at runtime, not frozen at
+  build time.
+
+**Which regions are not frozen at build time?** `section.runtime_content`.
+
+Declare it only on the sections that are fed after publication. A section
+without it is frozen: changing it means rebuilding and republishing.
+
+The field that matters most there is `tolerates`. A region fed by someone else
+will eventually receive content that does not fit the shape it was designed
+for — a headline of three lines where two were drawn, an article with no
+featured image, a product shot in the wrong aspect. The day it happens nobody
+says "my content does not fit"; they say "the site is broken", and the
+complaint comes to whoever built it.
+
+Writing down what the shape tolerates is what turns that from an incident into
+a decision someone already made.
+
 ## When to create it
 
 Create the blueprint after the reference scan and content manifest are valid,

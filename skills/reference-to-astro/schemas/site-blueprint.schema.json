@@ -20,37 +20,106 @@
     },
     "project": {
       "type": "object",
-      "required": ["name", "objective", "framework", "rendering", "fidelity_target"],
+      "required": [
+        "name",
+        "objective",
+        "framework",
+        "rendering",
+        "fidelity_target"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "objective": { "type": "string", "minLength": 1 },
-        "framework": { "enum": ["astro", "html", "other"] },
-        "rendering": { "enum": ["static", "hybrid", "server"] },
-        "fidelity_target": { "enum": ["directional", "high", "forensic"] },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "framework": {
+          "enum": [
+            "astro",
+            "html",
+            "other"
+          ]
+        },
+        "rendering": {
+          "enum": [
+            "static",
+            "hybrid",
+            "server"
+          ]
+        },
+        "fidelity_target": {
+          "enum": [
+            "directional",
+            "high",
+            "forensic"
+          ]
+        },
         "locales": {
           "type": "array",
-          "items": { "type": "string", "minLength": 2 },
+          "items": {
+            "type": "string",
+            "minLength": 2
+          },
           "uniqueItems": true
+        },
+        "deployment": {
+          "description": "Donde vive el sitio publicado. Opcional por compatibilidad, pero conviene decidirlo antes de escribir el plan: un sitio que va dentro de WordPress es huesped, no dueno, y eso cambia el header, el CSS admitido y que regiones deben alimentarse en vivo.",
+          "enum": [
+            "standalone",
+            "wordpress"
+          ]
         }
       },
       "additionalProperties": true
     },
     "inputs": {
       "type": "object",
-      "required": ["style_dna", "reference_evidence", "content_manifest", "build_brief"],
+      "required": [
+        "style_dna",
+        "reference_evidence",
+        "content_manifest",
+        "build_brief"
+      ],
       "properties": {
-        "style_dna": { "type": "string", "minLength": 1 },
-        "reference_evidence": { "type": "string", "minLength": 1 },
-        "content_manifest": { "type": "string", "minLength": 1 },
-        "build_brief": { "type": "string", "minLength": 1 },
-        "brand_dna": { "type": ["string", "null"] },
-        "brand_rules": { "type": ["string", "null"] }
+        "style_dna": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference_evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_manifest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "build_brief": {
+          "type": "string",
+          "minLength": 1
+        },
+        "brand_dna": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "brand_rules": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       },
       "additionalProperties": false
     },
     "checkpoints": {
       "type": "array",
-      "items": { "$ref": "#/$defs/checkpoint" },
+      "items": {
+        "$ref": "#/$defs/checkpoint"
+      },
       "minItems": 3
     },
     "global_system": {
@@ -62,86 +131,177 @@
         "motion_strategy"
       ],
       "properties": {
-        "brand_application": { "$ref": "#/$defs/ruleSet" },
+        "brand_application": {
+          "$ref": "#/$defs/ruleSet"
+        },
         "reference_application": {
           "type": "object",
-          "required": ["must_preserve", "may_adapt", "must_not_copy"],
+          "required": [
+            "must_preserve",
+            "may_adapt",
+            "must_not_copy"
+          ],
           "properties": {
-            "must_preserve": { "$ref": "#/$defs/stringList" },
-            "may_adapt": { "$ref": "#/$defs/stringList" },
-            "must_not_copy": { "$ref": "#/$defs/stringList" }
+            "must_preserve": {
+              "$ref": "#/$defs/stringList"
+            },
+            "may_adapt": {
+              "$ref": "#/$defs/stringList"
+            },
+            "must_not_copy": {
+              "$ref": "#/$defs/stringList"
+            }
           },
           "additionalProperties": false
         },
-        "navigation": { "type": "object" },
-        "responsive_strategy": { "type": "string", "minLength": 1 },
-        "motion_strategy": { "type": "string", "minLength": 1 },
-        "accessibility_strategy": { "type": "string" }
+        "navigation": {
+          "type": "object"
+        },
+        "responsive_strategy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "motion_strategy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accessibility_strategy": {
+          "type": "string"
+        }
       },
       "additionalProperties": false
     },
     "pages": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/page" }
+      "additionalProperties": {
+        "$ref": "#/$defs/page"
+      }
     },
     "decisions": {
       "type": "array",
-      "items": { "$ref": "#/$defs/decision" }
+      "items": {
+        "$ref": "#/$defs/decision"
+      }
     },
-    "approval": { "$ref": "#/$defs/approval" }
+    "approval": {
+      "$ref": "#/$defs/approval"
+    }
   },
   "$defs": {
     "stringList": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 },
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
       "uniqueItems": true
     },
     "ruleSet": {
       "type": "object",
-      "required": ["must_preserve", "may_adapt", "must_not_introduce"],
+      "required": [
+        "must_preserve",
+        "may_adapt",
+        "must_not_introduce"
+      ],
       "properties": {
-        "must_preserve": { "$ref": "#/$defs/stringList" },
-        "may_adapt": { "$ref": "#/$defs/stringList" },
-        "must_not_introduce": { "$ref": "#/$defs/stringList" }
+        "must_preserve": {
+          "$ref": "#/$defs/stringList"
+        },
+        "may_adapt": {
+          "$ref": "#/$defs/stringList"
+        },
+        "must_not_introduce": {
+          "$ref": "#/$defs/stringList"
+        }
       },
       "additionalProperties": false
     },
     "checkpoint": {
       "type": "object",
-      "required": ["id", "status", "artifact"],
+      "required": [
+        "id",
+        "status",
+        "artifact"
+      ],
       "properties": {
         "id": {
-          "enum": ["brand-manual", "reference-lab", "content-architecture"]
+          "enum": [
+            "brand-manual",
+            "reference-lab",
+            "content-architecture"
+          ]
         },
-        "status": { "enum": ["approved", "waived", "pending"] },
-        "artifact": { "type": ["string", "null"] },
-        "reason": { "type": "string" },
-        "notes": { "type": "string" }
+        "status": {
+          "enum": [
+            "approved",
+            "waived",
+            "pending"
+          ]
+        },
+        "artifact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
       },
       "additionalProperties": false
     },
     "page": {
       "type": "object",
-      "required": ["route", "purpose", "content_page", "sections"],
+      "required": [
+        "route",
+        "purpose",
+        "content_page",
+        "sections"
+      ],
       "properties": {
-        "route": { "type": "string", "pattern": "^/" },
-        "purpose": { "type": "string", "minLength": 1 },
-        "content_page": { "type": "string", "minLength": 1 },
-        "reading_path": { "$ref": "#/$defs/stringList" },
+        "route": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_page": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reading_path": {
+          "$ref": "#/$defs/stringList"
+        },
         "sections": {
           "type": "array",
-          "items": { "$ref": "#/$defs/section" },
+          "items": {
+            "$ref": "#/$defs/section"
+          },
           "minItems": 1
         },
         "excluded_content_sections": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["id", "reason"],
+            "required": [
+              "id",
+              "reason"
+            ],
             "properties": {
-              "id": { "type": "string", "minLength": 1 },
-              "reason": { "type": "string", "minLength": 1 }
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
             },
             "additionalProperties": false
           }
@@ -164,51 +324,111 @@
         "acceptance"
       ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "content_section": { "type": "string", "minLength": 1 },
-        "role": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
         "component": {
           "type": "object",
-          "required": ["family", "variant", "reusable"],
+          "required": [
+            "family",
+            "variant",
+            "reusable"
+          ],
           "properties": {
-            "family": { "type": "string", "minLength": 1 },
-            "variant": { "type": "string", "minLength": 1 },
-            "reusable": { "type": "boolean" },
-            "reuse_key": { "type": ["string", "null"] }
+            "family": {
+              "type": "string",
+              "minLength": 1
+            },
+            "variant": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reusable": {
+              "type": "boolean"
+            },
+            "reuse_key": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           },
           "additionalProperties": false
         },
         "content_policy": {
           "type": "object",
-          "required": ["must_preserve", "may_condense", "notes"],
+          "required": [
+            "must_preserve",
+            "may_condense",
+            "notes"
+          ],
           "properties": {
-            "must_preserve": { "$ref": "#/$defs/stringList" },
-            "may_condense": { "type": "boolean" },
-            "notes": { "type": "string" }
+            "must_preserve": {
+              "$ref": "#/$defs/stringList"
+            },
+            "may_condense": {
+              "type": "boolean"
+            },
+            "notes": {
+              "type": "string"
+            }
           },
           "additionalProperties": false
         },
         "reference_patterns": {
           "type": "array",
-          "items": { "$ref": "#/$defs/referencePattern" },
+          "items": {
+            "$ref": "#/$defs/referencePattern"
+          },
           "minItems": 1
         },
-        "composition": { "$ref": "#/$defs/composition" },
-        "responsive": { "$ref": "#/$defs/responsive" },
+        "composition": {
+          "$ref": "#/$defs/composition"
+        },
+        "responsive": {
+          "$ref": "#/$defs/responsive"
+        },
         "behaviors": {
           "type": "array",
-          "items": { "$ref": "#/$defs/behavior" }
+          "items": {
+            "$ref": "#/$defs/behavior"
+          }
         },
-        "acceptance": { "$ref": "#/$defs/acceptance" },
-        "uncertainties": { "$ref": "#/$defs/stringList" }
+        "acceptance": {
+          "$ref": "#/$defs/acceptance"
+        },
+        "uncertainties": {
+          "$ref": "#/$defs/stringList"
+        },
+        "runtime_content": {
+          "$ref": "#/$defs/runtimeContent"
+        }
       },
       "additionalProperties": false
     },
     "referencePattern": {
       "type": "object",
-      "required": ["style_path", "application", "mode", "evidence_refs", "rationale"],
+      "required": [
+        "style_path",
+        "application",
+        "mode",
+        "evidence_refs",
+        "rationale"
+      ],
       "properties": {
-        "style_path": { "type": "string", "minLength": 1 },
+        "style_path": {
+          "type": "string",
+          "minLength": 1
+        },
         "application": {
           "type": "array",
           "items": {
@@ -225,14 +445,27 @@
           "minItems": 1,
           "uniqueItems": true
         },
-        "mode": { "enum": ["exact", "derived", "adaptive", "inferred"] },
+        "mode": {
+          "enum": [
+            "exact",
+            "derived",
+            "adaptive",
+            "inferred"
+          ]
+        },
         "evidence_refs": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "minItems": 1,
           "uniqueItems": true
         },
-        "rationale": { "type": "string", "minLength": 1 }
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": false
     },
@@ -248,33 +481,75 @@
         "media_focal_strategy"
       ],
       "properties": {
-        "dominant_mass": { "type": "string", "minLength": 1 },
-        "secondary_mass": { "type": "string", "minLength": 1 },
-        "alignment_anchors": { "$ref": "#/$defs/stringList" },
-        "reading_path": { "$ref": "#/$defs/stringList" },
-        "intended_empty_space": { "type": "string", "minLength": 1 },
-        "figure_ground": { "type": "string", "minLength": 1 },
-        "media_focal_strategy": { "type": "string", "minLength": 1 }
+        "dominant_mass": {
+          "type": "string",
+          "minLength": 1
+        },
+        "secondary_mass": {
+          "type": "string",
+          "minLength": 1
+        },
+        "alignment_anchors": {
+          "$ref": "#/$defs/stringList"
+        },
+        "reading_path": {
+          "$ref": "#/$defs/stringList"
+        },
+        "intended_empty_space": {
+          "type": "string",
+          "minLength": 1
+        },
+        "figure_ground": {
+          "type": "string",
+          "minLength": 1
+        },
+        "media_focal_strategy": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": false
     },
     "responsiveMode": {
       "type": "object",
-      "required": ["layout_intent", "content_order", "media_behavior"],
+      "required": [
+        "layout_intent",
+        "content_order",
+        "media_behavior"
+      ],
       "properties": {
-        "layout_intent": { "type": "string", "minLength": 1 },
-        "content_order": { "$ref": "#/$defs/stringList" },
-        "media_behavior": { "type": "string", "minLength": 1 }
+        "layout_intent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_order": {
+          "$ref": "#/$defs/stringList"
+        },
+        "media_behavior": {
+          "type": "string",
+          "minLength": 1
+        }
       },
       "additionalProperties": false
     },
     "responsive": {
       "type": "object",
-      "required": ["desktop", "tablet", "mobile", "transformations"],
+      "required": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "transformations"
+      ],
       "properties": {
-        "desktop": { "$ref": "#/$defs/responsiveMode" },
-        "tablet": { "$ref": "#/$defs/responsiveMode" },
-        "mobile": { "$ref": "#/$defs/responsiveMode" },
+        "desktop": {
+          "$ref": "#/$defs/responsiveMode"
+        },
+        "tablet": {
+          "$ref": "#/$defs/responsiveMode"
+        },
+        "mobile": {
+          "$ref": "#/$defs/responsiveMode"
+        },
         "transformations": {
           "type": "array",
           "items": {
@@ -299,9 +574,20 @@
     },
     "behavior": {
       "type": "object",
-      "required": ["id", "kind", "implementation_intent", "desktop", "mobile", "reduced_motion", "evidence_refs"],
+      "required": [
+        "id",
+        "kind",
+        "implementation_intent",
+        "desktop",
+        "mobile",
+        "reduced_motion",
+        "evidence_refs"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
         "kind": {
           "enum": [
             "pointer-microinteraction",
@@ -318,13 +604,28 @@
             "other"
           ]
         },
-        "implementation_intent": { "type": "string", "minLength": 1 },
-        "desktop": { "type": "string", "minLength": 1 },
-        "mobile": { "type": "string", "minLength": 1 },
-        "reduced_motion": { "type": "string", "minLength": 1 },
+        "implementation_intent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "desktop": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mobile": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reduced_motion": {
+          "type": "string",
+          "minLength": 1
+        },
         "evidence_refs": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "minItems": 1,
           "uniqueItems": true
         }
@@ -333,35 +634,129 @@
     },
     "acceptance": {
       "type": "object",
-      "required": ["visual", "content", "responsive", "behavior"],
+      "required": [
+        "visual",
+        "content",
+        "responsive",
+        "behavior"
+      ],
       "properties": {
-        "visual": { "$ref": "#/$defs/stringList" },
-        "content": { "$ref": "#/$defs/stringList" },
-        "responsive": { "$ref": "#/$defs/stringList" },
-        "behavior": { "$ref": "#/$defs/stringList" }
+        "visual": {
+          "$ref": "#/$defs/stringList"
+        },
+        "content": {
+          "$ref": "#/$defs/stringList"
+        },
+        "responsive": {
+          "$ref": "#/$defs/stringList"
+        },
+        "behavior": {
+          "$ref": "#/$defs/stringList"
+        }
       },
       "additionalProperties": false
     },
     "decision": {
       "type": "object",
-      "required": ["id", "topic", "decision", "rationale", "status"],
+      "required": [
+        "id",
+        "topic",
+        "decision",
+        "rationale",
+        "status"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "topic": { "type": "string", "minLength": 1 },
-        "decision": { "type": "string", "minLength": 1 },
-        "rationale": { "type": "string", "minLength": 1 },
-        "status": { "enum": ["resolved", "open"] }
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "topic": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "resolved",
+            "open"
+          ]
+        }
       },
       "additionalProperties": false
     },
     "approval": {
       "type": "object",
-      "required": ["status", "notes"],
+      "required": [
+        "status",
+        "notes"
+      ],
       "properties": {
-        "status": { "enum": ["draft", "changes-requested", "approved"] },
-        "approved_by": { "type": ["string", "null"] },
-        "approved_at": { "type": ["string", "null"], "format": "date-time" },
-        "notes": { "type": "string" }
+        "status": {
+          "enum": [
+            "draft",
+            "changes-requested",
+            "approved"
+          ]
+        },
+        "approved_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approved_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "runtimeContent": {
+      "description": "Declarado solo en las secciones que NO se congelan en el build. Una region alimentada en vivo necesita su propio contrato: que tolera la forma cuando el contenido no viene como se espera.",
+      "type": "object",
+      "required": [
+        "owner",
+        "source",
+        "tolerates"
+      ],
+      "properties": {
+        "owner": {
+          "description": "Quien es dueno del contenido una vez publicado.",
+          "enum": [
+            "build",
+            "cms",
+            "external"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tolerates": {
+          "description": "Que aguanta la forma. Un titulo de tres lineas donde se disenaron dos, una nota sin imagen, un producto vertical en una grilla horizontal: el dia que pasa, nadie dice 'mi contenido no encaja', dice 'se rompio la web'.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/stringList"
+            }
+          ],
+          "minItems": 1
+        },
+        "notes": {
+          "type": "string"
+        }
       },
       "additionalProperties": false
     }

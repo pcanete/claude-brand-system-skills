@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+`reference-to-astro` 1.5.0 — dos preguntas que llegaban tarde
+
+La pregunta "¿esto termina en WordPress?" aparecia recien al empaquetar, cuando
+el sitio ya estaba construido. Y la decision de que regiones se alimentan
+despues de publicar no se registraba en ningun lado.
+
+Las dos cambian el plan, no el empaquetado:
+
+- Una pagina compilada dentro de WordPress es **huesped**: hay CSS ajeno que se
+  bloquea, y lo que la pagina aloje a proposito hay que medirlo antes.
+- **La navegacion no puede llevar sus enlaces en el codigo.** El cliente maneja
+  su menu en el CMS; un header con enlaces fijos es una segunda verdad que
+  diverge en silencio la primera vez que agrega un item.
+- Una region alimentada en vivo se disena distinto: forma fija, estado de carga,
+  y una tolerancia escrita.
+
+**`project.deployment`** (`standalone` / `wordpress`) y
+**`section.runtime_content`** registran las dos respuestas. Los dos son
+**opcionales**: un blueprint escrito antes de que existieran sigue validando, y
+hay una prueba que lo comprueba — hay alguien construyendo un sitio con estos
+skills ahora mismo y romperle el contrato a mitad de camino no es una opcion.
+
+Dentro de `runtime_content` el campo que importa es **`tolerates`**, y ese si es
+obligatorio cuando la region se declara. Una region que alimenta otro va a
+recibir tarde o temprano contenido que no entra en la forma para la que se
+diseno: un titular de tres lineas donde se dibujaron dos, una nota sin imagen,
+una foto vertical en una grilla horizontal. El dia que pasa nadie dice "mi
+contenido no encaja": dice "se rompio la web", y el reclamo llega a quien la
+construyo. Escribir que tolera la forma convierte eso en una decision que
+alguien ya tomo.
+
 `wordpress-publisher` 0.5.0 — lo primero que se verifica de un PHP es que sea PHP
 
 Un plugin generado tiro un sitio en produccion. La causa: una linea quedo como

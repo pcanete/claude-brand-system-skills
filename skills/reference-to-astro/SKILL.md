@@ -3,7 +3,7 @@ name: reference-to-astro
 description: Builds a website in Astro from an analyzed reference and an approved SITE_BLUEPRINT that maps client content to evidenced visual, responsive and behavioral patterns. Use when reference contracts and real content must become a verified implementation. Not for inventing a visual direction, scanning the reference, or packaging the result for WordPress.
 license: MIT
 metadata:
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Reference-to-Astro
@@ -331,6 +331,26 @@ Map:
 ### Phase 2 — Implementation plan
 
 Read `references/site-blueprint.md`.
+
+**Ask two things before writing the plan**, because both change the plan itself
+and not just how the result is packaged:
+
+1. **Where will the site live?** Standalone, or inside an existing WordPress?
+   A compiled page hosted by WordPress is a guest: foreign CSS is blocked, the
+   navigation cannot carry its links in the source — the client manages the menu
+   over there — and anything the page deliberately hosts has to be declared.
+2. **Which regions are not frozen at build time?** Latest posts, a product
+   strip, the menu itself. A frozen region changes only by rebuilding and
+   republishing; a region fed at runtime needs a declared shape and a written
+   tolerance for content that does not fit it.
+
+Record the answers in `project.deployment` and `section.runtime_content`. Both
+are optional, so a blueprint written before this existed keeps validating — but
+a blueprint that leaves them empty is claiming everything is frozen and the site
+is standalone. Say so out loud rather than by omission.
+
+Packaging for WordPress is `wordpress-publisher`'s job, not this skill's. What
+belongs here is the design consequence of that destination.
 
 Render the content-architecture checkpoint before requesting approval:
 

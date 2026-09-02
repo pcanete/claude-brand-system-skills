@@ -488,6 +488,53 @@ runNode("Draft SITE_BLUEPRINT cannot be validated as work in progress", [
   "--lenient"
 ]);
 
+// Los campos de destino y de contenido en vivo son opcionales a proposito: un
+// blueprint escrito antes de que existieran tiene que seguir validando, o se le
+// rompe el trabajo a quien esta construyendo ahora mismo.
+const sinCamposNuevos = path.join(blueprintGateRoot, "SITE_BLUEPRINT.sin-campos.json");
+const documentoSinCampos = JSON.parse(read(approvedBlueprint));
+delete documentoSinCampos.project.deployment;
+for (const pagina of Object.values(documentoSinCampos.pages)) {
+  for (const seccion of pagina.sections) delete seccion.runtime_content;
+}
+fs.writeFileSync(sinCamposNuevos, `${JSON.stringify(documentoSinCampos, null, 2)}
+`);
+
+runNode("A blueprint without the optional deployment fields was rejected", [
+  builderValidator,
+  ...webFixtures("reference-system"),
+  "--content",
+  path.join(root, "tests", "reference-system", "CONTENT_MANIFEST.json"),
+  "--blueprint",
+  sinCamposNuevos
+]);
+
+// Pero declarar una region alimentada en vivo sin decir que tolera su forma es
+// el hueco por el que entra "se rompio la web" cuando el cliente carga un
+// titulo mas largo del previsto.
+const sinTolerancia = path.join(blueprintGateRoot, "SITE_BLUEPRINT.sin-tolerancia.json");
+const documentoSinTolerancia = JSON.parse(read(approvedBlueprint));
+const primeraSeccion = Object.values(documentoSinTolerancia.pages)[0].sections[0];
+if (!primeraSeccion.runtime_content) {
+  fail("El ejemplo de SITE_BLUEPRINT ya no declara runtime_content: la prueba no comprueba nada");
+}
+delete primeraSeccion.runtime_content.tolerates;
+fs.writeFileSync(sinTolerancia, `${JSON.stringify(documentoSinTolerancia, null, 2)}
+`);
+
+runNode(
+  "A runtime-fed region was accepted without declaring what its shape tolerates",
+  [
+    builderValidator,
+    ...webFixtures("reference-system"),
+    "--content",
+    path.join(root, "tests", "reference-system", "CONTENT_MANIFEST.json"),
+    "--blueprint",
+    sinTolerancia
+  ],
+  { expect: "fail" }
+);
+
 // El objetivo de fidelidad gobierna la ceremonia y nada más. Un plan
 // direccional construye con checkpoints pendientes; uno forense no construye
 // sobre una conjetura. Las compuertas de invención son iguales en los tres.
