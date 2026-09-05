@@ -3,10 +3,19 @@ name: reference-lab-builder
 description: Turns evidence-backed STYLE_DNA and REFERENCE_EVIDENCE into a neutral interactive reference lab where typography, components, responsive states, motion, and behaviors can be inspected and approved before target content is applied. Use after reference-scanner and before SITE_BLUEPRINT. Not for scanning the source site, reproducing its content or brand, building the final customer website, or packaging WordPress.
 license: MIT
 metadata:
-  version: "0.3.0"
+  version: "1.0.0"
 ---
 
 # Reference Lab Builder
+
+Run `scripts/test-runtime.mjs` after changing demo rendering. The shared
+`scripts/lib/contract-path.mjs` resolves object keys and array members by ID.
+The catalog includes page-transition and webgl-scene demos; see
+`references/demo-catalog.md` for configuration and limits.
+
+Approval runs the same `scripts/lib/evidence-integrity.mjs` checks as scanner
+and Astro. Review critical inventory gaps before approving the laboratory;
+synthetic demos illustrate the evidence, they do not prove the reference.
 
 Build an invented, content-neutral website that demonstrates what the
 reference scan actually established.

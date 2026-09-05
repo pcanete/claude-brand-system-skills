@@ -16,18 +16,14 @@ Choose the smallest set that exposes the reference's distinctive behavior.
 | `media-sequence` | ordered or rapid image/object progression |
 | `drag-surface` | direct manipulation without claiming WebGL |
 | `fullscreen` | media expansion and dismissal |
+| `page-transition` | evidenced route/view replacement, including reverse and reduced states |
+| `webgl-scene` | evidenced GPU-style rendering with capability and reduced-motion fallback |
 
 `config` is data, never executable code. Common keys are `items`, `labels`,
 `duration_ms`, `speed_px_s`, `distance_px`, `ratio`, and `direction`.
 
-`typography` also reads `sizes_px`, `line_height_px` and `tracking_px`: arrays
-parallel to `items`. When `sizes_px` is present and complete, the demo renders
-those exact values and prints the ratio between consecutive levels. Declare them
-whenever the scan measured them — a demo that cites a typographic record as its
-source and then renders a scale of its own invites approval of something nobody
-measured. Without them the demo falls back to an adaptive scale and says so on
-screen.
-
 When exact values were not measured, choose a conservative adaptive value and
 say so in the demo `note`. Do not make the adaptive value look observed.
 
+`page-transition` and `webgl-scene` are never decorative defaults. Select them
+only when their `source_paths` and `evidence_refs` establish those behaviors.

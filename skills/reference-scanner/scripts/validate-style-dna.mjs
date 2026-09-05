@@ -23,6 +23,7 @@ import {
   verifyWebContracts
 } from "./lib/web-contracts.mjs";
 import { checkBehaviorAuditQuality } from "./lib/behavior-gates.mjs";
+import { checkEvidenceFiles, checkBehaviorInventory } from "./lib/evidence-integrity.mjs";
 
 const cwd = process.cwd();
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
@@ -87,6 +88,11 @@ async function main() {
   ) {
     failed = true;
   }
+
+  if (strict && reportGroups([
+    { label: "Captured evidence exists and matches", issues: await checkEvidenceFiles(evidence, path.dirname(path.resolve(cwd, files.evidence))) },
+    { label: "Initial behavior inventory is covered", issues: checkBehaviorInventory(evidence) }
+  ])) failed = true;
 
   if (failed) {
     console.error(

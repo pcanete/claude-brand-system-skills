@@ -5,6 +5,7 @@ import path from "node:path";
 import process from "node:process";
 
 import { chromium } from "playwright";
+import { assertPageState } from "./lib/qa-assertions.mjs";
 
 function arg(name, fallback) {
   const index =
@@ -52,7 +53,8 @@ async function load(page, url, timeout) {
   const settleTimeout =
     typeof timeout === "number" ? timeout : 3000;
 
-  await page.goto(url, { waitUntil: "domcontentloaded" });
+  const response = await page.goto(url, { waitUntil: "domcontentloaded" });
+  if (response && !response.ok()) throw new Error("Route returned HTTP " + response.status());
 
   try {
     await page.waitForLoadState("networkidle", {
@@ -250,6 +252,7 @@ async function captureBaseline({
   await settle(page);
 
   const suffix =
+    // Validate stable baseline state before persisting a successful capture.
     reducedMotion === "reduce"
       ? "-reduced-motion"
       : "";
@@ -259,6 +262,8 @@ async function captureBaseline({
 
   const destination =
     path.join(outputDir, filename);
+
+  await assertPageState(page, route.assertions || []);
 
   await page.screenshot({
     path: destination,
@@ -365,6 +370,7 @@ async function captureInteraction({
   }
 
   await settle(page, 100);
+  await assertPageState(page, interaction.assertions || []);
 
   const afterFile =
     path.join(
@@ -410,6 +416,9 @@ async function captureInteraction({
 async function main() {
   const profile =
     await readJson(profileFile);
+  if (!profile.routes?.length || !profile.viewports?.length) {
+    throw new Error("QA profile requires at least one route and viewport");
+  }
 
   await fs.mkdir(
     outputDir,

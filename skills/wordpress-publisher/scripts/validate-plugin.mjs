@@ -14,6 +14,7 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
+import { checkPhpSyntax } from './php-syntax.mjs';
 import { lintPhp } from './lint-php.mjs';
 
 function arg(name, fallback) {
@@ -55,6 +56,8 @@ export async function validatePlugin(pluginDir) {
   }
 
   if (issues.length) return issues;
+
+  issues.push(...await checkPhpSyntax(pluginDir));
 
   const main = await readFile(mainFile, 'utf8');
   const template = await readFile(templateFile, 'utf8');

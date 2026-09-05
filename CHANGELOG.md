@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-05 — Behavioral evidence and WordPress integrity
+
+- Breaking validation update: scanner 1.0.0, lab 1.0.0, Astro 2.0.0 and
+  WordPress publisher 1.0.0. Missing capture artifacts and ambiguous/cyclic
+  evidence are rejected; WordPress packaging requires PHP CLI.
+- New scans inventory behavior before design synthesis under behavior-evidence/1.
+- Both distributions share evidence validation, lab capabilities, blueprint
+  schema, browser assertions and real PHP syntax checks.
+- Complete dependency installation in CI; restore the Codex WordPress fixture.
+- Migration and exact scope: docs/behavior-evidence-release.md.
+
 ## Unreleased
 
 `reference-to-astro` 1.5.0 — dos preguntas que llegaban tarde

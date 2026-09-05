@@ -6,11 +6,11 @@ Cada skill se versiona por separado.
 | --- | ---: | --- |
 | brand-dna-scanner | 0.4.0 | Brand DNA 0.1.x |
 | brand-manual-builder | 0.1.0 | Brand manual spec 0.1.x |
-| reference-scanner | 0.8.0 | Web reference schemas 0.3.x |
-| reference-lab-builder | 0.3.0 | Reference lab spec 0.1.x |
-| reference-to-astro | 1.5.0 | Web reference schemas 0.3.x, SITE_BLUEPRINT 0.1.x |
+| reference-scanner | 1.0.0 | Web reference schemas 0.3.x–0.4.x |
+| reference-lab-builder | 1.0.0 | Reference lab spec 0.1.x |
+| reference-to-astro | 2.0.0 | Web reference schemas 0.3.x, SITE_BLUEPRINT 1.0 |
 | visual-tuning-kit | 0.6.0 | Tuning contract 0.1 |
-| wordpress-publisher | 0.5.0 | Plugin template 0.1.x |
+| wordpress-publisher | 1.0.0 | Plugin template 0.1.x |
 
 La versión vive en el frontmatter del `SKILL.md`. La revisión del repositorio
 falla si deja de coincidir con esta tabla: una tabla que nada puede contradecir

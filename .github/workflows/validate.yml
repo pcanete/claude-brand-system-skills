@@ -38,4 +38,17 @@ jobs:
         run: npm ci --prefix skills/visual-tuning-kit
 
       - name: Validate repository
+        run: |
+          npm ci --prefix skills/brand-manual-builder
+          npm ci --prefix skills/reference-lab-builder
+          php --version
+
+      - name: Run complete suite
         run: npm test
+
+      - name: Install browser for behavioral QA tests
+        working-directory: skills/reference-to-astro
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify browser assertions
+        run: node skills/reference-to-astro/scripts/test-qa-assertions.mjs

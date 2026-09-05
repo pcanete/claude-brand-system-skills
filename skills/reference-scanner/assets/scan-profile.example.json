@@ -1,5 +1,6 @@
 {
   "version": "0.4",
+  "validation_profile": "behavior-evidence/1",
   "mode": "forensic",
   "reference_url": "https://example.invalid/",
   "viewports": [

@@ -50,7 +50,7 @@
         "properties": {
           "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
           "title": { "type": "string", "minLength": 1 },
-          "kind": { "enum": ["typography", "hover-label", "navigation", "marquee", "scroll-reveal", "sticky-stack", "parallax", "loader", "filter", "media-sequence", "drag-surface", "fullscreen"] },
+          "kind": { "enum": ["typography", "hover-label", "navigation", "marquee", "scroll-reveal", "sticky-stack", "parallax", "loader", "filter", "media-sequence", "drag-surface", "fullscreen", "page-transition", "webgl-scene"] },
           "source_paths": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
           "evidence_refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
           "config": {

@@ -12,6 +12,7 @@ import path from "node:path";
 
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
+import { evidenceIds, checkEvidenceGraph } from "./evidence-integrity.mjs";
 
 // Shared with the evidence model: 0.60 is the boundary between moderate
 // evidence and weak inference. A claim at or above it must be supported.
@@ -74,15 +75,48 @@ export function createValidator(schemas) {
 }
 
 export function collectEvidenceIds(evidence) {
-  const ids = new Set();
+  return evidenceIds(evidence);
+}
 
-  for (const group of EVIDENCE_COLLECTIONS) {
-    for (const item of evidence[group] || []) {
-      if (item?.id) ids.add(item.id);
+// Contract paths may traverse object keys or array members addressed by id.
+// This matches how components and sections are represented across the web
+// contracts, for example `components.global-header.states`.
+export function resolvePath(document, dottedPath) {
+  let node = document;
+
+  for (const segment of String(dottedPath).split(".")) {
+    if (node && typeof node === "object" && !Array.isArray(node) && segment in node) {
+      node = node[segment];
+      continue;
+    }
+    if (Array.isArray(node)) {
+      const match = node.find((item) => item && typeof item === "object" && item.id === segment);
+      if (match !== undefined) {
+        node = match;
+        continue;
+      }
+    }
+    return { found: false, stoppedAt: segment };
+  }
+
+  return { found: true, value: node };
+}
+
+// GATE 7 — An observation must point to the finding it indexes. Otherwise
+// downstream skills can cite a label that has no corresponding contract data.
+export function checkObservationPathsResolve(style) {
+  const issues = [];
+
+  for (const observation of style.observations || []) {
+    const { found, stoppedAt } = resolvePath(style, observation.path);
+    if (!found) {
+      issues.push(
+        `${observation.path}: does not resolve in STYLE_DNA (stops at '${stoppedAt}')`
+      );
     }
   }
 
-  return ids;
+  return issues;
 }
 
 // Referential integrity: every reference points at recorded evidence.
@@ -343,56 +377,9 @@ export function checkClaimedAreasBacked(style) {
   return issues;
 }
 
-// Resuelve una ruta con puntos dentro del documento. Un segmento puede ser una
-// clave de objeto o el `id` de un elemento de un arreglo, que es como el
-// contrato guarda los componentes: `components.global-header.states`.
-export function resolvePath(document, dottedPath) {
-  let node = document;
-
-  for (const segment of String(dottedPath).split(".")) {
-    if (node && typeof node === "object" && !Array.isArray(node) && segment in node) {
-      node = node[segment];
-      continue;
-    }
-
-    if (Array.isArray(node)) {
-      const match = node.find((item) => item && typeof item === "object" && item.id === segment);
-      if (match !== undefined) {
-        node = match;
-        continue;
-      }
-    }
-
-    return { found: false, stoppedAt: segment };
-  }
-
-  return { found: true, value: node };
-}
-
-// GATE 7 — Las observaciones apuntan a lo que el documento dice.
-// `observations[].path` es la dirección que otros skills citan para justificar
-// una decisión. Si no resuelve, el escáner afirmó algo que no escribió: el
-// índice queda como una lista de etiquetas y quien cita no tiene dónde mirar.
-//
-// Incluye lo ausente. Observar que no hay video es un hallazgo, y el lugar de
-// un hallazgo es el documento: se registra el dato y la observación lo señala.
-export function checkObservationPathsResolve(style) {
-  const issues = [];
-
-  for (const observation of style.observations || []) {
-    const { found, stoppedAt } = resolvePath(style, observation.path);
-    if (!found) {
-      issues.push(
-        `${observation.path}: no resuelve en el documento (se corta en '${stoppedAt}')`
-      );
-    }
-  }
-
-  return issues;
-}
-
 export function verifyWebContracts(style, evidence, { strict = true } = {}) {
   const groups = [
+    { label: "Evidence IDs and graph are unambiguous", issues: checkEvidenceGraph(evidence), strictOnly: false },
     {
       label: "Evidence references resolve",
       issues: checkEvidenceReferences(style, evidence),
@@ -424,7 +411,7 @@ export function verifyWebContracts(style, evidence, { strict = true } = {}) {
       strictOnly: true
     },
     {
-      label: "Observation paths resolve in the document",
+      label: "Observation paths resolve in STYLE_DNA",
       issues: checkObservationPathsResolve(style),
       strictOnly: true
     }

@@ -3,10 +3,15 @@ name: reference-scanner
 description: Analyzes a reference website as a visual and behavioral system and records evidence another agent can build from. Covers layout, typography, media, desktop and mobile interaction, responsive transformation, motion, page transitions and WebGL, producing STYLE_DNA and REFERENCE_EVIDENCE. Use when a chosen reference site's visual logic or detailed behavior must be captured, documented or handed to an implementer. Not for cross-channel brand identity extraction or for building the result.
 license: MIT
 metadata:
-  version: "0.8.0"
+  version: "1.0.0"
 ---
 
 # Reference Scanner
+
+For a new scan, start with `references/behavior-handoff.md`: understand and
+inventory the site's behavior before synthesizing its design rules. The shared
+`scripts/lib/evidence-integrity.mjs` checks that this handoff is backed by
+persisted evidence and reaches downstream consumers without broken references.
 
 Analyze an existing website as a design and interaction system.
 

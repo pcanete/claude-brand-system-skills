@@ -25,6 +25,7 @@ import {
   verifyWebContracts
 } from "./lib/web-contracts.mjs";
 import { checkBehaviorAuditQuality } from "./lib/behavior-gates.mjs";
+import { checkEvidenceFiles, checkBehaviorInventory } from "./lib/evidence-integrity.mjs";
 
 const cwd = process.cwd();
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
@@ -363,6 +364,8 @@ async function main() {
   }
 
   const groups = [
+    { label: "Captured evidence exists and matches", issues: strict ? await checkEvidenceFiles(evidence, path.dirname(path.resolve(cwd, files.evidence))) : [] },
+    { label: "Initial behavior inventory is covered", issues: strict ? checkBehaviorInventory(evidence) : [] },
     ...verifyWebContracts(style, evidence, { strict }),
     // The builder verifies what it receives. A scan that promised behavior
     // forensics and delivered prose is caught here, not after the site is

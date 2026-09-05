@@ -168,7 +168,7 @@ export function auditar(css, { scope = null, bodyClasses = [] } = {}) {
       condicion: regla.condicion,
       // Peligrosa: alcanza elementos que la portada usa, cambia como se ven, y
       // no depende de una condicion que la deje inerte.
-      peligrosa: raiz && invasivas.length > 0 && !condicional,
+      peligrosa: raiz && invasivas.length > 0,
       propiedades_invasivas: invasivas
     });
   }
@@ -182,7 +182,7 @@ export function auditar(css, { scope = null, bodyClasses = [] } = {}) {
     peligrosas,
     dependientes,
     globales_detalle: globales,
-    veredicto: peligrosas.length ? 'revisar' : dependientes.length ? 'depende' : 'segura'
+    veredicto: peligrosas.length ? 'revisar' : 'requiere-verificacion-en-navegador'
   };
 }
 
@@ -224,7 +224,7 @@ async function main() {
     console.log(`  ${resultado.total} selectores — ${resultado.acotadas} acotados (${porcentaje}%), ${resultado.globales} globales`);
 
     if (!resultado.peligrosas.length && !resultado.dependientes.length) {
-      console.log('\n  ✓ Segura de admitir: ninguna regla global cambia como se ve la portada.');
+      console.log('\n  No se detectaron conflictos globales en este análisis parcial; verificar en navegador.');
     } else if (resultado.peligrosas.length) {
       console.log(`\n  ✗ ${resultado.peligrosas.length} reglas globales tocan elementos que la portada usa:`);
       for (const item of resultado.peligrosas) {
@@ -249,7 +249,7 @@ async function main() {
 
     const inertes = resultado.globales_detalle.filter((item) => !item.peligrosa);
     if (inertes.length) {
-      console.log(`\n  ${inertes.length} reglas globales inertes — necesitan una clase, una condicion o no aplican:`);
+      console.log(`\n  ${inertes.length} reglas adicionales; su efecto depende del DOM y del viewport:`);
       for (const item of inertes.slice(0, 12)) {
         const cond = item.condicion ? `  [${item.condicion}]` : '';
         console.log(`      ${item.selector}${cond}`);
@@ -267,7 +267,7 @@ async function main() {
   console.log(
     revisar.length
       ? `\n${revisar.length} de ${informe.length} hojas necesitan revision antes de declararlas en allowedStyles.`
-      : `\nLas ${informe.length} hojas se pueden declarar en allowedStyles del wordpress.config.json.`
+      : '\nVerificar las hojas en una portada de prueba antes de admitirlas.'
   );
 }
 

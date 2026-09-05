@@ -3,7 +3,7 @@ name: reference-to-astro
 description: Builds a website in Astro from an analyzed reference and an approved SITE_BLUEPRINT that maps client content to evidenced visual, responsive and behavioral patterns. Use when reference contracts and real content must become a verified implementation. Not for inventing a visual direction, scanning the reference, or packaging the result for WordPress.
 license: MIT
 metadata:
-  version: "1.5.0"
+  version: "2.0.0"
 ---
 
 # Reference-to-Astro
@@ -78,6 +78,11 @@ project. Install their dependencies once with `npm install` inside the skill
 directory.
 
 ## Input gate
+
+The input validator also runs `scripts/lib/evidence-integrity.mjs`: evidence
+IDs, capture files/hashes and the scanner's initial behavior inventory must
+resolve before implementation. Carry the audit IDs into behavioral acceptance
+criteria; do not replace an unresolved reference mechanism with a guess.
 
 Before any construction work, verify the contracts:
 
@@ -540,6 +545,16 @@ Then run the passes the tooling cannot do for you:
 Fix significant mismatches and repeat.
 
 ## Fidelity QA priorities
+
+Run `scripts/test-qa-assertions.mjs` after changing browser assertions.
+
+Use `scripts/lib/qa-assertions.mjs` through the QA profile's route and
+interaction `assertions`. Each check names a selector and expected `visible`,
+`text`, `attributes`, `css` or `font: {family, weight}`. Font checks require a
+loaded FontFace and the expected computed family; they do not prove that every
+glyph used that font. Inspect typography visually as well. Bind these checks
+to the initial behavior audit, including menu state, reverse/close and mobile
+substitution. A successful click without an expected result is only a capture.
 
 Review in this order:
 

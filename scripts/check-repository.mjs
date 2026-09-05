@@ -60,6 +60,12 @@ function runNode(label, args, { expect = "pass", cwd = root } = {}) {
 }
 
 const files = walk(root);
+runNode("Reference lab runtime regression tests failed", [
+  path.join(root, "skills", "reference-lab-builder", "scripts", "test-runtime.mjs")
+]);
+runNode("Evidence handoff and PHP syntax regression tests failed", [
+  path.join(root, "scripts", "test-evidence-integrity.mjs")
+]);
 
 for (const file of files.filter((item) => item.endsWith(".json"))) {
   try {

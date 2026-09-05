@@ -3,7 +3,7 @@ name: wordpress-publisher
 description: Convierte un sitio Astro ya construido en un plugin de WordPress que reemplaza únicamente la portada, dejando que WordPress siga atendiendo cuenta, registro, tienda, búsqueda y administración. Genera el paquete, verifica que sea instalable y produce un ZIP. Usar cuando la portada nueva tiene que convivir con un WordPress existente en lugar de reemplazarlo. No usar para publicar un sitio estático completo, que no necesita WordPress en el medio.
 license: MIT
 metadata:
-  version: "0.5.0"
+  version: "1.0.0"
 ---
 
 # WordPress Publisher
@@ -104,6 +104,18 @@ marcador no se reemplazó o si la plantilla perdió los hooks de WordPress, no
 hay export.
 
 ## Qué verifica el validador
+
+Para evaluar una hoja ajena, usar `scripts/audit-foreign-css.mjs`.
+Es un diagnóstico parcial: una regla dentro de @media puede afectar el viewport
+objetivo y la ausencia de alertas no acredita que sea seguro admitir la hoja.
+
+El validador usa `scripts/php-syntax.mjs` para ejecutar PHP CLI con
+`-n -l` sobre todo el PHP generado, sin ejecutar el código. PHP debe estar
+disponible en PATH o en `PHP_BINARY`; si falta o falla, no se genera el ZIP.
+La sintaxis no verifica el comportamiento de WordPress: después de instalar
+en un entorno de prueba, comparar portada anónima, navegación, cuenta/tienda,
+consentimiento, fuentes y estilos con el build local. Verificar además la
+vista autenticada por separado, porque la barra de administración puede cambiarla.
 
 El exportador revisa lo que puede mientras genera. El validador revisa el
 artefacto terminado, que es lo que realmente se instala:
