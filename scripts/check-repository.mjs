@@ -6,7 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const excluded = new Set([".git", "node_modules"]);
@@ -1001,6 +1001,306 @@ runNode(
   ],
   { expect: "fail" }
 );
+
+// --- wordpress-publisher: compatibilidad hacia atras ---------------------
+// El modo `front-page` es el que esta instalado en sitios vivos. "No rompi
+// nada" es una afirmacion que se mide o no vale nada: se compara archivo por
+// archivo contra una linea base generada con la implementacion anterior al
+// refactor por modos.
+const { exportarFixture } = await import(
+  pathToFileURL(path.join(root, "scripts", "snapshot-wordpress-front-page.mjs")).href
+);
+
+const lineaBase = JSON.parse(
+  read(path.join(root, "tests", "wordpress-fixture", "expected", "front-page.json"))
+).archivos;
+
+const producido = exportarFixture();
+
+for (const ruta of new Set([...Object.keys(lineaBase), ...Object.keys(producido)])) {
+  if (lineaBase[ruta] === producido[ruta]) continue;
+
+  fail(
+    !lineaBase[ruta]
+      ? `El modo front-page ahora produce un archivo que antes no existia: ${ruta}`
+      : !producido[ruta]
+        ? `El modo front-page dejo de producir ${ruta}`
+        : `El modo front-page cambio el contenido de ${ruta}. Si el cambio es querido, regeneralo con scripts/snapshot-wordpress-front-page.mjs y que el diff quede en el commit.`
+  );
+}
+
+// Una configuracion sin `mode` es una configuracion de portada, y el artefacto
+// lo dice: el validador -y quien depure en produccion- leen el modo del archivo
+// que efectivamente se instala.
+const { modoDeclarado } = await import(
+  pathToFileURL(path.join(root, "skills", "wordpress-publisher", "scripts", "validate-plugin.mjs")).href
+);
+
+if (modoDeclarado(read(path.join(exportedPlugin, "portada-fixture.php"))) !== "front-page") {
+  fail("Un paquete generado sin `mode` no se declara como front-page");
+}
+
+// --- wordpress-publisher: los modos nuevos --------------------------------
+const { resolveConfig } = await import(
+  pathToFileURL(path.join(root, "skills", "wordpress-publisher", "lib", "config.mjs")).href
+);
+
+const exportador = path.join(root, "skills", "wordpress-publisher", "scripts", "export-plugin.mjs");
+const validador = path.join(root, "skills", "wordpress-publisher", "scripts", "validate-plugin.mjs");
+
+function proyectoDeModos(config) {
+  const proyecto = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "cbss-modos-")), "project");
+  copyTree(path.join(root, "tests", "wordpress-modes-fixture"), proyecto);
+  fs.writeFileSync(
+    path.join(proyecto, "wordpress.config.json"),
+    `${JSON.stringify(config, null, 2)}\n`
+  );
+  return proyecto;
+}
+
+const baseDeModos = {
+  name: "Sistema",
+  description: "Fixture sintetico de modos.",
+  author: "Fixture",
+  version: "0.1.0"
+};
+
+const paginasDeModos = [
+  { id: "inicio", label: "Inicio compilado", source: "dist/index.html" },
+  { id: "producto-x", label: "Producto X" }
+];
+
+const modosAVerificar = [
+  {
+    etiqueta: "page-template variante canvas",
+    config: {
+      ...baseDeModos,
+      slug: "modo-canvas",
+      mode: "page-template",
+      variant: "canvas",
+      pages: paginasDeModos
+    },
+    comprobar(pluginDir) {
+      const principal = read(path.join(pluginDir, "modo-canvas.php"));
+      if (!principal.includes("add_filter( 'theme_page_templates'")) {
+        fail("El modo page-template no registra sus plantillas sin tema hijo");
+      }
+      const plantilla = read(path.join(pluginDir, "templates", "page-producto-x.php"));
+      for (const hook of ["wp_head()", "wp_body_open()", "wp_footer()"]) {
+        if (!plantilla.includes(hook)) fail(`La variante canvas perdio ${hook}`);
+      }
+    }
+  },
+  {
+    etiqueta: "page-template variante theme",
+    config: {
+      ...baseDeModos,
+      slug: "modo-tema",
+      mode: "page-template",
+      variant: "theme",
+      pages: paginasDeModos
+    },
+    comprobar(pluginDir) {
+      const plantilla = read(path.join(pluginDir, "templates", "page-producto-x.php"));
+      for (const llamada of ["get_header()", "get_footer()"]) {
+        if (!plantilla.includes(llamada)) {
+          fail(`La variante theme no conserva ${llamada}: el tema pierde su cabecera o su pie`);
+        }
+      }
+      const css = read(path.join(pluginDir, "dist", "_astro", "sistema.css"));
+      if (/(^|\})\s*body\s*\{/.test(css)) {
+        fail("La variante theme empaqueto CSS que todavia le habla al body de la pagina");
+      }
+    }
+  },
+  {
+    etiqueta: "embedded-page",
+    config: {
+      ...baseDeModos,
+      slug: "modo-embed",
+      mode: "embedded-page",
+      shortcode: "sistema_pieza",
+      pages: paginasDeModos
+    },
+    comprobar(pluginDir) {
+      const principal = read(path.join(pluginDir, "modo-embed.php"));
+      if (!principal.includes("add_shortcode( 'sistema_pieza'")) {
+        fail("El modo embedded-page no registra su shortcode");
+      }
+      const fragmento = read(path.join(pluginDir, "fragments", "inicio.php"));
+      if (/<(?:html|head|body)\b/i.test(fragmento)) {
+        fail("Un fragmento incrustado trae etiquetas de documento");
+      }
+      // Astro deja sus modulos cerrando el body. Si viajan adentro del
+      // fragmento, dos inserciones en la misma pagina ejecutan el mismo
+      // modulo dos veces.
+      if (/<script[^>]+src=/i.test(fragmento)) {
+        fail("El fragmento arrastra un script propio en vez de encolarlo");
+      }
+      if (!principal.includes("modo-embed-script-1")) {
+        fail("El modulo de la pieza no quedo registrado para encolarse");
+      }
+    }
+  },
+  {
+    etiqueta: "elementor-widgets",
+    config: {
+      ...baseDeModos,
+      slug: "modo-widgets",
+      mode: "elementor-widgets",
+      widgets: [
+        {
+          id: "grilla-productos",
+          label: "Grilla de productos",
+          controls: [{ name: "titulo", type: "text", label: "Titulo", default: "Productos" }],
+          data: [{ name: "productos", source: "woocommerce.products", limit: 8 }]
+        }
+      ]
+    },
+    comprobar(pluginDir) {
+      const principal = read(path.join(pluginDir, "modo-widgets.php"));
+
+      for (const enganche of [
+        "did_action( 'elementor/loaded' )",
+        "add_action( 'elementor/widgets/register'",
+        "add_action( 'elementor/elements/categories_registered'"
+      ]) {
+        if (!principal.includes(enganche)) fail(`El modo elementor-widgets no usa ${enganche}`);
+      }
+
+      // Sin WooCommerce el widget devuelve una lista vacia; no rompe la pagina.
+      if (!principal.includes("function_exists( 'wc_get_products' )")) {
+        fail("El proveedor de productos no comprueba que WooCommerce este activo");
+      }
+      if (principal.includes("$wpdb")) {
+        fail("El proveedor de datos consulta la base directamente en vez de usar las APIs");
+      }
+
+      const clase = read(path.join(pluginDir, "widgets", "class-grilla-productos.php"));
+      if (!clase.includes("extends \\Elementor\\Widget_Base")) {
+        fail("El widget generado no extiende Widget_Base");
+      }
+    }
+  }
+];
+
+for (const caso of modosAVerificar) {
+  const proyecto = proyectoDeModos(caso.config);
+  const pluginDir = path.join(proyecto, "wordpress", "build", caso.config.slug);
+
+  runNode(`El modo ${caso.etiqueta} no exporto`, [exportador, "--project", proyecto], {
+    cwd: proyecto
+  });
+
+  if (!fs.existsSync(pluginDir)) {
+    fail(`El modo ${caso.etiqueta} no dejo ningun paquete`);
+    continue;
+  }
+
+  runNode(
+    `El paquete de ${caso.etiqueta} fue rechazado por su propio validador`,
+    [validador, "--plugin", pluginDir, "--config", path.join(proyecto, "wordpress.config.json")],
+    { cwd: proyecto }
+  );
+
+  caso.comprobar(pluginDir);
+}
+
+// Que el CSS quede acotado no se declara: se mide. Se inyecta una regla que
+// alcanza a toda la pagina y el paquete tiene que dejar de pasar.
+const proyectoFuga = proyectoDeModos({
+  ...baseDeModos,
+  slug: "modo-fuga",
+  mode: "embedded-page",
+  pages: paginasDeModos
+});
+
+const pluginDeFuga = path.join(proyectoFuga, "wordpress", "build", "modo-fuga");
+const configDeFuga = path.join(proyectoFuga, "wordpress.config.json");
+
+runNode("La exportacion de la prueba de aislamiento fallo", [exportador, "--project", proyectoFuga], {
+  cwd: proyectoFuga
+});
+
+const cssDeFuga = path.join(pluginDeFuga, "dist", "_astro", "sistema.css");
+const cssSano = read(cssDeFuga);
+
+fs.writeFileSync(cssDeFuga, `${cssSano}\nbody{color:red}\n`);
+
+runNode(
+  "Un CSS que le habla a toda la pagina entro en un paquete incrustable",
+  [validador, "--plugin", pluginDeFuga, "--config", configDeFuga],
+  { expect: "fail", cwd: proyectoFuga }
+);
+
+// Restaurado: la comprobacion que sigue valida el mismo paquete y tiene que
+// pasar. Si no, el error quedo puesto y la anterior paso por otra razon.
+fs.writeFileSync(cssDeFuga, cssSano);
+
+runNode(
+  "El paquete incrustable sano fue rechazado: la prueba de aislamiento paso por el motivo equivocado",
+  [validador, "--plugin", pluginDeFuga, "--config", configDeFuga],
+  { cwd: proyectoFuga }
+);
+
+// Las compuertas de la configuracion. Cada una existe por una razon que se
+// puede nombrar; si alguna deja de rechazar, la razon se perdio.
+const configuracionesQueDebenFallar = [
+  [
+    "un widget que se llama como un ladrillo de Elementor",
+    { slug: "x-y", mode: "elementor-widgets", widgets: [{ id: "heading", label: "T", controls: [{ name: "t", type: "text" }] }] }
+  ],
+  [
+    "un widget que no declara nada que cambie",
+    { slug: "x-y", mode: "elementor-widgets", widgets: [{ id: "bloque-marca", label: "B", controls: [{ name: "c", type: "color" }] }] }
+  ],
+  [
+    "una fuente de datos sin generador",
+    { slug: "x-y", mode: "elementor-widgets", widgets: [{ id: "grilla-x", label: "G", data: [{ name: "d", source: "sql.directo" }] }] }
+  ],
+  ["un modo inexistente", { slug: "x-y", mode: "inventado" }],
+  ["un nombre con comilla simple, que corta el PHP generado", { slug: "x-y", name: "Portada d'algo" }],
+  ["una plantilla de pagina sin etiqueta visible", { slug: "x-y", mode: "page-template", pages: [{ id: "a" }] }],
+  ["dos paginas con el mismo id", { slug: "x-y", mode: "embedded-page", pages: [{ id: "a" }, { id: "a" }] }]
+];
+
+for (const [etiqueta, configuracion] of configuracionesQueDebenFallar) {
+  let acepto = false;
+  try {
+    resolveConfig(configuracion);
+    acepto = true;
+  } catch {
+    acepto = false;
+  }
+  if (acepto) fail(`La configuracion acepto ${etiqueta}`);
+}
+
+// Una ruta fuera del build es un nombre de archivo valido, asi que no la puede
+// atajar la configuracion: la ataja el lector, al exportar.
+const proyectoFuera = proyectoDeModos({
+  ...baseDeModos,
+  slug: "modo-fuera",
+  mode: "embedded-page",
+  pages: [{ id: "a", source: "../wordpress.config.json" }]
+});
+
+runNode(
+  "Se exporto una pagina que vive fuera del build",
+  [exportador, "--project", proyectoFuera],
+  { expect: "fail", cwd: proyectoFuera }
+);
+
+// El escapado del cuerpo de un widget se comprueba leyendo el PHP generado.
+const { sinEscapar } = await import(
+  pathToFileURL(path.join(root, "skills", "wordpress-publisher", "exporters", "elementor-widgets.mjs")).href
+);
+
+if (sinEscapar("<?php echo $ajustes['x']; ?>", "prueba.php").length === 0) {
+  fail("El detector de impresiones sin escapar no ve un echo crudo");
+}
+if (sinEscapar("<?php echo esc_html( $ajustes['x'] ); ?>", "prueba.php").length !== 0) {
+  fail("El detector de impresiones sin escapar marca un echo que si escapa");
+}
 
 if (failures.length) {
   console.error("\nRepository validation failed:\n");

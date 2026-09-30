@@ -1,4 +1,4 @@
 interface:
   display_name: "WordPress Publisher"
-  short_description: "Empaqueta la portada compilada como plugin de WordPress"
-  default_prompt: "Usa $wordpress-publisher para convertir el build de este sitio en un plugin que reemplace solo la portada."
+  short_description: "Empaqueta el sitio compilado como plugin de WordPress"
+  default_prompt: "Usa $wordpress-publisher para llevar el build de este sitio a WordPress: portada, plantillas de pagina, piezas incrustadas o widgets de Elementor, segun el caso."

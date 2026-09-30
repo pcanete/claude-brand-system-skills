@@ -84,10 +84,14 @@ declaró. El panel vive en desarrollo y escribe un archivo de valores aprobados
 que sí se compila — probar y decidir son dos estados distintos a propósito.
 
 **wordpress-publisher** cubre la publicación cuando el cliente ya tiene un
-WordPress que debe seguir funcionando. Reemplaza la portada y nada más, y
-distingue con cuidado entre desencolar los estilos visuales del tema —que
-pelean con el diseño nuevo— y dejar intactos scripts, analítica y
-consentimiento, que otros plugins necesitan.
+WordPress que debe seguir funcionando. Ocupa el alcance que se declare —la
+portada, plantillas de página, piezas incrustadas con un shortcode, o widgets de
+Elementor para lo que de verdad tenga que ser editable— y distingue con cuidado
+entre desencolar los estilos visuales del tema —que pelean con el diseño nuevo—
+y dejar intactos scripts, analítica y consentimiento, que otros plugins
+necesitan. Cuando la pieza convive con el tema en el mismo documento, el CSS
+compilado viaja acotado bajo una raíz propia, y que lo esté se mide con el mismo
+auditor que juzga el CSS ajeno.
 
 Las dos salieron de un rediseño real y estaban atrapadas dentro del proyecto de
 un cliente. Extraerlas fue el trabajo: separar el motor genérico del contrato

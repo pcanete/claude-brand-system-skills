@@ -1,57 +1,7 @@
-<?php
 /**
- * Plugin Name: {{PLUGIN_NAME}}
- * Description: {{PLUGIN_DESCRIPTION}}
- * Version: {{PLUGIN_VERSION}}
- * Requires at least: 6.2
- * Requires PHP: 7.4
- * Author: {{PLUGIN_AUTHOR}}
- * Text Domain: {{slug}}
- */
-
-defined( 'ABSPATH' ) || exit;
-
-define( '{{CONST_PREFIX}}_VERSION', '{{PLUGIN_VERSION}}' );
-define( '{{CONST_PREFIX}}_PATH', plugin_dir_path( __FILE__ ) );
-define( '{{CONST_PREFIX}}_URL', plugin_dir_url( __FILE__ ) );
-
-/**
- * Replaces only the public site front page.
+ * Decide que hojas de estilo entran en {{ALCANCE_NOMBRE}} compilada.
  *
- * WordPress keeps handling every other route, including WooCommerce,
- * account, registration, search, feeds and administration screens.
- */
-function {{fn_prefix}}_template_include( $template ) {
-	if (
-		is_admin()
-		|| wp_doing_ajax()
-		|| is_feed()
-		|| is_embed()
-		|| ! is_front_page()
-	) {
-		return $template;
-	}
-
-	$front_page = {{CONST_PREFIX}}_PATH . 'templates/front-page.php';
-	return is_readable( $front_page ) ? $front_page : $template;
-}
-add_filter( 'template_include', '{{fn_prefix}}_template_include', PHP_INT_MAX );
-
-/**
- * Adds a stable class for compatibility rules and production diagnostics.
- */
-function {{fn_prefix}}_body_class( $classes ) {
-	if ( is_front_page() ) {
-		$classes[] = '{{slug}}';
-	}
-	return $classes;
-}
-add_filter( 'body_class', '{{fn_prefix}}_body_class' );
-
-/**
- * Decide que hojas de estilo entran en la portada compilada.
- *
- * Es una lista blanca, no negra. La portada trae su propio CSS y sus propias
+ * Es una lista blanca, no negra. {{ALCANCE_NOMBRE_C}} trae su propio CSS y sus propias
  * fuentes: nada de lo que enfile el resto del sitio le hace falta. Una lista
  * negra obliga a perseguir cada plugin nuevo que se instale, y el que no se
  * persiga se filtra sin que nadie lo note.
@@ -67,13 +17,13 @@ function {{fn_prefix}}_is_external_visual_style( $src, $handle = '' ) {
 	$allowed_handles = array(
 		'{{PLUGIN_SLUG}}-isolation',
 		// Interfaz de WordPress para quien esta logueado: sin esto la barra de
-		// administracion aparece rota sobre la portada.
+		// administracion aparece rota sobre {{ALCANCE_NOMBRE}}.
 		'admin-bar',
 		'dashicons',
 	);
 
 	/*
-	 * Componentes de WordPress que la portada aloja a proposito -popups,
+	 * Componentes de WordPress que {{ALCANCE_NOMBRE}} aloja a proposito -popups,
 	 * banners de consentimiento, chat, mini-carrito- necesitan su CSS. Se
 	 * declaran en wordpress.config.json y se auditan antes con
 	 * `scripts/audit-foreign-css.mjs`, que mide cuanto de esa hoja es global
@@ -113,10 +63,10 @@ function {{fn_prefix}}_is_external_visual_style( $src, $handle = '' ) {
 }
 
 /**
- * Removes visual CSS from the theme/builders on the custom front page only.
+ * Removes visual CSS from the theme/builders on {{ALCANCE_INGLES}}.
  */
 function {{fn_prefix}}_dequeue_external_visual_styles() {
-	if ( ! is_front_page() || is_admin() ) {
+	if ( {{FUERA_DE_ALCANCE}} || is_admin() ) {
 		return;
 	}
 
@@ -150,7 +100,7 @@ function {{fn_prefix}}_record_removed_style( $handle, $src = '' ) {
 /**
  * Informe de lo que la lista blanca dejo afuera.
  *
- * Cuando un componente de WordPress aparece en la portada sin estilos, la
+ * Cuando un componente de WordPress aparece en {{ALCANCE_NOMBRE}} sin estilos, la
  * pregunta es siempre la misma: que handle hay que declarar. Adivinarlo cuesta
  * varias vueltas de subir el plugin y mirar. Esto lo responde de una.
  *
@@ -158,7 +108,7 @@ function {{fn_prefix}}_record_removed_style( $handle, $src = '' ) {
  * nunca ve nada de esto.
  */
 function {{fn_prefix}}_report_removed_styles() {
-	if ( ! is_front_page() || ! current_user_can( 'manage_options' ) ) {
+	if ( {{FUERA_DE_ALCANCE}} || ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
@@ -170,7 +120,7 @@ function {{fn_prefix}}_report_removed_styles() {
 	$removed = ( isset( {{const_global}} ) && is_array( {{const_global}} ) ) ? {{const_global}} : array();
 
 	echo "
-<!-- {{PLUGIN_NAME}}: hojas de estilo quitadas de la portada -->
+<!-- {{PLUGIN_NAME}}: hojas de estilo quitadas de {{ALCANCE_NOMBRE}} -->
 ";
 
 	if ( empty( $removed ) ) {
@@ -201,32 +151,9 @@ add_action( 'wp_footer', '{{fn_prefix}}_report_removed_styles', PHP_INT_MAX );
  */
 function {{fn_prefix}}_filter_external_visual_style_tag( $html, $handle, $href, $media ) {
 	unset( $media );
-	if ( is_front_page() && {{fn_prefix}}_is_external_visual_style( $href, $handle ) ) {
+	if ( {{EN_ALCANCE}} && {{fn_prefix}}_is_external_visual_style( $href, $handle ) ) {
 		return '';
 	}
 	return $html;
 }
 add_filter( 'style_loader_tag', '{{fn_prefix}}_filter_external_visual_style_tag', PHP_INT_MAX, 4 );
-
-/**
- * Prevent activation of an incomplete package.
- */
-function {{fn_prefix}}_activate() {
-	$required = array(
-		{{CONST_PREFIX}}_PATH . 'templates/front-page.php',
-		{{CONST_PREFIX}}_PATH . 'dist/_astro',
-		{{CONST_PREFIX}}_PATH . 'dist/assets',
-	);
-
-	foreach ( $required as $path ) {
-		if ( ! file_exists( $path ) ) {
-			deactivate_plugins( plugin_basename( __FILE__ ) );
-			wp_die(
-				esc_html__( 'El paquete de {{PLUGIN_NAME}} está incompleto. Volvé a generar y subir el ZIP completo.', '{{slug}}' ),
-				esc_html__( 'No se pudo activar {{PLUGIN_NAME}}', '{{slug}}' ),
-				array( 'back_link' => true )
-			);
-		}
-	}
-}
-register_activation_hook( __FILE__, '{{fn_prefix}}_activate' );

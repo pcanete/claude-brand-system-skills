@@ -137,6 +137,42 @@ mirando. Con una condición que este caso dejó clara: **la comparación se hace
 contra la versión anónima del sitio publicado**, porque es la única que
 representa lo que ve un visitante.
 
+### La hoja de aislamiento presupone un sitio oscuro
+
+`wordpress-isolation.css` arranca con `color: var(--paper, #f2f2f2)`. Ese
+respaldo viene del proyecto donde nació la plantilla, que era oscuro. En un sitio
+claro cuyo build no define `--paper`, el texto arranca casi blanco sobre blanco
+hasta que una regla del sistema lo pisa.
+
+Cambiarlo a `color: inherit` tampoco sirve: heredaría el color que puso el tema
+del cliente, que es justo lo que la hoja existe para no heredar. La salida
+probablemente sea que el exportador lea el color base del build y lo escriba, en
+vez de suponerlo.
+
+**Origen:** un valor de un cliente que quedó dentro de una plantilla genérica.
+
+### El cuerpo de un widget de Elementor no se genera desde el build
+
+El modo `elementor-widgets` genera la plomería completa —registro, categoría,
+controles, proveedor de datos, escapado— y deja el cuerpo visible como andamio
+para editar a mano. El markup del build no se transfiere solo.
+
+Es deliberado: un componente de dominio real depende del catálogo y del diseño
+de ese cliente. Pero la parte mecánica —tomar la región del build marcada con un
+ancla y volverla el cuerpo del widget, con los valores reemplazados por los
+controles— sí se puede automatizar, y hoy se hace copiando y pegando.
+
+**Origen:** alcance acotado a propósito en 0.6.0, declarado al entregarlo.
+
+### Fuentes de datos: faltan ACF y JetEngine
+
+Hay generador para `woocommerce.products` y `wp.posts`. Declarar cualquier otra
+fuente falla al exportar, con un mensaje que lo dice — que es mejor que
+inventarla, pero los sitios reales que motivaron este modo usan JetEngine para
+los campos de producto.
+
+**Origen:** el caso que disparó el modo mencionaba JetEngine explícitamente.
+
 ### El laboratorio de referencia no cubre WebGL ni transiciones de página
 
 `reference-lab-builder` aísla doce tipos de demo, y ninguno es WebGL ni

@@ -70,7 +70,7 @@ async function main() {
   run(
     '3/4 · Verificar que sea instalable',
     process.execPath,
-    [path.join(here, 'validate-plugin.mjs'), '--plugin', pluginDir],
+    [path.join(here, 'validate-plugin.mjs'), '--plugin', pluginDir, '--config', configPath],
     projectRoot
   );
 
@@ -81,10 +81,29 @@ async function main() {
     projectRoot
   );
 
+  // Qué queda por hacer a mano depende del modo: subir el ZIP no siempre es
+  // el último paso.
+  const despues = {
+    'front-page':
+      '  La portada queda reemplazada al activar. Verificá en una ventana privada,\n' +
+      '  y también desde un teléfono: guarda su propia copia y puede seguir\n' +
+      '  mostrando la anterior.\n',
+    'page-template':
+      '  Falta asignar la plantilla: en cada página, Atributos → Plantilla, y elegir\n' +
+      '  la que aporta este plugin. Hasta que alguien la elija, el sitio no cambia.\n',
+    'embedded-page':
+      `  Falta insertar el shortcode [${config.shortcode ?? `${String(config.slug).replaceAll('-', '_')}_page`} id="..."] donde vaya la pieza.\n` +
+      '  Hasta que esté en el contenido de alguna página, el sitio no cambia.\n',
+    'elementor-widgets':
+      '  Los widgets aparecen en Elementor, en su propia categoría. El cuerpo de cada\n' +
+      '  uno está en widgets/<id>.php del paquete: ahí entra el markup del build.\n'
+  };
+
   process.stdout.write(
-    '\n✓ Listo. Lo único que queda a mano es subir el ZIP desde el panel de WordPress\n' +
-      '  (Plugins → Añadir nuevo → Subir plugin) y activarlo. Si ya estaba instalado,\n' +
-      '  subir el nuevo reemplaza al anterior: el plugin no guarda estado propio.\n'
+    '\n✓ Listo. Subí el ZIP desde el panel de WordPress (Plugins → Añadir nuevo →\n' +
+      '  Subir plugin) y activalo. Si ya estaba instalado, el nuevo reemplaza al\n' +
+      '  anterior: el plugin no guarda estado propio.\n\n' +
+      (despues[config.mode ?? 'front-page'] ?? '')
   );
 }
 

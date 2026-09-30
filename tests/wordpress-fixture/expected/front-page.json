@@ -1,0 +1,14 @@
+{
+  "que_es": "Huella sha256 de cada archivo que produce el modo front-page sobre el fixture, generada con la implementacion anterior al refactor por modos. Se normalizan los finales de linea y se quita la linea que declara el modo.",
+  "como_se_regenera": "node scripts/snapshot-wordpress-front-page.mjs",
+  "archivos": {
+    "assets/wordpress-isolation.css": "75380146c27ce65dcc4a0f7098e58de3765e429e76dc9cf4b0505545fe8fe312",
+    "dist/_astro/portada.css": "f9a9d0e15f3384a1615ed7c6721de42c08180f21b037ac52604fcfd2488aa287",
+    "dist/_astro/portada.js": "28329c0e27f47d2fc91f7c56d4fc2d90927ea2b6f4f69633d2e6cde8709f7966",
+    "dist/assets/favicon.svg": "6e13a6a2435e70aaa71ac74ecfb86f41a53ab092e08ee8e50316ff30dead3be0",
+    "dist/assets/hero.svg": "6e13a6a2435e70aaa71ac74ecfb86f41a53ab092e08ee8e50316ff30dead3be0",
+    "portada-fixture.php": "6b62ad11320137f12e305f7de97fa6eb00ba16dbf55e3f6f55eea3d8c3418935",
+    "readme.txt": "b0bf64dfd8c86ac63dc98b43fefd58162ed3dbf512e6fdafae70489600b7539f",
+    "templates/front-page.php": "899c9175695a47580065219896b3e85dd907ddd031fc54a7f15ebb3e8752b0d4"
+  }
+}

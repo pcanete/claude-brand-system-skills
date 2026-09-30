@@ -2,6 +2,88 @@
 
 ## Unreleased
 
+`wordpress-publisher` 0.6.0 — cuatro formas de entrar en WordPress
+
+El skill sabia hacer una sola cosa: reemplazar la portada. Es la que mas se usa
+y la que menos supuestos hace, pero no es la unica que aparece en un rediseño
+real. Faltaban tres, y sin ellas cada caso nuevo se resolvia a mano.
+
+Ahora el alcance lo declara `mode`:
+
+- **`front-page`** — la portada, como hasta hoy.
+- **`page-template`** — plantillas que el cliente elige desde *Pagina >
+  Atributos > Plantilla*, **sin tema hijo**. Dos variantes: `canvas` se queda con
+  el documento entero; `theme` deja la cabecera y el pie del cliente en su lugar.
+- **`embedded-page`** — un shortcode que inserta la pieza dentro del contenido,
+  con varias piezas por paquete y los assets encolados solo donde aparece.
+- **`elementor-widgets`** — widgets propios, y solo para lo que de verdad tiene
+  que ser editable o dinamico.
+
+**Una configuracion sin `mode` significa portada**, y eso no va a cambiar: es la
+forma del archivo que ya esta instalada en sitios vivos.
+
+### Que impide que esto se vuelva un constructor de paginas
+
+El riesgo del modo de Elementor es obvio: que todo termine fragmentado en
+widgets porque Elementor esta instalado. Dos compuertas lo frenan, y las dos son
+la misma idea dicha de dos maneras.
+
+Un widget que se llama como un ladrillo —heading, parrafo, icono, espaciador,
+boton— no exporta: Elementor ya los trae, y hacer los propios es la forma mas
+rapida de que el diseño se desarme. Y **un widget que no declara ningun control
+de contenido ni ninguna fuente de datos tampoco exporta**: si no se puede nombrar
+lo que cambia, ese componente muestra siempre lo mismo y vive mejor en la pagina
+compilada.
+
+`references/modos.md` documenta el arbol completo, e incluye el caso que mas se
+confunde: cuando el contenido cambia solo —precios, productos, ultimas
+entradas— pero nadie va a mover nada, **eso no es un widget**. Es la pagina
+compilada leyendo datos por `wp-json`, que es lo que `runtime_content` con
+`owner: cms` ya declaraba en el blueprint. Sin escribirlo, la decision cae en
+Elementor por descarte, que es exactamente lo que hay que evitar.
+
+### El aislamiento se mide
+
+Los tres modos nuevos conviven con el tema del cliente en el mismo documento.
+Eso obliga a acotar el CSS compilado bajo una raiz propia, incluidos los
+`<style>` en linea, porque una regla sobre `body` no distingue entre la pieza y
+la cabecera que estaba ahi antes.
+
+La transformacion no es exacta y no pretende serlo. Lo que la vuelve confiable
+es lo que viene despues: **`audit-foreign-css.mjs` mide el resultado y el paquete
+no sale si queda una sola regla fuera de la raiz.** La herramienta que juzga es
+la que se escribio para el problema inverso —decidir que CSS ajeno entra en la
+portada—, asi que no comparte los puntos ciegos de la que transforma. Hay una
+prueba que inyecta una regla global y exige que el validador la rechace, y otra
+que confirma que el mismo paquete sano vuelve a pasar.
+
+De paso, el auditor dejo de contar los fotogramas de un `@keyframes` como reglas
+globales: `from` y `to` no son selectores.
+
+### Compatibilidad
+
+"No rompi nada" es una afirmacion que se mide o no vale nada. Hay una linea base
+congelada —huella de cada archivo que producia la implementacion anterior sobre
+el fixture— y la revision del repositorio falla si el modo `front-page` cambia un
+solo byte. Regenerarla es un acto deliberado, con el diff a la vista en el
+commit.
+
+### Tres cosas que aparecieron leyendo
+
+- **El plugin generado ahora se defiende de su propia copia duplicada.** Dos
+  carpetas con el mismo plugin activas declaran las mismas funciones y PHP corta
+  con *Cannot redeclare*. El guard existia en un proyecto y nunca habia vuelto al
+  skill, asi que todo paquete generado repetia el error.
+- **La cabecera y la constante de version tienen que coincidir.** Si divergen, el
+  navegador puede servir el CSS viejo sobre el HTML nuevo y el sitio se ve mal
+  sin que nada este roto.
+- **Los `.html` ya no viajan en el paquete.** Quedaban accesibles por URL
+  directa: una copia cruda de la misma pagina, sin plantilla ni canonica, que
+  Google puede indexar.
+
+Y `readme.txt`, que era una plantilla generica, dejo de llevar adentro el
+changelog de un cliente.
+
 `reference-to-astro` 1.5.0 — dos preguntas que llegaban tarde
 
 La pregunta "¿esto termina en WordPress?" aparecia recien al empaquetar, cuando

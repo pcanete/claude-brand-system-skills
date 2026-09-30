@@ -46,6 +46,8 @@ const INVASIVE = new Set([
 // Selectores que alcanzan a la pagina entera aunque no nombren un contenedor.
 const RAIZ = /^(html|body|:root|\*|h[1-6]|p|a|ul|ol|li|img|button|input|select|textarea)\b/i;
 
+const KEYFRAMES = /^@(?:-\w+-)?keyframes\b/i;
+
 export function parseSelectors(css) {
   const reglas = [];
   const contexto = [];   // condiciones @media/@supports activas
@@ -87,9 +89,17 @@ export function parseSelectors(css) {
       const cuerpo = css.slice(i + 1, j - 1).trim();
       const condicion = contexto.length ? contexto[contexto.length - 1] : null;
 
-      for (const selector of titulo.split(',')) {
-        const limpio = selector.trim();
-        if (limpio) reglas.push({ selector: limpio, cuerpo, condicion });
+      // Adentro de un @keyframes los bloques no son reglas: `from`, `to` y
+      // `50%` son fotogramas, no selectores. Contarlos como reglas globales
+      // infla el informe con ruido que nadie puede accionar, y arruina
+      // cualquier comprobacion que exija cero reglas fuera del alcance.
+      const enFotogramas = contexto.some((nivel) => KEYFRAMES.test(nivel));
+
+      if (!enFotogramas) {
+        for (const selector of titulo.split(',')) {
+          const limpio = selector.trim();
+          if (limpio) reglas.push({ selector: limpio, cuerpo, condicion });
+        }
       }
 
       i = j;

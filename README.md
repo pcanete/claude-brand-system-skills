@@ -86,7 +86,7 @@ revisión del repositorio falla.
 | `reference-lab-builder` | ¿Entendimos el sistema visual antes de aplicarlo? | Laboratorio neutro, aprobado |
 | `reference-to-astro` | ¿Cómo se reconstruye con el contenido del cliente? | `SITE_BLUEPRINT` aprobado, luego proyecto Astro verificado |
 | `visual-tuning-kit` | ¿Cómo se afina sin volver a tocar el código? | Valores aprobados que se compilan |
-| `wordpress-publisher` | ¿Cómo entra esta portada en un WordPress vivo? | Plugin instalable y verificado |
+| `wordpress-publisher` | ¿Cómo entra este diseño en un WordPress vivo? | Plugin instalable y verificado, en el alcance que corresponda |
 
 Cada uno se instala por separado. Los contratos compartidos viajan duplicados a
 propósito, y la revisión del repositorio falla si las copias derivan.

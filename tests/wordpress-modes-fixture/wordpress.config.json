@@ -1,0 +1,13 @@
+{
+  "slug": "sistema-paginas",
+  "name": "Sistema Paginas",
+  "description": "Fixture sintetico para verificar los modos.",
+  "author": "Fixture",
+  "version": "0.1.0",
+  "mode": "page-template",
+  "variant": "canvas",
+  "pages": [
+    { "id": "inicio", "label": "Inicio compilado", "source": "dist/index.html" },
+    { "id": "producto-x", "label": "Producto X" }
+  ]
+}
