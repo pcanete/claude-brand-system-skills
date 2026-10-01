@@ -1085,6 +1085,14 @@ const modosAVerificar = [
       if (!principal.includes("add_filter( 'theme_page_templates'")) {
         fail("El modo page-template no registra sus plantillas sin tema hijo");
       }
+      // La plantilla imprime el cuerpo compilado sin preguntar nada: tomar una
+      // pagina protegida seria publicar lo que el cliente decidio cerrar.
+      if (!principal.includes("post_password_required()")) {
+        fail("El modo page-template toma paginas protegidas con contraseña");
+      }
+      if (!principal.includes("is_singular( 'page' )")) {
+        fail("El modo page-template no se limita a paginas");
+      }
       const plantilla = read(path.join(pluginDir, "templates", "page-producto-x.php"));
       for (const hook of ["wp_head()", "wp_body_open()", "wp_footer()"]) {
         if (!plantilla.includes(hook)) fail(`La variante canvas perdio ${hook}`);
@@ -1241,6 +1249,71 @@ runNode(
   "El paquete incrustable sano fue rechazado: la prueba de aislamiento paso por el motivo equivocado",
   [validador, "--plugin", pluginDeFuga, "--config", configDeFuga],
   { cwd: proyectoFuga }
+);
+
+// Medir el resultado no alcanza para todo. Hay formas de CSS que el auditor
+// tampoco ve, y para esas el acotador tiene que negarse: si las transforma a
+// ciegas, produce justo la fuga que las dos compuertas existen para evitar.
+const { acotarCss } = await import(
+  pathToFileURL(path.join(root, "skills", "wordpress-publisher", "lib", "css-scope.mjs")).href
+);
+const { auditar } = await import(
+  pathToFileURL(
+    path.join(root, "skills", "wordpress-publisher", "scripts", "audit-foreign-css.mjs")
+  ).href
+);
+
+const cssQueDebeRechazarse = [
+  ["un @import, que trae una hoja que nadie miro", '@import url("otra.css");.x{color:red}'],
+  ["una regla anidada, que vive donde nadie mira", ".x{color:red;body{margin:0}}"],
+  ["una at-rule que no sabe tratar", "@scope (.a) to (.b){body{margin:0}}"],
+  ["un selector con dos raices", "html.dark body{color:red}"],
+  ["una raiz envuelta con varios argumentos", ":where(html, body){margin:0}"]
+];
+
+for (const [etiqueta, css] of cssQueDebeRechazarse) {
+  let acoto = false;
+  try {
+    acotarCss(css, ".r");
+    acoto = true;
+  } catch (error) {
+    if (error.name !== "CssNoAcotable") {
+      fail(`El acotador fallo por otra razon ante ${etiqueta}: ${error.message}`);
+    }
+  }
+  if (acoto) fail(`El acotador de CSS acepto ${etiqueta} en vez de rechazarlo`);
+}
+
+// Y hace falta que se niegue, porque medir despues no lo detecta. Si alguna vez
+// el auditor aprende a ver estos casos, esta comprobacion falla y el rechazo se
+// puede aflojar — que es la unica razon honesta para aflojarlo.
+for (const [etiqueta, css] of [
+  ["una regla anidada", ".r .x{color:red;body{margin:0}}"],
+  ["un selector con dos raices mal reescrito", ".r.dark body{color:red}"]
+]) {
+  if (auditar(css, { scope: ".r" }).globales !== 0) {
+    fail(
+      `El auditor ahora si ve ${etiqueta}: revisar si el rechazo del acotador sigue siendo necesario`
+    );
+  }
+}
+
+// De punta a punta: una hoja del build con un selector de dos raices tiene que
+// frenar la exportacion, no colarse en el paquete.
+const proyectoRaro = proyectoDeModos({
+  ...baseDeModos,
+  slug: "modo-raro",
+  mode: "embedded-page",
+  pages: paginasDeModos
+});
+
+const cssDelFixture = path.join(proyectoRaro, "dist", "_astro", "sistema.css");
+fs.writeFileSync(cssDelFixture, `${read(cssDelFixture)}\nhtml.dark body{color:red}\n`);
+
+runNode(
+  "Una hoja que el acotador no entiende se exporto igual",
+  [exportador, "--project", proyectoRaro],
+  { expect: "fail", cwd: proyectoRaro }
 );
 
 // Las compuertas de la configuracion. Cada una existe por una razon que se

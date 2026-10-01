@@ -66,7 +66,20 @@ export async function acotarCssEmpaquetado(pluginDistDir, raiz) {
 
     const archivo = path.join(pluginDistDir, relativa);
     const fuente = await readFile(archivo, 'utf8');
-    await writeFile(archivo, acotarCss(fuente, raiz), 'utf8');
+
+    let acotada;
+    try {
+      acotada = acotarCss(fuente, raiz);
+    } catch (error) {
+      if (error.name !== 'CssNoAcotable') throw error;
+      // El mensaje tiene que decir en qué archivo, o la corrección empieza por
+      // buscarlo a mano entre las hojas del build.
+      throw new Error(
+        `dist/${relativa.replaceAll('\\', '/')}: ${error.detalle}\n  ${error.salida}`
+      );
+    }
+
+    await writeFile(archivo, acotada, 'utf8');
     tocadas.push(relativa.replaceAll('\\', '/'));
   }
 

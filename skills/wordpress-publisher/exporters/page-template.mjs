@@ -78,7 +78,7 @@ export async function preparar(contexto) {
 
       entrada.partes = partes;
       entrada.scripts = [...new Set([...partes.scripts, ...delCuerpo.scripts])];
-      entrada.cuerpo = acomodar(delCuerpo.resto, config);
+      entrada.cuerpo = acomodar(delCuerpo.resto, config, `el cuerpo de ${pagina.id}`);
 
       rutasDeAssets.push(...partes.estilos, ...entrada.scripts);
     }
@@ -158,9 +158,9 @@ export async function preparar(contexto) {
  * Deja un trozo de HTML listo para vivir adentro del documento del tema:
  * los estilos en línea acotados, y las rutas apuntando al plugin.
  */
-function acomodar(html, config) {
+function acomodar(html, config, donde) {
   return reescribirUrlsDeAssets(
-    acotarEstilosEnLinea(render(html, config), alcanceAislamiento(config)),
+    acotarEstilosEnLinea(render(html, config), alcanceAislamiento(config), donde),
     config
   );
 }
@@ -177,7 +177,7 @@ function cabeceraSuelta(resto, config, pagina) {
     '',
     "defined( 'ABSPATH' ) || exit;",
     '?>',
-    acomodar(resto, config),
+    acomodar(resto, config, `el head de ${pagina.id}`),
     ''
   ].join('\n');
 }

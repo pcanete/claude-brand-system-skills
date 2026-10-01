@@ -3,7 +3,7 @@ name: wordpress-publisher
 description: Convierte un sitio Astro ya construido en un plugin de WordPress, en el alcance que haga falta: reemplazar la portada, registrar plantillas de página que el cliente elige desde el panel, insertar piezas con un shortcode, o aportar widgets de Elementor para lo que de verdad tiene que ser editable o dinámico. Genera el paquete, verifica que sea instalable y produce un ZIP. Usar cuando el diseño nuevo tiene que convivir con un WordPress existente en lugar de reemplazarlo. No usar para publicar un sitio estático completo, que no necesita WordPress en el medio.
 license: MIT
 metadata:
-  version: "0.6.0"
+  version: "0.6.1"
 ---
 
 # WordPress Publisher
@@ -29,27 +29,38 @@ El principio que la ordena:
 > dinámico. Código generado para lo que necesita máxima fidelidad, libertad
 > visual y no necesita edición granular.
 
+La decisión real es **por qué ruta entra el diseño**, y este skill cubre cuatro
+de las rutas posibles, no todas:
+
 | Modo | Qué ocupa | Cuándo |
 | --- | --- | --- |
 | `front-page` | la portada pública | el rediseño es la portada, y el resto del sitio sigue igual |
 | `page-template` | plantillas que el cliente elige en *Página > Atributos* | varias páginas compiladas, conectadas desde el panel |
 | `embedded-page` | un shortcode adentro del contenido | una pieza dentro de una página que el cliente ya administra |
-| `elementor-widgets` | widgets propios en el constructor | alguien va a editar ese componente adentro de Elementor |
+| `elementor-widgets` | widgets propios en el constructor | el cliente edita ese componente y los widgets de fábrica no alcanzan |
 
-**Las cinco preguntas, los casos y el árbol completo están en
-[`references/modos.md`](references/modos.md).** Leerlo antes de escribir la
-configuración. Dos reglas de ahí que conviene tener presentes acá:
+**El mapa completo —las siete rutas, las cinco preguntas y los casos A a G—
+está en [`references/modos.md`](references/modos.md).** Leerlo antes de escribir
+la configuración, porque tres de esas rutas no son modos de este skill y se
+eligen igual.
+
+Dos reglas de ahí que conviene tener presentes acá:
 
 - **Nunca elegir Elementor porque esté instalado.** La pregunta es si alguien va
   a editar ahí adentro, y hay que poder nombrarlo.
 - **Nunca fragmentar un diseño terminado.** Lo que llegó resuelto del build se
   queda resuelto.
 
-Y el caso que más se confunde: cuando el contenido cambia solo —precios,
-productos, últimas entradas— pero nadie va a mover nada, **eso no es un widget**.
-Es la página compilada leyendo datos por `wp-json`, declarado en el blueprint del
-sitio como `runtime_content` con `owner: cms`. Resolverlo con widgets fragmenta
-un diseño que no necesitaba fragmentarse.
+Y las dos rutas que se saltean más seguido, las dos por el mismo reflejo de
+pasar de "compilado" a "widget propio" como si no hubiera nada en el medio:
+
+- **Si el componente se puede armar con los widgets que Elementor ya trae, se
+  arma así** y este skill no participa de esa región. Un widget propio sólo
+  agrega código para mantener.
+- **Si el contenido cambia solo** —precios, productos, últimas entradas— y nadie
+  va a mover nada, eso tampoco es un widget: es la página compilada leyendo
+  datos por `wp-json`, declarado en el blueprint como `runtime_content` con
+  `owner: cms`.
 
 ## Uso
 
@@ -141,6 +152,17 @@ entero, como la portada. `theme` deja la cabecera y el pie del cliente en su
 lugar y aporta sólo el cuerpo — con lo que eso implica: el CSS compilado viaja
 acotado bajo una raíz propia, y los assets se encolan en vez de imprimirse.
 
+`theme` depende de que el tema implemente `get_header()` y `get_footer()`, que es
+lo normal en un tema clásico. **Un tema de bloques puede no tenerlas y dejar la
+página sin cabecera ni pie:** comprobarlo en staging, y si no las ofrece, usar
+`canvas`.
+
+Dos cosas que este modo no toma, a propósito: las **páginas protegidas con
+contraseña** —las sigue resolviendo WordPress, porque la plantilla imprime el
+cuerpo compilado sin preguntar nada— y cualquier ruta que no sea una página
+singular, incluida la tienda de WooCommerce, que es un archivo aunque tenga una
+página asignada.
+
 ### `embedded-page`
 
 ```json
@@ -213,6 +235,12 @@ que no son opcionales:
 - **acota el CSS compilado** bajo una raíz propia, incluidos los `<style>` en
   línea. Una regla sobre `body` no distingue entre la pieza y la cabecera del
   cliente;
+- **rechaza, con archivo y salida, el CSS que no sabe acotar**: un `@import` —que
+  trae una hoja que nadie miró—, una regla anidada, una at-rule desconocida, o un
+  selector del que queda una raíz suelta. No es conservadurismo: son justo los
+  casos que la auditoría posterior **tampoco** ve, porque los lee como el cuerpo
+  de otra regla. Transformarlos a ciegas produce la única fuga que ninguna
+  compuerta detecta;
 - **saca los módulos del cuerpo** para encolarlos. Astro deja sus scripts
   cerrando el `<body>`; si viajan adentro del fragmento, dos inserciones en la
   misma página ejecutan el mismo módulo dos veces.

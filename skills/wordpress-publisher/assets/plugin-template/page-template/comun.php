@@ -27,7 +27,17 @@ add_filter( 'theme_page_templates', '{{fn_prefix}}_registrar_plantillas' );
  * Que plantilla propia pidio la pagina actual, si es que pidio alguna.
  */
 function {{fn_prefix}}_plantilla_elegida() {
+	// Solo paginas, y solo las que pidieron una plantilla propia. Las rutas de
+	// archivo -incluida la tienda de WooCommerce, que es un archivo aunque tenga
+	// una pagina asignada- no son `is_singular('page')` y no pasan por aca.
 	if ( ! is_singular( 'page' ) ) {
+		return null;
+	}
+
+	// Una pagina protegida con contraseña la sigue resolviendo WordPress. Esta
+	// plantilla imprime el cuerpo compilado sin preguntar nada: tomarla seria
+	// publicar el contenido que el cliente decidio cerrar.
+	if ( post_password_required() ) {
 		return null;
 	}
 

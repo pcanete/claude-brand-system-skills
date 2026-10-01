@@ -2,6 +2,54 @@
 
 ## Unreleased
 
+`wordpress-publisher` 0.6.1 — el mapa completo, y lo que el acotador no sabe hacer
+
+**Endurece una compuerta.** El esquema no cambia y ninguna configuracion deja de
+valer, pero **una hoja de estilos que ayer se exportaba hoy puede ser
+rechazada**: el acotador de CSS dejo de transformar a ciegas lo que no entiende.
+
+Rechaza cuatro cosas, con archivo y con salida: un `@import` —que trae una hoja
+que este acotador nunca ve—, una regla anidada, una at-rule que no sabe tratar, y
+un selector del que queda una raiz suelta despues de reescribirlo (`html.dark
+body`, `:where(html, body)`).
+
+No es conservadurismo. Son exactamente los casos que la auditoria posterior
+**tampoco** ve: una regla anidada vive dentro de lo que las dos herramientas leen
+como el cuerpo de declaraciones de su regla madre, y un selector mal reescrito
+empieza con la clase raiz, asi que el auditor lo cuenta como acotado. Medir
+despues no alcanza cuando lo que hay que medir esta en un punto ciego comun.
+Hay una prueba que lo demuestra: verifica que el auditor devuelve cero reglas
+globales sobre esos casos, y si algun dia aprende a verlos, falla — que es la
+unica razon honesta para aflojar el rechazo.
+
+### El mapa de rutas, no la lista de modos
+
+`references/modos.md` pasa de documentar cuatro modos a documentar **siete
+rutas**, con el estado de cada una. Tres no son modos de este skill y se eligen
+igual; una ruta que no figura se resuelve a mano y sin que nadie la revise.
+
+La que faltaba reconocer es **Elementor nativo**: armar el componente con los
+widgets que Elementor ya trae, sin codigo propio. El reflejo es saltar de
+compilado a widget propio como si no hubiera nada en el medio, y casi siempre lo
+hay. Si el componente se puede armar con lo que ya existe, un widget propio solo
+agrega codigo para mantener.
+
+Tambien quedan en el mapa, declaradas como no implementadas acá: los datos en
+vivo sobre pagina compilada (`runtime_content` con `owner: cms`) y entregar un
+contrato portable a un ejecutor que lo implemente nativamente.
+
+### Una pagina protegida con contraseña ya no se publica sola
+
+El modo `page-template` tomaba cualquier pagina con la plantilla asignada,
+incluidas las protegidas con contraseña. La plantilla imprime el cuerpo
+compilado sin preguntar nada, asi que tomarla era publicar el contenido que el
+cliente decidio cerrar. Ahora esas paginas las sigue resolviendo WordPress.
+
+Y queda escrito lo que el modo nunca toma: ninguna ruta que no sea una pagina
+singular, incluida la tienda de WooCommerce, que es un archivo aunque tenga una
+pagina asignada. La variante `theme` ademas depende de `get_header()` y
+`get_footer()`: un tema de bloques puede no tenerlas, y entonces va `canvas`.
+
 `wordpress-publisher` 0.6.0 — cuatro formas de entrar en WordPress
 
 El skill sabia hacer una sola cosa: reemplazar la portada. Es la que mas se usa

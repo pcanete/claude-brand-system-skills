@@ -68,9 +68,9 @@ function fragmento(cuerpo, config, pagina, resto) {
  * Deja un trozo de HTML listo para vivir adentro de una página ajena:
  * los estilos en línea acotados, y las rutas apuntando al plugin.
  */
-function acomodar(html, config) {
+function acomodar(html, config, donde) {
   return reescribirUrlsDeAssets(
-    acotarEstilosEnLinea(render(html, config), alcanceAislamiento(config)),
+    acotarEstilosEnLinea(render(html, config), alcanceAislamiento(config), donde),
     config
   );
 }
@@ -107,10 +107,10 @@ export async function preparar(contexto) {
     archivos.push({
       ruta: `fragments/${pagina.id}.php`,
       contenido: fragmento(
-        acomodar(cuerpo, config),
+        acomodar(cuerpo, config, `el cuerpo de ${pagina.id}`),
         config,
         pagina,
-        partes.resto ? acomodar(partes.resto, config) : ''
+        partes.resto ? acomodar(partes.resto, config, `el head de ${pagina.id}`) : ''
       )
     });
 
